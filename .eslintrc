@@ -1,0 +1,16 @@
+{
+  "extends": "standard",
+  "rules": {
+    "semi": [2, "never"],
+    "camelcase": 0,
+    "space-before-function-paren": ["off", "always"]
+  },
+  "parserOptions": {
+    "ecmaVersion": 8,
+    "sourceType": "module"
+  },
+  "env": {
+    "node": true,
+    "mocha": true
+  }
+}

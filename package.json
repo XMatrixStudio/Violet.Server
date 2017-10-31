@@ -1,0 +1,48 @@
+{
+  "name": "violet.server",
+  "version": "1.0.0",
+  "description": "Violet Server",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XMatrixStudio/Violet.Server.git"
+  },
+  "keywords": [
+    "Violet"
+  ],
+  "author": "zhenlychen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/XMatrixStudio/Violet.Server/issues"
+  },
+  "homepage": "https://github.com/XMatrixStudio/Violet.Server#readme",
+  "dependencies": {
+    "fs-extra": "^4.0.2",
+    "kcors": "^2.2.1",
+    "koa": "^2.3.0",
+    "koa-bodyparser": "^4.2.0",
+    "koa-helmet": "^3.2.0",
+    "koa-router": "^7.2.1",
+    "koa-session": "^5.5.0",
+    "require-indexify": "^1.0.0",
+    "winston": "^2.4.0",
+    "winston-daily-rotate-file": "^1.7.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.10.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-html": "^3.2.2",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "koa-morgan": "^1.0.1"
+  }
+}
