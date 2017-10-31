@@ -8,7 +8,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "dev"
+    "test": "node ./index.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,7 @@
     "koa-helmet": "^3.2.0",
     "koa-router": "^7.2.1",
     "koa-session": "^5.5.0",
+    "mongoose": "^4.12.5",
     "require-indexify": "^1.0.0",
     "winston": "^2.4.0",
     "winston-daily-rotate-file": "^1.7.2"
