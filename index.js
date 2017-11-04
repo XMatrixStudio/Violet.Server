@@ -39,4 +39,4 @@ app.on('error', error => {
 
 app.listen(process.env.PORT || 30002)
 
-console.log('Listen in port ', 30002)
+console.log('Listen at port ', 30002)
