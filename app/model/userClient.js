@@ -8,4 +8,4 @@ let authSchema = db.Schema({
     achievement: [String]
   }]
 }, { collection: 'userClients' })
-let authDB = db.model('userClients', authSchema)
+let AuthDB = db.model('userClients', authSchema)

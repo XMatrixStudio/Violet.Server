@@ -9,4 +9,4 @@ let devSchema = db.Schema({
     url: String
   }]
 }, { collection: 'devClients' })
-let devDB = db.model('devClients', devSchema)
+let DevDB = db.model('devClients', devSchema)

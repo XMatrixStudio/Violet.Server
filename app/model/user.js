@@ -1,12 +1,13 @@
 const db = require('../../lib/mongo')
-const verify = require('../../lib/verify')
 const userSchema = db.Schema({
   email: String,
   name: String,
   nikeName: String,
   password: String,
+  salt: String,
   valid: Boolean,
   exp: Number,
+  class: Number,
   detail: {
     web: String,
     phone: Number,
@@ -14,31 +15,128 @@ const userSchema = db.Schema({
     sex: Number,
     birthDate: Date,
     location: String,
-    avatar: String,
-    class: Number
-  }
+    avatar: String
+  },
+  vCode: Number,
+  emailTime: Date
 }, { collection: 'users' })
-const userDB = db.model('users', userSchema)
+const UserDB = db.model('users', userSchema)
+
+exports.addUser = async(userEmail, userName, userPassword, userSalt) => {
+  try {
+    let user = new UserDB({
+      email: userEmail,
+      nikeName: userName,
+      name: userName.toString().toLowerCase(),
+      password: userPassword,
+      salt: userSalt
+    })
+    let result = await user.save()
+    return result._id
+  } catch (error) {
+    return false
+  }
+}
 
 exports.getById = async userId => {
-  let user = await userDB.findById(userId)
-  return user
+  try {
+    let user = await UserDB.findById(userId)
+    if (user === null) throw new Error('null')
+    return user
+  } catch (error) {
+    return false
+  }
 }
 
-exports.getByName = async(userName) => {
-  let user = await userDB.findOne({ name: userName })
-  return user
+exports.getByName = async userName => {
+  try {
+    let user = await UserDB.findOne({ name: userName })
+    if (user === null) throw new Error('null')
+    return user
+  } catch (error) {
+    return false
+  }
 }
 
-exports.getByEmail = async(userEmail) => {
-  let user = await userDB.findOne({ email: userEmail })
-  return user
+exports.getByEmail = async userEmail => {
+  try {
+    let user = await UserDB.findOne({ email: userEmail })
+    if (user === null) throw new Error('null')
+    return user
+  } catch (error) {
+    return false
+  }
+}
+
+async function setById(userId, name, value) {
+  let user = await exports.getById(userId)
+  if (!user) return false
+  user[name] = value
+  await user.save()
+  return true
+}
+
+exports.validById = async userId => {
+  let result = await setById(userId, 'valid', true)
+  return result
+}
+
+exports.setExpById = async(userId, value) => {
+  let result = await setById(userId, 'exp', value)
+  return result
+}
+
+exports.setClassById = async(userId, value) => {
+  let result = await setById(userId, 'class', value)
+  return result
+}
+
+exports.setVCodeById = async(userId, value) => {
+  let result = await setById(userId, 'vCode', value)
+  return result
+}
+
+exports.setEmailTimeById = async(userId, value) => {
+  let result = await setById(userId, 'emailTime', value)
+  return result
+}
+
+exports.setPasswordByEmail = async(userEmail, password, userSalt) => {
+  let user = await exports.getByEmail(userEmail)
+  if (!user) return false
+  user.password = password
+  user.salt = userSalt
+  await user.save()
+  return true
+}
+
+exports.changeExpById = async(userId, value) => {
+  let user = await exports.getById(userId)
+  if (!user) return false
+  user.exp += value
+  await user.save()
+  return true
+}
+
+exports.setDetailById = async(userId, data) => {
+  let user = await exports.getById(userId)
+  if (!user) return false
+  if (data.web) user.detail.web = data.web
+  if (data.phone) user.detail.phone = data.phone
+  if (data.info) user.detail.info = data.info
+  if (data.sex) user.detail.sex = data.sex
+  if (data.birthDate) user.detail.birthDate = data.birthDate
+  if (data.location) user.detail.location = data.location
+  if (data.avatar) user.detail.avatar = data.avatar
+  await user.save()
+  return true
 }
 
 /*
 async function test(params) {
-  let user = await exports.getByName('ZhenlyChen')
+  let user = await exports.addUser('zhenlychen@qq.com', 'zhenly', 'abcde')
   console.log(user)
 }
 
-test(); */
+test()
+*/

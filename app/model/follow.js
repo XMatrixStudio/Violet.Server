@@ -4,4 +4,4 @@ let followSchema = db.Schema({
   followers: [String],
   following: [String]
 }, { collection: 'follow' })
-let followDB = db.model('follow', followSchema)
+let FollowDB = db.model('follow', followSchema)

@@ -1,12 +1,47 @@
 const Router = require('koa-router')
+const user = require('./user')
+const util = require('./util')
+const assert = require('../../lib/assert')
+
+// 白名单列表
+// 凡是在此白名单 均不检查是否登陆
+
+const whiteList = {
+  get: {
+    '/v2/self/util/vCode': false
+  },
+  post: {
+    '/v2/self/user/login': false,
+    '/v2/self/user/register': false
+  }
+}
+
+// 处理函数
+const checkLogin = (isCheck, ctx, next) => {
+  if (!isCheck) ctx.state.passStatusCheck = true
+  return next()
+}
 
 let router = new Router()
 
-router.get('/api', (ctx) => {
-  console.log('hello', ctx.user(ctx))
-  ctx.session.userId = 1234
-  ctx.body = ctx.session.userId
-  ctx.state = 200
+// 对白名单里面的每个规则创建一个路由
+// 按需求检查登录状态
+for (const method in whiteList) {
+  for (const path in whiteList[method]) {
+    router[method](path, checkLogin.bind(null))
+  }
+}
+
+// 兜底判断，如果没有被白名单检查，则必须登录
+router.use('/v2/self/', async(ctx, next) => {
+  if (!ctx.state.passStatusCheck) {
+    assert(ctx.session.userId, 'invalid_token')
+    assert(ctx.session.remember || (new Date(ctx.session.time) - new Date()) >= 86400000, 'timeout_token')
+    if (!ctx.session.remember) ctx.session.time = new Date()
+  }
+  return next()
 })
 
+router.use('/v2/self/user', user.routes())
+router.use('/v2/self/util', util.routes())
 module.exports = router.routes()

@@ -1,0 +1,15 @@
+2017-10-6 17:17:6: TypeError: Cannot read property 'toString' of undefined
+    at new captchapng (D:\Project\XMatrixStudio\Violet\node_modules\captchapng2\lib\captchapng.js:19:36)
+    at Object.exports.getVCode (D:\Project\XMatrixStudio\Violet\lib\util.js:16:13)
+    at exports.getVCode (D:\Project\XMatrixStudio\Violet\app\controller\util.js:4:25)
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:44:32)
+    at next (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:45:18)
+    at D:\Project\XMatrixStudio\Violet\node_modules\koa-router\lib\router.js:345:16
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:44:32)
+    at D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:36:12
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\lib\router.js:350:31)
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-compose\index.js:42:32)
+    at next (D:\Project\XMatrixStudio\Violet\node_modules\koa-compose\index.js:43:18)
+    at bodyParser (D:\Project\XMatrixStudio\Violet\node_modules\koa-bodyparser\index.js:86:11)
+    at <anonymous>
+    at process._tickCallback (internal/process/next_tick.js:188:7) 
