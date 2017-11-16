@@ -22,7 +22,7 @@ exports.login = async ctx => {
 
 exports.register = async ctx => {
   let body = _.pick(ctx.request.body, ['name', 'email', 'userPass', 'vCode'])
-  verify({ data: body.email, type: 'string', regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, message: 'invalid_email' })
+  verify({ data: body.email, type: 'string', regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, maxLength: 64, message: 'invalid_email' })
   verify({ data: body.name, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{3,18}$/, message: 'invalid_name' })
   verify({ data: body.userPass, type: 'string', maxLength: 64, minLength: 6, message: 'invalid_password' })
   let regExp = /^[0-9]$/
@@ -30,5 +30,20 @@ exports.register = async ctx => {
   verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
   assert(ctx.session.vCode === body.vCode, 'error_code')
   await userService.register(body.email, body.name, body.userPass)
+  ctx.state = 200
+}
+
+exports.logout = async ctx => {
+  ctx.session.userId = null
+  ctx.state = 200
+}
+
+exports.changePassword = async ctx => {
+  let body = _.pick(ctx.request.body, ['email', 'password', 'vCode'])
+  verify({ data: body.email, type: 'string', regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, maxLength: 64, message: 'invalid_email' })
+  verify({ data: body.password, type: 'string', maxLength: 64, minLength: 6, message: 'invalid_password' })
+  verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
+  assert(ctx.session.vCode === body.vCode, 'error_code')
+  await userService.changePassword(body.email, body.password)
   ctx.state = 200
 }

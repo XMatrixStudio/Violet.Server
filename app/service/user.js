@@ -25,13 +25,24 @@ exports.login = async(userName, userPassword) => {
 
 exports.register = async(userEmail, userName, userPassword) => {
   let user = await userModel.getByEmail(userEmail.toString().toLowerCase())
-  assert(user === false, 'exist_email') // 用户邮箱已存在
+  assert(!user, 'exist_email') // 用户邮箱已存在
   user = await userModel.getByName(userName.toString().toLowerCase())
-  assert(user === false, 'exist_name') // 用户名已存在
-  let userSalt = util.rand()
-  userPassword = util.hash(userPassword)
-  userPassword = userPassword.toString().concat(userSalt)
-  userPassword = util.hash(userPassword)
-  await userModel.add(userEmail, userName, userPassword, userSalt)
-  return true
+  assert(!user, 'exist_name') // 用户名已存在
+  let data = hashPassword(userPassword)
+  await userModel.add(userEmail, userName, data.password, data.salt)
+}
+
+exports.changePassword = async(userEmail, userPassword) => {
+  let user = await userModel.getByEmail(userEmail.toString().toLowerCase())
+  assert(user, 'invalid_email') // 邮箱不存在
+  let data = hashPassword(userPassword)
+  await userModel.setPasswordByEmail(userEmail, data.password, data.salt)
+}
+
+function hashPassword(password) {
+  let result = {
+    salt: util.rand()
+  }
+  result.password = util.hash(util.hash(password).toString().concat(result.salt))
+  return result
 }

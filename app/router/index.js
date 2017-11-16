@@ -5,20 +5,19 @@ const assert = require('../../lib/assert')
 
 // 白名单列表
 // 凡是在此白名单 均不检查是否登陆
-
 const whiteList = {
   get: {
-    '/v2/self/util/vCode': false
+    '/v2/self/util/vCode': true
   },
   post: {
-    '/v2/self/user/login': false,
-    '/v2/self/user/register': false
+    '/v2/self/user/login': true,
+    '/v2/self/user/register': true
   }
 }
 
 // 处理函数
-const checkLogin = (isCheck, ctx, next) => {
-  if (!isCheck) ctx.state.passStatusCheck = true
+const withoutLogin = (ctx, next) => {
+  ctx.state.passStatusCheck = true
   return next()
 }
 
@@ -28,7 +27,7 @@ let router = new Router()
 // 按需求检查登录状态
 for (const method in whiteList) {
   for (const path in whiteList[method]) {
-    router[method](path, checkLogin.bind(null))
+    router[method](path, withoutLogin)
   }
 }
 

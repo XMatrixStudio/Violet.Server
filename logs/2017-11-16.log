@@ -1,0 +1,42 @@
+2017-10-16 20:14:2 WARN: AssertionError [ERR_ASSERTION]: invalid_token
+    at assert (D:\Project\XMatrixStudio\Violet\lib\assert.js:6:5)
+    at router.use (D:\Project\XMatrixStudio\Violet\app\router\index.js:38:5)
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:44:32)
+    at next (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:45:18)
+    at D:\Project\XMatrixStudio\Violet\node_modules\koa-router\lib\router.js:345:16
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:44:32)
+    at D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:36:12
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\lib\router.js:350:31)
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-compose\index.js:42:32)
+    at next (D:\Project\XMatrixStudio\Violet\node_modules\koa-compose\index.js:43:18)
+    at bodyParser (D:\Project\XMatrixStudio\Violet\node_modules\koa-bodyparser\index.js:86:11)
+    at <anonymous>
+    at process._tickCallback (internal/process/next_tick.js:188:7) 
+2017-10-16 20:17:15 WARN: AssertionError [ERR_ASSERTION]: invalid_token
+    at assert (D:\Project\XMatrixStudio\Violet\lib\assert.js:6:5)
+    at router.use (D:\Project\XMatrixStudio\Violet\app\router\index.js:38:5)
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:44:32)
+    at next (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:45:18)
+    at D:\Project\XMatrixStudio\Violet\node_modules\koa-router\lib\router.js:345:16
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:44:32)
+    at D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:36:12
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\lib\router.js:350:31)
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-compose\index.js:42:32)
+    at next (D:\Project\XMatrixStudio\Violet\node_modules\koa-compose\index.js:43:18)
+    at bodyParser (D:\Project\XMatrixStudio\Violet\node_modules\koa-bodyparser\index.js:86:11)
+    at <anonymous>
+    at process._tickCallback (internal/process/next_tick.js:188:7) 
+2017-10-16 20:18:36 WARN: AssertionError [ERR_ASSERTION]: invalid_token
+    at assert (D:\Project\XMatrixStudio\Violet\lib\assert.js:6:5)
+    at router.use (D:\Project\XMatrixStudio\Violet\app\router\index.js:39:5)
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:44:32)
+    at next (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:45:18)
+    at D:\Project\XMatrixStudio\Violet\node_modules\koa-router\lib\router.js:345:16
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:44:32)
+    at D:\Project\XMatrixStudio\Violet\node_modules\koa-router\node_modules\koa-compose\index.js:36:12
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-router\lib\router.js:350:31)
+    at dispatch (D:\Project\XMatrixStudio\Violet\node_modules\koa-compose\index.js:42:32)
+    at next (D:\Project\XMatrixStudio\Violet\node_modules\koa-compose\index.js:43:18)
+    at bodyParser (D:\Project\XMatrixStudio\Violet\node_modules\koa-bodyparser\index.js:86:11)
+    at <anonymous>
+    at process._tickCallback (internal/process/next_tick.js:188:7) 
