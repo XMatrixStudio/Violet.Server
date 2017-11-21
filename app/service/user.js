@@ -30,14 +30,25 @@ exports.register = async(userEmail, userName, userPassword) => {
   await userModel.add(userEmail, userName, data.password, data.salt)
 }
 
-exports.changePassword = async(userEmail, userPassword) => {
-  let user = await userModel.getByEmail(userEmail.toString().toLowerCase())
-  assert(user, 'invalid_email') // 邮箱不存在
+exports.changePassword = async(userEmail, userPassword, vCode) => {
+  await checkEmailCode(userEmail, vCode)
   let data = util.hashPassword(userPassword)
   await userModel.setPasswordByEmail(userEmail, data.password, data.salt)
 }
 
-exports.validEmail = async userId => {
-  let result = await userModel.validByEmail(userId)
+exports.validEmail = async(userEmail, vCode) => {
+  await checkEmailCode(userEmail, vCode)
+  let result = await userModel.validByEmail(userEmail)
   assert(result, 'invalid_email') // 邮箱不存在
+}
+
+async function checkEmailCode(userEmail, vCode) {
+  let user = await userModel.getByEmail(userEmail.toString().toLowerCase())
+  assert(user, 'invalid_email') // 用户邮箱不存在
+  assert(user.emailTime, 'timeout_vCode') // 还没有申请验证码
+  let time = new Date(user.emailTime)
+  assert(time.toString() !== 'Invalid Date', 'Invalid_Date_danger!') // 不应该发生的错误
+  assert(new Date() - time < 1000 * 60 * 10, 'timeout_vCode') // 十分钟的有效期
+  assert(user.emailCode === vCode, 'error_vCode') // 验证码错误
+  await userModel.setEmailTimeById(user._id, new Date('2000-1-1'))
 }

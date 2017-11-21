@@ -2,12 +2,13 @@ const Router = require('koa-router')
 const user = require('./user')
 const util = require('./util')
 const assert = require('../../lib/assert')
-const userModel = require('../model/user')
-  // 白名单列表
-  // 凡是在此白名单 均不检查是否登陆
+
+// 白名单列表
+// 凡是在此白名单 均不检查是否登陆
 const whiteList = {
   get: {
-    '/v2/self/util/vCode': true
+    '/v2/self/util/vCode': true,
+    '/v2/self/util/EmailCode': true
   },
   post: {
     '/v2/self/user/login': true,
@@ -37,9 +38,8 @@ router.use('/v2/self/', async(ctx, next) => {
     assert(ctx.session.userId, 'invalid_token')
     assert(ctx.session.remember || (new Date(ctx.session.time) - new Date()) >= 86400000, 'timeout_token')
     if (!ctx.session.remember) ctx.session.time = new Date()
-    let user = await userModel.getById(ctx.session.userId)
+    let user = await ctx.userData()
     assert(user, 'invalid_token')
-    ctx.context.user = user
   }
   return next()
 })

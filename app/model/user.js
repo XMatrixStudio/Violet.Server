@@ -17,7 +17,7 @@ const userSchema = db.Schema({
     location: String,
     avatar: String
   },
-  vCode: Number,
+  emailCode: Number,
   emailTime: Date
 }, { collection: 'users' })
 const UserDB = db.model('users', userSchema)
@@ -76,10 +76,6 @@ async function setById(userId, name, value) {
   return true
 }
 
-exports.validById = async userId => {
-  let result = await setById(userId, 'valid', true)
-  return result
-}
 
 exports.setExpById = async(userId, value) => {
   let result = await setById(userId, 'exp', value)
@@ -91,14 +87,22 @@ exports.setClassById = async(userId, value) => {
   return result
 }
 
-exports.setVCodeById = async(userId, value) => {
-  let result = await setById(userId, 'vCode', value)
+exports.setEmailCodeById = async(userId, value) => {
+  let result = await setById(userId, 'emailCode', value)
   return result
 }
 
 exports.setEmailTimeById = async(userId, value) => {
   let result = await setById(userId, 'emailTime', value)
   return result
+}
+
+exports.validByEmail = async userEmail => {
+  let user = await exports.getByEmail(userEmail)
+  if (!user) return false
+  user.valid = true
+  await user.save()
+  return true
 }
 
 exports.setPasswordByEmail = async(userEmail, password, userSalt) => {
