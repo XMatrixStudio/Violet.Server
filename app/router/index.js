@@ -8,7 +8,8 @@ const assert = require('../../lib/assert')
 const whiteList = {
   get: {
     '/v2/self/util/vCode': true,
-    '/v2/self/util/EmailCode': true
+    '/v2/self/util/EmailCode': true,
+    '/v2/self/util/ClientInfo/:clientId': true
   },
   post: {
     '/v2/self/user/login': true,

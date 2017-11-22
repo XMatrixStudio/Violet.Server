@@ -41,7 +41,7 @@ exports.addUser = async(userEmail, userName, userPassword, userSalt) => {
 exports.getById = async userId => {
   try {
     let user = await UserDB.findById(userId)
-    if (user === null) throw new Error('null')
+    if (!user) throw new Error('null')
     return user
   } catch (error) {
     return false
@@ -51,7 +51,7 @@ exports.getById = async userId => {
 exports.getByName = async userName => {
   try {
     let user = await UserDB.findOne({ name: userName })
-    if (user === null) throw new Error('null')
+    if (!user) throw new Error('null')
     return user
   } catch (error) {
     return false
@@ -61,7 +61,7 @@ exports.getByName = async userName => {
 exports.getByEmail = async userEmail => {
   try {
     let user = await UserDB.findOne({ email: userEmail })
-    if (user === null) throw new Error('null')
+    if (!user) throw new Error('null')
     return user
   } catch (error) {
     return false
@@ -75,7 +75,6 @@ async function setById(userId, name, value) {
   await user.save()
   return true
 }
-
 
 exports.setExpById = async(userId, value) => {
   let result = await setById(userId, 'exp', value)
@@ -135,12 +134,3 @@ exports.setDetailById = async(userId, data) => {
   await user.save()
   return true
 }
-
-/*
-async function test(params) {
-  let user = await exports.addUser('zhenlychen@qq.com', 'zhenly', 'abcde')
-  console.log(user)
-}
-
-test()
-*/

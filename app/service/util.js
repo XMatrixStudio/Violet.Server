@@ -1,4 +1,5 @@
 const userModel = require('../model/user')
+const clientModel = require('../model/devClient')
 const assert = require('../../lib/assert')
 
 exports.getEmailCode = async userEmail => {
@@ -13,4 +14,13 @@ exports.getEmailCode = async userEmail => {
   let code = parseInt(Math.random() * 900000 + 100000)
   await userModel.setEmailCodeById(user._id, code)
   await userModel.setEmailTimeById(user._id, time)
+}
+
+exports.getClientInfo = async clientId => {
+  let client = await clientModel.getClientById(clientId)
+  assert(client, 'error_clientId')
+  delete client.ownerId
+  delete client.key
+  delete client.data
+  return client
 }
