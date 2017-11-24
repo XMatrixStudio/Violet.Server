@@ -27,7 +27,14 @@ exports.register = async(userEmail, userName, userPassword) => {
   user = await userModel.getByName(userName.toString().toLowerCase())
   assert(!user, 'exist_name') // 用户名已存在
   let data = util.hashPassword(userPassword)
-  await userModel.add(userEmail, userName, data.password, data.salt)
+  let userId = await userModel.add()
+  await userModel.setById(userId, {
+    email: userEmail,
+    name: userName.toString().toLowerCase(),
+    nikeName: userName,
+    password: data.password,
+    salt: data.salt
+  })
 }
 
 exports.changePassword = async(userEmail, userPassword, vCode) => {
@@ -50,7 +57,7 @@ async function checkEmailCode(userEmail, vCode) {
   assert(time.toString() !== 'Invalid Date', 'Invalid_Date_danger!') // 不应该发生的错误
   assert(new Date() - time < 1000 * 60 * 10, 'timeout_vCode') // 十分钟的有效期
   assert(user.emailCode === vCode, 'error_vCode') // 验证码错误
-  await userModel.setDataById(user._id, {
+  await userModel.setById(user._id, {
     emailTime: new Date('2000-1-1')
   })
 }

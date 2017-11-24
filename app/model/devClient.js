@@ -13,7 +13,39 @@ let devSchema = db.Schema({
 }, { collection: 'devClients' })
 let DevDB = db.model('devClients', devSchema)
 
-exports.getClientById = async clientId => {
+exports.addAuthById = async(clientId, value) => {
+  try {
+    let client = await DevDB.findById(clientId)
+    if (!client) throw new Error('null')
+    client.data.authCount += value
+    await client.save()
+  } catch (error) {
+    return false
+  }
+}
+
+exports.addLoginById = async(clientId, value) => {
+  try {
+    let client = await DevDB.findById(clientId)
+    if (!client) throw new Error('null')
+    client.data.LoginCount += value
+    await client.save()
+  } catch (error) {
+    return false
+  }
+}
+
+exports.add = async() => {
+  try {
+    let client = new DevDB()
+    let result = await client.save()
+    return result._id
+  } catch (error) {
+    return false
+  }
+}
+
+exports.getById = async clientId => {
   try {
     let client = await DevDB.findById(clientId)
     if (!client) throw new Error('null')
@@ -23,24 +55,40 @@ exports.getClientById = async clientId => {
   }
 }
 
-exports.gitClientByOwner = async ownerId => {
-
+exports.getByOwner = async ownerId => {
+  try {
+    let clients = await DevDB.find({ ownerId: ownerId })
+    return clients
+  } catch (error) {
+    return false
+  }
 }
 
-exports.setDataById = async(clientId, data) => {
+exports.setById = async(clientId, data) => {
   try {
     let client = await DevDB.findById(clientId)
     if (!client) throw new Error('null')
-    if (data.name) client.name = data.name
-    if (data.ownerId) client.ownerId = data.ownerId
-    if (data.icon) client.icon = data.icon
-    if (data.key) client.key = data.key
-    if (data.url) client.url = data.url
-    if (data.detail) client.detail = data.detail
-    if (data.authCount) client.data.authCount = data.authCount
-    if (data.LoginCount) client.data.LoginCount = data.LoginCount
+    let names = ['name', 'ownerId', 'icon', 'key', 'url', 'detail']
+    for (let name of names) {
+      if (data[name]) client[name] = data[name]
+    }
+    if (data.data) {
+      let names = ['authCount', 'LoginCount']
+      for (let name of names) {
+        if (data[name]) client.data[name] = data[name]
+      }
+    }
     await client.save()
     return true
+  } catch (error) {
+    return false
+  }
+}
+
+exports.deleteById = async clientId => {
+  try {
+    let result = await DevDB.findByIdAndRemove(clientId)
+    return result
   } catch (error) {
     return false
   }

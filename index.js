@@ -22,9 +22,11 @@ app.use(require('koa-session')(config.session, app))
 app.use(require('koa-bodyparser')())
 
 // 获取用户信息
-app.context.userData = async ctx => {
-  let user = await userModel.getById(ctx.session.userId)
-  return user
+app.context.getUserData = async ctx => {
+  if (!ctx.state.userData) {
+    ctx.state.userData = await userModel.getById(ctx.session.userId)
+  }
+  return ctx.state.userData
 }
 
 // 路由

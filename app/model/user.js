@@ -22,7 +22,7 @@ const userSchema = db.Schema({
 }, { collection: 'users' })
 const UserDB = db.model('users', userSchema)
 
-exports.setDataById = async(userId, data) => {
+exports.setById = async(userId, data) => {
   try {
     let user = await UserDB.findById(userId)
     if (!user) throw new Error('null')
@@ -43,15 +43,9 @@ exports.setDataById = async(userId, data) => {
   }
 }
 
-exports.addUser = async(userEmail, userName, userPassword, userSalt) => {
+exports.add = async() => {
   try {
-    let user = new UserDB({
-      email: userEmail,
-      nikeName: userName,
-      name: userName.toString().toLowerCase(),
-      password: userPassword,
-      salt: userSalt
-    })
+    let user = new UserDB()
     let result = await user.save()
     return result._id
   } catch (error) {
@@ -102,14 +96,6 @@ exports.setPasswordByEmail = async(userEmail, password, userSalt) => {
   if (!user) return false
   user.password = password
   user.salt = userSalt
-  await user.save()
-  return true
-}
-
-exports.changeExpById = async(userId, value) => {
-  let user = await exports.getById(userId)
-  if (!user) return false
-  user.exp += value
   await user.save()
   return true
 }

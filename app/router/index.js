@@ -39,12 +39,12 @@ router.use('/v2/self/', async(ctx, next) => {
     assert(ctx.session.userId, 'invalid_token')
     assert(ctx.session.remember || (new Date(ctx.session.time) - new Date()) >= 86400000, 'timeout_token')
     if (!ctx.session.remember) ctx.session.time = new Date()
-    let user = await ctx.userData()
+    let user = await ctx.getUserData()
     assert(user, 'invalid_token')
   }
   return next()
 })
 
-router.use('/v2/self/user', user.routes())
+router.use('/v2/self/users', user.routes())
 router.use('/v2/self/util', util.routes())
 module.exports = router.routes()
