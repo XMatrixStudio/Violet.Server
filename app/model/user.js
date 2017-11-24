@@ -22,6 +22,27 @@ const userSchema = db.Schema({
 }, { collection: 'users' })
 const UserDB = db.model('users', userSchema)
 
+exports.setDataById = async(userId, data) => {
+  try {
+    let user = await UserDB.findById(userId)
+    if (!user) throw new Error('null')
+    let names = ['name', 'nikeName', 'password', 'salt', 'valid', 'exp', 'class', 'emailCode', 'emailTime']
+    for (let name of names) {
+      if (data[name]) user[name] = data[name]
+    }
+    if (data.detail) {
+      let names = ['web', 'phone', 'info', 'sex', 'birthDate', 'location', 'avatar']
+      for (let name of names) {
+        if (data.detail[name]) user.detail[name] = data.detail[name]
+      }
+    }
+    await user.save()
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
 exports.addUser = async(userEmail, userName, userPassword, userSalt) => {
   try {
     let user = new UserDB({
@@ -68,34 +89,6 @@ exports.getByEmail = async userEmail => {
   }
 }
 
-async function setById(userId, name, value) {
-  let user = await exports.getById(userId)
-  if (!user) return false
-  user[name] = value
-  await user.save()
-  return true
-}
-
-exports.setExpById = async(userId, value) => {
-  let result = await setById(userId, 'exp', value)
-  return result
-}
-
-exports.setClassById = async(userId, value) => {
-  let result = await setById(userId, 'class', value)
-  return result
-}
-
-exports.setEmailCodeById = async(userId, value) => {
-  let result = await setById(userId, 'emailCode', value)
-  return result
-}
-
-exports.setEmailTimeById = async(userId, value) => {
-  let result = await setById(userId, 'emailTime', value)
-  return result
-}
-
 exports.validByEmail = async userEmail => {
   let user = await exports.getByEmail(userEmail)
   if (!user) return false
@@ -121,16 +114,15 @@ exports.changeExpById = async(userId, value) => {
   return true
 }
 
-exports.setDetailById = async(userId, data) => {
-  let user = await exports.getById(userId)
-  if (!user) return false
-  if (data.web) user.detail.web = data.web
-  if (data.phone) user.detail.phone = data.phone
-  if (data.info) user.detail.info = data.info
-  if (data.sex) user.detail.sex = data.sex
-  if (data.birthDate) user.detail.birthDate = data.birthDate
-  if (data.location) user.detail.location = data.location
-  if (data.avatar) user.detail.avatar = data.avatar
-  await user.save()
-  return true
+/*
+async function test() {
+  let user = await exports.getByEmail('zhenly@qq.com')
+  console.log(user)
+  await exports.setDataById(user._id, {
+    nikeName: 'ZhenlyChenChen'
+  })
+  user = await exports.getByEmail('zhenly@qq.com')
+  console.log(user)
 }
+test()
+ */

@@ -12,8 +12,10 @@ exports.getEmailCode = async userEmail => {
     assert(new Date() - time < 1000 * 60, 'limit_time')
   }
   let code = parseInt(Math.random() * 900000 + 100000)
-  await userModel.setEmailCodeById(user._id, code)
-  await userModel.setEmailTimeById(user._id, time)
+  await userModel.setDataById(user._id, {
+    emailCode: code,
+    emailTime: time
+  })
 }
 
 exports.getClientInfo = async clientId => {

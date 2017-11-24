@@ -50,5 +50,7 @@ async function checkEmailCode(userEmail, vCode) {
   assert(time.toString() !== 'Invalid Date', 'Invalid_Date_danger!') // 不应该发生的错误
   assert(new Date() - time < 1000 * 60 * 10, 'timeout_vCode') // 十分钟的有效期
   assert(user.emailCode === vCode, 'error_vCode') // 验证码错误
-  await userModel.setEmailTimeById(user._id, new Date('2000-1-1'))
+  await userModel.setDataById(user._id, {
+    emailTime: new Date('2000-1-1')
+  })
 }

@@ -23,6 +23,10 @@ exports.getClientById = async clientId => {
   }
 }
 
+exports.gitClientByOwner = async ownerId => {
+
+}
+
 exports.setDataById = async(clientId, data) => {
   try {
     let client = await DevDB.findById(clientId)
