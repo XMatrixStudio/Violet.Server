@@ -17,6 +17,6 @@ exports.getEmailCode = async ctx => {
 
 exports.getClientInfo = async ctx => {
   verify({ data: ctx.params.clientId, type: 'string', maxLength: 24, minLength: 24, message: 'error_clientId' })
-  let client = await utilService.getClientInfo(ctx.params.clientId)
-  ctx.body = client
+  let clientInfo = await utilService.getClientInfo(ctx.params.clientId)
+  ctx.body = clientInfo
 }
