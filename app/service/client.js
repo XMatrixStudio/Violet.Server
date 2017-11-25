@@ -1,4 +1,4 @@
-const ClientModel = require('../model/devClient')
+const ClientModel = require('../model/client')
 const assert = require('../../lib/assert')
 const util = require('../../lib/util')
 

@@ -10,8 +10,8 @@ let devSchema = db.Schema({
     authCount: Number,
     LoginCount: Number
   }
-}, { collection: 'devClients' })
-let DevDB = db.model('devClients', devSchema)
+}, { collection: 'client' })
+let DevDB = db.model('client', devSchema)
 
 exports.addAuthById = async(clientId, value) => {
   try {

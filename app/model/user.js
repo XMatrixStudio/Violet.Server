@@ -5,9 +5,15 @@ const userSchema = db.Schema({
   nikeName: String,
   password: String,
   salt: String,
-  valid: Boolean,
+  valid: {
+    type: Boolean,
+    default: false
+  },
   exp: Number,
-  class: Number,
+  userClass: {
+    type: Number,
+    default: 0
+  },
   detail: {
     web: String,
     phone: Number,
@@ -17,26 +23,92 @@ const userSchema = db.Schema({
     location: String,
     avatar: String
   },
-  emailCode: Number,
-  emailTime: Date
+  emailCode: { type: Number, default: 0 },
+  emailTime: { type: Date, default: new Date('2000-1-1') },
+  auth: [{
+    clientId: String, // db.Schema.Types.ObjectId,
+    achievement: [String]
+  }]
 }, { collection: 'users' })
 const UserDB = db.model('users', userSchema)
 
+exports.addAchievement = async(userId, clientId, achievementId) => {
+  try {
+    let result = await UserDB.update({
+      _id: userId,
+      'auth.clientId': clientId
+    }, {
+      $addToSet: {
+        'auth.$.achievement': achievementId
+      }
+    })
+    return result.nModified === 1
+  } catch (error) {
+    return false
+  }
+}
+
+exports.addAuth = async(userId, clientId) => {
+  try {
+    let result = await UserDB.update({
+      _id: userId,
+      'auth.clientId': { $ne: clientId }
+    }, {
+      $push: {
+        auth: {
+          clientId: clientId
+        }
+      }
+    })
+    return {
+      isNew: result.nModified === 1
+    }
+  } catch (error) {
+    return false
+  }
+}
+
+exports.deleteAuth = async(userId, clientId) => {
+  try {
+    let result = await UserDB.update({
+      _id: userId,
+      'auth.clientId': clientId
+    }, {
+      $pull: {
+        auth: {
+          clientId: clientId
+        }
+      }
+    })
+    return result.nModified === 1
+  } catch (error) {
+    return false
+  }
+}
+
+exports.getAuthList = async userId => {
+  try {
+    let user = await UserDB.findById(userId).select('auth')
+    return user.auth
+  } catch (error) {
+    return false
+  }
+}
+
 exports.setById = async(userId, data) => {
   try {
-    let user = await UserDB.findById(userId)
-    if (!user) throw new Error('null')
-    let names = ['name', 'nikeName', 'password', 'salt', 'valid', 'exp', 'class', 'emailCode', 'emailTime']
+    let data = {}
+    let names = ['name', 'nikeName', 'password', 'salt', 'valid', 'exp', 'userClass', 'emailCode', 'emailTime']
     for (let name of names) {
-      if (data[name]) user[name] = data[name]
+      if (data[name]) data[name] = data[name]
     }
     if (data.detail) {
       let names = ['web', 'phone', 'info', 'sex', 'birthDate', 'location', 'avatar']
       for (let name of names) {
-        if (data.detail[name]) user.detail[name] = data.detail[name]
+        if (data.detail[name]) data.detail[name] = data.detail[name]
       }
     }
-    await user.save()
+    await UserDB.update({ _id: userId }, { $set: data })
     return true
   } catch (error) {
     return false
@@ -45,9 +117,8 @@ exports.setById = async(userId, data) => {
 
 exports.add = async() => {
   try {
-    let user = new UserDB()
-    let result = await user.save()
-    return result._id
+    let user = await UserDB.create({})
+    return user.id
   } catch (error) {
     return false
   }
@@ -56,7 +127,6 @@ exports.add = async() => {
 exports.getById = async userId => {
   try {
     let user = await UserDB.findById(userId)
-    if (!user) throw new Error('null')
     return user
   } catch (error) {
     return false
@@ -66,7 +136,6 @@ exports.getById = async userId => {
 exports.getByName = async userName => {
   try {
     let user = await UserDB.findOne({ name: userName })
-    if (!user) throw new Error('null')
     return user
   } catch (error) {
     return false
@@ -76,7 +145,6 @@ exports.getByName = async userName => {
 exports.getByEmail = async userEmail => {
   try {
     let user = await UserDB.findOne({ email: userEmail })
-    if (!user) throw new Error('null')
     return user
   } catch (error) {
     return false
@@ -100,15 +168,8 @@ exports.setPasswordByEmail = async(userEmail, password, userSalt) => {
   return true
 }
 
-/*
 async function test() {
-  let user = await exports.getByEmail('zhenly@qq.com')
-  console.log(user)
-  await exports.setDataById(user._id, {
-    nikeName: 'ZhenlyChenChen'
-  })
-  user = await exports.getByEmail('zhenly@qq.com')
-  console.log(user)
+  let result = await exports.getAuthList('5a195ef4d45fb82cf00929d1', 'kkka')
+  console.log(result)
 }
 test()
- */
