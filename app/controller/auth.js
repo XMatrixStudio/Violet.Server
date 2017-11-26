@@ -1,11 +1,8 @@
 const authServer = require('../service/auth')
 const verify = require('../../lib/verify')
-const assert = require('../../lib/assert')
-const _ = require('lodash')
 
 exports.getList = async ctx => {
-  let list = await authServer.getList(ctx.getUserId())
-  return list
+  ctx.body = await authServer.getList(ctx.getUserId())
 }
 
 exports.get = async ctx => {
