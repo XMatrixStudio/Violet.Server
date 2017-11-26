@@ -4,8 +4,7 @@ const assert = require('../../lib/assert')
 const _ = require('lodash')
 
 exports.getList = async ctx => {
-  let clients = await clientServer.getList(ctx.session.userId)
-  ctx.body = clients
+  ctx.body = await clientServer.getList(ctx.session.userId)
 }
 
 exports.add = async ctx => {
