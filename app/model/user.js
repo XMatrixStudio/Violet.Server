@@ -23,13 +23,25 @@ const userSchema = db.Schema({
     location: String,
     avatar: String
   },
-  emailCode: { type: Number, default: 0 },
-  emailTime: { type: Date, default: new Date('2000-1-1') },
+  emailCode: {
+    type: Number,
+    default: 0
+  },
+  emailTime: {
+    type: Date,
+    default: new Date('2000-1-1')
+  },
+  createTime: {
+    type: Date,
+    default: new Date()
+  },
   auth: [{
     clientId: String, // db.Schema.Types.ObjectId,
     achievement: [String]
   }]
-}, { collection: 'users' })
+}, {
+  collection: 'users'
+})
 const UserDB = db.model('users', userSchema)
 
 exports.addAchievement = async(userId, clientId, achievementId) => {
@@ -52,7 +64,9 @@ exports.addAuth = async(userId, clientId) => {
   try {
     let result = await UserDB.update({
       _id: userId,
-      'auth.clientId': { $ne: clientId }
+      'auth.clientId': {
+        $ne: clientId
+      }
     }, {
       $push: {
         auth: {
@@ -108,7 +122,11 @@ exports.setById = async(userId, data) => {
         if (data.detail[name]) data.detail[name] = data.detail[name]
       }
     }
-    await UserDB.update({ _id: userId }, { $set: data })
+    await UserDB.update({
+      _id: userId
+    }, {
+      $set: data
+    })
     return true
   } catch (error) {
     return false
@@ -135,7 +153,9 @@ exports.getById = async userId => {
 
 exports.getByName = async userName => {
   try {
-    let user = await UserDB.findOne({ name: userName })
+    let user = await UserDB.findOne({
+      name: userName
+    })
     return user
   } catch (error) {
     return false
@@ -144,7 +164,9 @@ exports.getByName = async userName => {
 
 exports.getByEmail = async userEmail => {
   try {
-    let user = await UserDB.findOne({ email: userEmail })
+    let user = await UserDB.findOne({
+      email: userEmail
+    })
     return user
   } catch (error) {
     return false
