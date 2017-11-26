@@ -3,6 +3,7 @@ const app = new Koa()
 const config = require('./config')
 const log = require('./lib/log')
 const isDev = process.env.NODE_ENV !== 'production'
+const userModel = require('./app/model/user')
 
 // HTTP log
 if (isDev) app.use(require('koa-morgan')('dev'))
@@ -20,14 +21,20 @@ app.use(require('koa-session')(config.session, app))
 // json and form to object
 app.use(require('koa-bodyparser')())
 
-// 路由
-app.use(require('./app/router'))
-
 // 获取用户信息
-app.context.user = (ctx) => {
-  // return userModel.getById(ctx.session.user_id)
+app.context.getUserData = async ctx => {
+  if (!ctx.state.userData) {
+    ctx.state.userData = await userModel.getById(ctx.session.userId)
+  }
+  return ctx.state.userData
+}
+
+app.context.getUserId = async ctx => {
   return ctx.session.userId
 }
+
+// 路由
+app.use(require('./app/router'))
 
 // 异常处理
 // 404和err.expose为true的错误不会捕捉
@@ -39,4 +46,4 @@ app.on('error', error => {
 
 app.listen(process.env.PORT || 30002)
 
-console.log('Listen at port ', 30002)
+console.log('Listen at port', 30002)
