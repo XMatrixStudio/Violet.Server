@@ -61,3 +61,14 @@ async function checkEmailCode(userEmail, vCode) {
     emailTime: new Date('2000-1-1')
   })
 }
+
+exports.getBaseInfo = async(userId) => {
+  let user = await userModel.getById(userId)
+  return {
+    email: user.email,
+    name: user.name,
+    nikeName: user.nikeName,
+    exp: user.exp,
+    detail: user.detail
+  }
+}

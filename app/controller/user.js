@@ -54,3 +54,7 @@ exports.validEmail = async ctx => {
   await userService.validEmail(ctx.userData().email, body.vCode)
   ctx.state = 200
 }
+
+exports.getBaseInfo = async ctx => {
+  ctx.body = await userService.getInfo(ctx.getUserId())
+}
