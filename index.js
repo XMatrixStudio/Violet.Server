@@ -29,6 +29,10 @@ app.context.getUserData = async ctx => {
   return ctx.state.userData
 }
 
+app.context.getUserId = async ctx => {
+  return ctx.session.userId
+}
+
 // 路由
 app.use(require('./app/router'))
 

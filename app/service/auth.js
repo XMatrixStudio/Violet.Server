@@ -1,6 +1,7 @@
 const clientModel = require('../model/client')
 const userModel = require('../model/user')
 const assert = require('../../lib/assert')
+const util = require('../../lib/util')
 
 exports.getList = async userId => {
   let authList = await userModel.getAuthList(userId)
@@ -27,8 +28,12 @@ exports.auth = async(userId, clientId) => {
   assert(result, 'invalid_clientId')
   if (result.isNew) await clientModel.addAuthById(clientId, 1)
   await clientModel.addLoginById(clientId, 1)
-
-  // return code
+  let code = await util.generateCode(userId, clientId)
+  let client = await clientModel.getById(clientId)
+  return {
+    code: code,
+    url: client.url
+  }
 }
 
 exports.delete = async(userId, clientId) => {

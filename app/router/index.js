@@ -1,5 +1,7 @@
 const Router = require('koa-router')
 const user = require('./user')
+const client = require('./client')
+const auth = require('./auth')
 const util = require('./util')
 const assert = require('../../lib/assert')
 
@@ -47,4 +49,6 @@ router.use('/v2/self/', async(ctx, next) => {
 
 router.use('/v2/self/users', user.routes())
 router.use('/v2/self/util', util.routes())
+router.use('/v2/self/auth', auth.routes())
+router.use('/v2/self/client', client.routes())
 module.exports = router.routes()

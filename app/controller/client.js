@@ -31,9 +31,9 @@ exports.setInfo = async ctx => {
   let body = _.pick(ctx.request.body, ['name', 'detail', 'url'])
   body.id = ctx.params.id
   verify({ data: body.id, type: 'string', maxLength: 24, minLength: 24, message: 'invalid_clientId' })
-  verify({ data: body.name, type: 'string', maxLength: 64, minLength: 6, message: 'invalid_name' })
-  verify({ data: body.detail, type: 'string', maxLength: 1024, minLength: 6, message: 'invalid_detail' })
-  verify({ data: body.url, type: 'string', maxLength: 512, minLength: 6, message: 'invalid_url' })
+  verify({ data: body.name, type: 'string', maxLength: 64, minLength: 6, message: 'invalid_name', require: false })
+  verify({ data: body.detail, type: 'string', maxLength: 1024, minLength: 6, message: 'invalid_detail', require: false })
+  verify({ data: body.url, type: 'string', maxLength: 512, minLength: 6, message: 'invalid_url', require: false })
   await clientServer.setInfo(body.id, {
     name: body.name,
     detail: body.detail,

@@ -168,8 +168,8 @@ exports.setPasswordByEmail = async(userEmail, password, userSalt) => {
   return true
 }
 
-async function test() {
+/* async function test() {
   let result = await exports.getAuthList('5a195ef4d45fb82cf00929d1', 'kkka')
   console.log(result)
 }
-test()
+test() */

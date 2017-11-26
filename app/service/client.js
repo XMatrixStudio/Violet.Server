@@ -40,6 +40,9 @@ exports.getInfo = async clientId => {
 }
 
 exports.setInfo = async(clientId, data) => {
+  for (let name in data) {
+    if (data[name] === undefined) delete data[name]
+  }
   let result = await ClientModel.setById(clientId, data)
   assert(result, 'invalid_clientId')
 }
