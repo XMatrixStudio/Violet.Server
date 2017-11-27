@@ -72,3 +72,7 @@ exports.getBaseInfo = async(userId) => {
     detail: user.detail
   }
 }
+
+exports.patchBaseInfo = async(userId, body) => {
+  await userModel.setById(userId, { detail: body })
+}

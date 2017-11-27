@@ -57,4 +57,16 @@ exports.validEmail = async ctx => {
 
 exports.getBaseInfo = async ctx => {
   ctx.body = await userService.getInfo(ctx.getUserId())
+  ctx.body = 200
+}
+
+exports.patchBaseInfo = async ctx => {
+  let body = _.pick(ctx.request.body, ['sex', 'web', 'phone', 'info', 'location', 'birthDate', 'showPhone', 'showDate'])
+  verify({ data: body.sex, type: 'string', regExp: /^[012]$/, message: 'error_sex' })
+  verify({ data: body.phone, type: 'string', regExp: /^1[3|4|5|8][0-9]\d{4,8}$/, message: 'error_web' })
+  verify({ data: new Date(body.birthDate), type: 'date', message: 'error_birthDate' })
+  verify({ data: body.showPhone, type: 'string', regExp: /^(true)|(false)$/, message: 'error_showPhone' })
+  verify({ data: body.showDate, type: 'string', regExp: /^(true)|(false)$/, message: 'error_showDate' })
+  await userService.patchBaseInfo(ctx.getUserId(), body)
+  ctx.state = 200
 }
