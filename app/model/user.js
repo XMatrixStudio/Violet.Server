@@ -40,27 +40,27 @@ const userSchema = db.Schema({
     achievement: [String]
   }]
 }, {
-  collection: 'users'
-})
+    collection: 'users'
+  })
 const UserDB = db.model('users', userSchema)
 
-exports.addAchievement = async(userId, clientId, achievementId) => {
+exports.addAchievement = async (userId, clientId, achievementId) => {
   try {
     let result = await UserDB.update({
       _id: userId,
       'auth.clientId': clientId
     }, {
-      $addToSet: {
-        'auth.$.achievement': achievementId
-      }
-    })
+        $addToSet: {
+          'auth.$.achievement': achievementId
+        }
+      })
     return result.nModified === 1
   } catch (error) {
     return false
   }
 }
 
-exports.addAuth = async(userId, clientId) => {
+exports.addAuth = async (userId, clientId) => {
   try {
     let result = await UserDB.update({
       _id: userId,
@@ -68,12 +68,12 @@ exports.addAuth = async(userId, clientId) => {
         $ne: clientId
       }
     }, {
-      $push: {
-        auth: {
-          clientId: clientId
+        $push: {
+          auth: {
+            clientId: clientId
+          }
         }
-      }
-    })
+      })
     return {
       isNew: result.nModified === 1
     }
@@ -82,18 +82,18 @@ exports.addAuth = async(userId, clientId) => {
   }
 }
 
-exports.deleteAuth = async(userId, clientId) => {
+exports.deleteAuth = async (userId, clientId) => {
   try {
     let result = await UserDB.update({
       _id: userId,
       'auth.clientId': clientId
     }, {
-      $pull: {
-        auth: {
-          clientId: clientId
+        $pull: {
+          auth: {
+            clientId: clientId
+          }
         }
-      }
-    })
+      })
     return result.nModified === 1
   } catch (error) {
     return false
@@ -109,7 +109,7 @@ exports.getAuthList = async userId => {
   }
 }
 
-exports.setById = async(userId, data) => {
+exports.setById = async (userId, data) => {
   try {
     let data = {}
     let names = ['name', 'nikeName', 'password', 'salt', 'valid', 'exp', 'userClass', 'emailCode', 'emailTime']
@@ -125,15 +125,15 @@ exports.setById = async(userId, data) => {
     await UserDB.update({
       _id: userId
     }, {
-      $set: data
-    })
+        $set: data
+      })
     return true
   } catch (error) {
     return false
   }
 }
 
-exports.add = async() => {
+exports.add = async () => {
   try {
     let user = await UserDB.create({})
     return user.id
@@ -181,7 +181,7 @@ exports.validByEmail = async userEmail => {
   return true
 }
 
-exports.setPasswordByEmail = async(userEmail, password, userSalt) => {
+exports.setPasswordByEmail = async (userEmail, password, userSalt) => {
   let user = await exports.getByEmail(userEmail)
   if (!user) return false
   user.password = password

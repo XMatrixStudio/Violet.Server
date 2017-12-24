@@ -2,8 +2,7 @@
   "extends": "standard",
   "rules": {
     "semi": [2, "never"],
-    "camelcase": 0,
-    "space-before-function-paren": ["off", "always"]
+    "camelcase": 0
   },
   "parserOptions": {
     "ecmaVersion": 8,

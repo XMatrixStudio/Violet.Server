@@ -13,7 +13,7 @@ let devSchema = db.Schema({
 }, { collection: 'client' })
 let DevDB = db.model('client', devSchema)
 
-exports.addAuthById = async(clientId, value) => {
+exports.addAuthById = async (clientId, value) => {
   try {
     let client = await DevDB.findById(clientId)
     if (!client) throw new Error('null')
@@ -24,7 +24,7 @@ exports.addAuthById = async(clientId, value) => {
   }
 }
 
-exports.addLoginById = async(clientId, value) => {
+exports.addLoginById = async (clientId, value) => {
   try {
     let client = await DevDB.findById(clientId)
     if (!client) throw new Error('null')
@@ -35,7 +35,7 @@ exports.addLoginById = async(clientId, value) => {
   }
 }
 
-exports.add = async() => {
+exports.add = async () => {
   try {
     let client = new DevDB()
     let result = await client.save()
@@ -64,7 +64,7 @@ exports.getByOwner = async ownerId => {
   }
 }
 
-exports.setById = async(clientId, data) => {
+exports.setById = async (clientId, data) => {
   try {
     let client = await DevDB.findById(clientId)
     if (!client) throw new Error('null')

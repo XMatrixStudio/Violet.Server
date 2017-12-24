@@ -36,7 +36,7 @@ for (const method in whiteList) {
 }
 
 // 兜底判断，如果没有被白名单检查，则必须登录
-router.use('/v2/self/', async(ctx, next) => {
+router.use('/v2/self/', async (ctx, next) => {
   if (!ctx.state.passStatusCheck) {
     assert(ctx.session.userId, 'invalid_token')
     assert(ctx.session.remember || (new Date(ctx.session.time) - new Date()) >= 86400000, 'timeout_token')

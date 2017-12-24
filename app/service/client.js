@@ -16,7 +16,7 @@ exports.getList = async userId => {
   return result
 }
 
-exports.add = async(userId, name, detail, url) => {
+exports.add = async (userId, name, detail, url) => {
   let clientId = await ClientModel.add()
   let result = await ClientModel.setById(clientId, {
     name: name,
@@ -39,7 +39,7 @@ exports.getInfo = async clientId => {
   return client
 }
 
-exports.setInfo = async(clientId, data) => {
+exports.setInfo = async (clientId, data) => {
   for (let name in data) {
     if (data[name] === undefined) delete data[name]
   }
@@ -59,4 +59,13 @@ exports.changeKey = async clientId => {
   })
   assert(result, 'invalid_clientId')
   return newKey
+}
+
+exports.getClientInfo = async clientId => {
+  let client = await ClientModel.getClientById(clientId)
+  assert(client, 'error_clientId')
+  delete client.ownerId
+  delete client.key
+  delete client.data
+  return client
 }
