@@ -6,7 +6,6 @@ const _ = require('lodash')
 
 exports.login = async ctx => {
   let body = _.pick(ctx.request.body, ['userName', 'userPass', 'remember'])
-  console.log('body:', body)
   assert(body.userName, 'invalid_param')
   if (body.userName.toString().indexOf('@') !== -1) {
     verify({ data: body.userName, type: 'string', maxLength: 64, regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, message: 'invalid_email' })
@@ -33,13 +32,18 @@ exports.register = async ctx => {
   assert(!regExp.test(body.userPass), 'invalid_password') // 不允许纯数字密码
   verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
   assert(await util.checkVCode(ctx, body.vCode), 'error_code')
-  await userService.register(body.email, body.name, body.userPass)
-  ctx.state = 200
+  let userId = await userService.register(body.email, body.name, body.userPass)
+  // 注册后自动登陆
+  ctx.session.userId = userId
+  ctx.session.time = new Date()
+  ctx.session.remember = false
+  // 注册成功
+  ctx.status = 200
 }
 
 exports.logout = async ctx => {
-  ctx.session.userId = null
-  ctx.state = 200
+  ctx.session = null
+  ctx.status = 200
 }
 
 exports.changePassword = async ctx => {
@@ -48,14 +52,14 @@ exports.changePassword = async ctx => {
   verify({ data: body.password, type: 'string', maxLength: 64, minLength: 6, message: 'invalid_password' })
   verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
   await userService.changePassword(body.email, body.password, body.vCode)
-  ctx.state = 200
+  ctx.status = 200
 }
 
 exports.validEmail = async ctx => {
   let body = _.pick(ctx.request.body, ['vCode'])
   verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
   await userService.validEmail(ctx.userData().email, body.vCode)
-  ctx.state = 200
+  ctx.status = 200
 }
 
 exports.getBaseInfo = async ctx => {
@@ -71,5 +75,5 @@ exports.patchBaseInfo = async ctx => {
   verify({ data: body.showPhone, type: 'string', regExp: /^(true)|(false)$/, message: 'error_showPhone' })
   verify({ data: body.showDate, type: 'string', regExp: /^(true)|(false)$/, message: 'error_showDate' })
   await userService.patchBaseInfo(ctx.getUserId(), body)
-  ctx.state = 200
+  ctx.status = 200
 }

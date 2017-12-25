@@ -62,10 +62,12 @@ exports.changeKey = async clientId => {
 }
 
 exports.getClientInfo = async clientId => {
-  let client = await ClientModel.getClientById(clientId)
+  let client = await ClientModel.getById(clientId)
   assert(client, 'error_clientId')
-  delete client.ownerId
-  delete client.key
-  delete client.data
-  return client
+  let data = {
+    name: client.name,
+    detail: client.detail,
+    url: client.url
+  }
+  return data
 }

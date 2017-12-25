@@ -42,8 +42,8 @@ const userSchema = db.Schema({
     achievement: [String]
   }]
 }, {
-    collection: 'users'
-  })
+  collection: 'users'
+})
 const UserDB = db.model('users', userSchema)
 
 exports.addAchievement = async (userId, clientId, achievementId) => {
@@ -52,10 +52,10 @@ exports.addAchievement = async (userId, clientId, achievementId) => {
       _id: userId,
       'auth.clientId': clientId
     }, {
-        $addToSet: {
-          'auth.$.achievement': achievementId
-        }
-      })
+      $addToSet: {
+        'auth.$.achievement': achievementId
+      }
+    })
     return result.nModified === 1
   } catch (error) {
     return false
@@ -70,12 +70,12 @@ exports.addAuth = async (userId, clientId) => {
         $ne: clientId
       }
     }, {
-        $push: {
-          auth: {
-            clientId: clientId
-          }
+      $push: {
+        auth: {
+          clientId: clientId
         }
-      })
+      }
+    })
     return {
       isNew: result.nModified === 1
     }
@@ -90,12 +90,12 @@ exports.deleteAuth = async (userId, clientId) => {
       _id: userId,
       'auth.clientId': clientId
     }, {
-        $pull: {
-          auth: {
-            clientId: clientId
-          }
+      $pull: {
+        auth: {
+          clientId: clientId
         }
-      })
+      }
+    })
     return result.nModified === 1
   } catch (error) {
     return false
@@ -113,22 +113,23 @@ exports.getAuthList = async userId => {
 
 exports.setById = async (userId, data) => {
   try {
-    let data = {}
-    let names = ['name', 'nikeName', 'password', 'salt', 'valid', 'exp', 'userClass', 'emailCode', 'emailTime']
+    let newData = {}
+    let names = ['email', 'name', 'nikeName', 'password', 'salt', 'valid', 'exp', 'userClass', 'emailCode', 'emailTime']
     for (let name of names) {
-      if (data[name]) data[name] = data[name]
+      if (data[name]) newData[name] = data[name]
     }
     if (data.detail) {
+      newData.detail = {}
       let names = ['web', 'phone', 'info', 'sex', 'birthDate', 'location', 'avatar', 'showPhone', 'showDate']
       for (let name of names) {
-        if (data.detail[name]) data.detail[name] = data.detail[name]
+        if (data.detail[name]) newData.detail[name] = data.detail[name]
       }
     }
     await UserDB.update({
       _id: userId
     }, {
-        $set: data
-      })
+      $set: newData
+    })
     return true
   } catch (error) {
     return false
