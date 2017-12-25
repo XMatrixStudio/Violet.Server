@@ -6,13 +6,16 @@ const _ = require('lodash')
 
 exports.login = async ctx => {
   let body = _.pick(ctx.request.body, ['userName', 'userPass', 'remember'])
+  console.log('body:', body)
+  assert(body.userName, 'invalid_param')
   if (body.userName.toString().indexOf('@') !== -1) {
     verify({ data: body.userName, type: 'string', maxLength: 64, regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, message: 'invalid_email' })
   } else {
     verify({ data: body.userName, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{3,18}$/, message: 'invalid_name' })
   }
   body.userName = body.userName.toString().toLowerCase()
-  verify({ data: body.userPass, type: 'string' }, { data: body.remember, type: 'boolean' })
+  body.remember = body.remember === 'true'
+  verify({ data: body.userPass, type: 'string', message: 'invalid_pass' })
   let result = await userService.login(body.userName, body.userPass)
   ctx.session.userId = result.id
   ctx.session.time = new Date()
