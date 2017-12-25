@@ -21,7 +21,9 @@ const userSchema = db.Schema({
     sex: Number,
     birthDate: Date,
     location: String,
-    avatar: String
+    avatar: String,
+    showPhone: Boolean,
+    showDate: Boolean
   },
   emailCode: {
     type: Number,
@@ -117,7 +119,7 @@ exports.setById = async (userId, data) => {
       if (data[name]) data[name] = data[name]
     }
     if (data.detail) {
-      let names = ['web', 'phone', 'info', 'sex', 'birthDate', 'location', 'avatar']
+      let names = ['web', 'phone', 'info', 'sex', 'birthDate', 'location', 'avatar', 'showPhone', 'showDate']
       for (let name of names) {
         if (data.detail[name]) data.detail[name] = data.detail[name]
       }

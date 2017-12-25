@@ -88,3 +88,7 @@ exports.getEmailCode = async userEmail => {
     emailTime: new Date()
   })
 }
+
+exports.patchBaseInfo = async(userId, body) => {
+  await userModel.setById(userId, { detail: body })
+}
