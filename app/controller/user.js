@@ -27,7 +27,7 @@ exports.login = async ctx => {
 exports.register = async ctx => {
   let body = _.pick(ctx.request.body, ['name', 'email', 'userPass', 'vCode'])
   verify({ data: body.email, type: 'string', regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, maxLength: 64, message: 'invalid_email' })
-  verify({ data: body.name, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{3,18}$/, message: 'invalid_name' })
+  verify({ data: body.name, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{5,18}$/, message: 'invalid_name' })
   verify({ data: body.userPass, type: 'string', maxLength: 64, minLength: 6, message: 'invalid_password' })
   let regExp = /^[0-9]$/
   assert(!regExp.test(body.userPass), 'invalid_password') // 不允许纯数字密码
