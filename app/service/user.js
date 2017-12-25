@@ -9,9 +9,9 @@ exports.login = async (userName, userPassword) => {
   } else {
     user = await userModel.getByName(userName)
   }
-  assert(user, 'error') // 用户不存在
+  assert(user, 'error_pass') // 用户不存在
   let hashed = util.hashPassword(userPassword, user.salt)
-  assert(hashed === user.password, 'error') // 密码错误
+  assert(hashed === user.password, 'error_pass') // 密码错误
   return {
     id: user._id,
     name: user.nikeName,

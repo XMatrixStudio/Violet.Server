@@ -14,8 +14,8 @@ const whiteList = {
     '/v2/self/util/ClientInfo/:clientId': true
   },
   post: {
-    '/v2/self/user/login': true,
-    '/v2/self/user/register': true
+    '/v2/self/users/login': true,
+    '/v2/self/users/register': true
   }
 }
 
