@@ -89,8 +89,8 @@ exports.addAuth = async (userId, clientId) => {
     }, {
       $push: {
         auth: {
-            clientId: clientId
-          }
+          clientId: clientId
+        }
       }
     })
     return {
@@ -115,8 +115,8 @@ exports.deleteAuth = async (userId, clientId) => {
     }, {
       $pull: {
         auth: {
-            clientId: clientId
-          }
+          clientId: clientId
+        }
       }
     })
     return result.nModified === 1
@@ -244,17 +244,3 @@ exports.setPasswordByEmail = async (userEmail, password, userSalt) => {
   await user.save()
   return true
 }
-
-/*
-async function test (params) {
-  let res = await exports.setById('5a423d7b1957c732d450a4ac', {
-    nikeName: 'ZhenlyChen',
-    secure: {
-      password: 'abc'
-    }
-  })
-  console.log(res)
-}
-
-test()
- */
