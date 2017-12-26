@@ -10,8 +10,8 @@ exports.login = async (userName, userPassword) => {
     user = await userModel.getByName(userName)
   }
   assert(user, 'error_pass') // 用户不存在
-  let hashed = util.hashPassword(userPassword, user.salt)
-  assert(hashed === user.password, 'error_pass') // 密码错误
+  let hashed = await util.hashPassword(userPassword, user.salt)
+  assert(hashed.password === user.password, 'error_pass') // 密码错误
   return {
     id: user._id,
     name: user.nikeName,
@@ -26,7 +26,7 @@ exports.register = async (userEmail, userName, userPassword) => {
   assert(!user, 'exist_email') // 用户邮箱已存在
   user = await userModel.getByName(userName.toString().toLowerCase())
   assert(!user, 'exist_name') // 用户名已存在
-  let data = util.hashPassword(userPassword)
+  let data = await util.hashPassword(userPassword)
   let userId = await userModel.add()
   await userModel.setById(userId, {
     email: userEmail,
@@ -35,11 +35,12 @@ exports.register = async (userEmail, userName, userPassword) => {
     password: data.password,
     salt: data.salt
   })
+  return userId
 }
 
 exports.changePassword = async (userEmail, userPassword, vCode) => {
   await checkEmailCode(userEmail, vCode)
-  let data = util.hashPassword(userPassword)
+  let data = await util.hashPassword(userPassword)
   await userModel.setPasswordByEmail(userEmail, data.password, data.salt)
 }
 

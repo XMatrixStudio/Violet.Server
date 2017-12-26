@@ -31,5 +31,5 @@ exports.delete = async ctx => {
   }
   verify({ data: body.clientId, type: 'string', maxLength: 24, minLength: 24, message: 'invalid_clientId' })
   await authServer.delete(ctx.getUserId(), body.clientId)
-  ctx.state = 200
+  ctx.status = 200
 }

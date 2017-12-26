@@ -48,7 +48,9 @@ const userSchema = db.Schema({
   manage: [{
     clientId: String // db.Schema.Types.ObjectId
   }]
-}, { collection: 'users' })
+}, {
+  collection: 'users'
+})
 const UserDB = db.model('users', userSchema)
 
 /**
@@ -175,21 +177,22 @@ exports.setInfoById = async (userId, data) => {
 
 exports.setById = async (userId, data) => {
   try {
-    let data = {}
-    let names = ['name', 'nikeName', 'password', 'salt', 'valid', 'exp', 'userClass', 'emailCode', 'emailTime']
+    let newData = {}
+    let names = ['email', 'name', 'nikeName', 'password', 'salt', 'valid', 'exp', 'userClass', 'emailCode', 'emailTime']
     for (let name of names) {
-      if (data[name]) data[name] = data[name]
+      if (data[name]) newData[name] = data[name]
     }
     if (data.detail) {
+      newData.detail = {}
       let names = ['web', 'phone', 'info', 'sex', 'birthDate', 'location', 'avatar', 'showPhone', 'showDate']
       for (let name of names) {
-        if (data.detail[name]) data.detail[name] = data.detail[name]
+        if (data.detail[name]) newData.detail[name] = data.detail[name]
       }
     }
     await UserDB.update({
       _id: userId
     }, {
-      $set: data
+      $set: newData
     })
     return true
   } catch (error) {
