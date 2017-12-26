@@ -44,9 +44,6 @@ const userSchema = db.Schema({
   auth: [{
     clientId: String, // db.Schema.Types.ObjectId
     achievement: [String]
-  }],
-  manage: [{
-    clientId: String // db.Schema.Types.ObjectId
   }]
 }, {
   collection: 'users'
@@ -92,8 +89,8 @@ exports.addAuth = async (userId, clientId) => {
     }, {
       $push: {
         auth: {
-          clientId: clientId
-        }
+            clientId: clientId
+          }
       }
     })
     return {
@@ -118,8 +115,8 @@ exports.deleteAuth = async (userId, clientId) => {
     }, {
       $pull: {
         auth: {
-          clientId: clientId
-        }
+            clientId: clientId
+          }
       }
     })
     return result.nModified === 1
@@ -150,25 +147,18 @@ exports.getAuthList = async userId => {
  */
 exports.setInfoById = async (userId, data) => {
   try {
-    let newData = {}
+    let user = await exports.getById(userId)
     let names = ['publicEmail', 'email', 'bio', 'url', 'phone', 'gender', 'birthDate', 'location', 'avatar']
     for (let name of names) {
-      if (data[name]) newData[name] = data[name]
+      if (data[name]) user.info[name] = data[name]
     }
     if (data.show) {
-      newData.show = {}
       let names = ['phone', 'gender', 'birth']
       for (let name of names) {
-        if (data.show[name]) newData.show[name] = data.show[name]
+        if (data.show[name]) user.info.show[name] = data.show[name]
       }
     }
-    await UserDB.update({
-      _id: userId
-    }, {
-      $set: {
-        info: newData
-      }
-    })
+    await user.save(() => { })
     return true
   } catch (error) {
     return false
@@ -177,23 +167,18 @@ exports.setInfoById = async (userId, data) => {
 
 exports.setById = async (userId, data) => {
   try {
-    let newData = {}
-    let names = ['email', 'name', 'nikeName', 'password', 'salt', 'valid', 'exp', 'userClass', 'emailCode', 'emailTime']
+    let user = await exports.getById(userId)
+    let names = ['email', 'name', 'nikeName', 'class', 'createTime']
     for (let name of names) {
-      if (data[name]) newData[name] = data[name]
+      if (data[name]) user[name] = data[name]
     }
-    if (data.detail) {
-      newData.detail = {}
-      let names = ['web', 'phone', 'info', 'sex', 'birthDate', 'location', 'avatar', 'showPhone', 'showDate']
+    if (data.secure) {
+      let names = ['password', 'salt', 'valid', 'emailCode', 'emailTime', 'autoLogin']
       for (let name of names) {
-        if (data.detail[name]) newData.detail[name] = data.detail[name]
+        if (data.secure[name]) user.secure[name] = data.secure[name]
       }
     }
-    await UserDB.update({
-      _id: userId
-    }, {
-      $set: newData
-    })
+    await user.save(() => { })
     return true
   } catch (error) {
     return false
@@ -224,7 +209,7 @@ exports.getById = async userId => {
 exports.getByName = async userName => {
   try {
     let user = await UserDB.findOne({
-      name: userName
+      name: userName.toString().toLowerCase()
     })
     return user
   } catch (error) {
@@ -235,7 +220,7 @@ exports.getByName = async userName => {
 exports.getByEmail = async userEmail => {
   try {
     let user = await UserDB.findOne({
-      email: userEmail
+      email: userEmail.toString().toLowerCase()
     })
     return user
   } catch (error) {
@@ -246,7 +231,7 @@ exports.getByEmail = async userEmail => {
 exports.validByEmail = async userEmail => {
   let user = await exports.getByEmail(userEmail)
   if (!user) return false
-  user.valid = true
+  user.secure.valid = true
   await user.save()
   return true
 }
@@ -254,23 +239,22 @@ exports.validByEmail = async userEmail => {
 exports.setPasswordByEmail = async (userEmail, password, userSalt) => {
   let user = await exports.getByEmail(userEmail)
   if (!user) return false
-  user.password = password
-  user.salt = userSalt
+  user.secure.password = password
+  user.secure.salt = userSalt
   await user.save()
   return true
 }
 
-async function test () {
-  let result = await exports.setInfoById('5a4104318a51da3ab0ebea61', {
-    publicEmail: 'zhenlychen@foxmail.com',
-    bio: 'I\'m dalao~',
-    gender: 2,
-    show: {
-      phone: false,
-      gender: true,
-      birth: false
+/*
+async function test (params) {
+  let res = await exports.setById('5a423d7b1957c732d450a4ac', {
+    nikeName: 'ZhenlyChen',
+    secure: {
+      password: 'abc'
     }
   })
-  console.log(result)
+  console.log(res)
 }
+
 test()
+ */

@@ -3,7 +3,7 @@ const utilCtrl = require('../controller/util')
 const util = new Router()
 
 util.get('/vCode', utilCtrl.getVCode)
-util.get('/EmailCode', utilCtrl.getEmailCode)
+util.post('/EmailCode', utilCtrl.getEmailCode)
 util.get('/ClientInfo/:clientId', utilCtrl.getClientInfo)
 
 module.exports = util

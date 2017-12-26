@@ -1,7 +1,8 @@
-const util = require('../../lib/util')
 const userService = require('../service/user')
 const clientService = require('../service/client')
 const verify = require('../../lib/verify')
+const assert = require('../../lib/assert')
+const util = require('../../lib/util')
 const _ = require('lodash')
 
 exports.getVCode = async ctx => {
@@ -11,8 +12,10 @@ exports.getVCode = async ctx => {
 }
 
 exports.getEmailCode = async ctx => {
-  let body = _.pick(ctx.request.body, ['email'])
+  let body = _.pick(ctx.request.body, ['email', 'vCode'])
   verify({ data: body.email, type: 'string', maxLength: 64, regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, message: 'invalid_email' })
+  verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
+  assert(await util.checkVCode(ctx, body.vCode), 'error_code')
   await userService.getEmailCode(body.email)
   ctx.status = 200
 }
