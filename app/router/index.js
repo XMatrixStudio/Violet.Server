@@ -40,9 +40,9 @@ for (const method in whiteList) {
 router.use('/v2/self/', async (ctx, next) => {
   if (!ctx.state.passStatusCheck) {
     assert(ctx.session.userId, 'invalid_token')
-    assert(ctx.session.remember || (new Date() - new Date(ctx.session.time)) >= 86400 * 1000, 'timeout_token')
+    assert(ctx.session.remember || ((new Date() - new Date(ctx.session.time)) <= (86400 * 1000)), 'timeout_token')
     if (!ctx.session.remember) ctx.session.time = new Date()
-    let user = await ctx.getUserData()
+    let user = await ctx.getUserData(ctx)
     assert(user, 'invalid_token')
   }
   return next()

@@ -57,8 +57,8 @@ exports.changePassword = async ctx => {
 
 exports.validEmail = async ctx => {
   let body = _.pick(ctx.request.body, ['vCode'])
-  verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
-  await userService.validEmail(ctx.userData().email, body.vCode)
+  verify({ data: body.vCode, type: 'string', maxLength: 6, minLength: 6, message: 'error_emailCode' })
+  await userService.validEmail((await ctx.getUserData(ctx)).email, body.vCode)
   ctx.status = 200
 }
 

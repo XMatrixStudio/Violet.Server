@@ -12,10 +12,8 @@ exports.getVCode = async ctx => {
 }
 
 exports.getEmailCode = async ctx => {
-  let body = _.pick(ctx.request.body, ['email', 'vCode'])
+  let body = _.pick(ctx.request.body, ['email'])
   verify({ data: body.email, type: 'string', maxLength: 64, regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, message: 'invalid_email' })
-  verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
-  assert(await util.checkVCode(ctx, body.vCode), 'error_code')
   await userService.getEmailCode(body.email)
   ctx.status = 200
 }
