@@ -77,3 +77,7 @@ exports.patchBaseInfo = async ctx => {
   await userService.patchBaseInfo(ctx.getUserId(), body)
   ctx.status = 200
 }
+
+exports.loginState = async ctx => {
+  ctx.status = 200
+}
