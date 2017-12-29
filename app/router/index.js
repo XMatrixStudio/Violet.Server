@@ -17,6 +17,9 @@ const whiteList = {
     '/v2/self/util/EmailCode': true,
     '/v2/self/users/register': true,
     '/v2/self/users/password': true
+  },
+  delete: {
+    '/v2/self/users/login': true
   }
 }
 

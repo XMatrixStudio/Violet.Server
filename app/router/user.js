@@ -2,6 +2,7 @@ const Router = require('koa-router')
 const userCtrl = require('../controller/user')
 const user = new Router()
 
+user.get('/login', userCtrl.loginState) // 检查登陆状态
 user.post('/login', userCtrl.login) // 登陆
 user.delete('/login', userCtrl.logout) // 退出登陆
 user.post('/register', userCtrl.register) // 注册
