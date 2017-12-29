@@ -2,7 +2,7 @@ const userModel = require('../model/user')
 const assert = require('../../lib/assert')
 const util = require('../../lib/util')
 const config = require('../../config')
-
+const email = require('../../lib/email')
 exports.login = async (userName, userPassword) => {
   let user
   userName = userName.toString().toLowerCase()
@@ -87,9 +87,9 @@ exports.getEmailCode = async userEmail => {
     assert(time.toString() !== 'Invalid Date', 'Invalid_Date_danger!') // 不应该发生的错误
     assert(new Date() - time > 1000 * 60, 'limit_time')
   }
-  let code = 999999
   // let code = parseInt(Math.random() * 900000 + 100000)
-  // 发送验证邮件
+  // await email.sendEmailCode(userEmail, user.nikeName, code)
+  let code = 999999
   await userModel.setById(user._id, {
     secure: {
       emailCode: code,

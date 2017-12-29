@@ -46,7 +46,7 @@ exports.logout = async ctx => {
 exports.changePassword = async ctx => {
   let body = _.pick(ctx.request.body, ['email', 'password', 'vCode'])
   verify({ data: body.email, type: 'string', regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, maxLength: 64, message: 'invalid_email' })
-  verify({ data: body.password, type: 'string', maxLength: 64, minLength: 6, message: 'invalid_password' })
+  verify({ data: body.password, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_password' })
   verify({ data: body.vCode, type: 'string', maxLength: 6, minLength: 6, message: 'error_emailCode' })
   await userService.changePassword(body.email, body.password, body.vCode)
   ctx.status = 200
