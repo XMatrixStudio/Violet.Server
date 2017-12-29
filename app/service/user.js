@@ -17,7 +17,7 @@ exports.login = async (userName, userPassword) => {
     id: user._id,
     name: user.nikeName,
     email: user.email,
-    avatar: user.avatar || config.default.avatar,
+    avatar: user.info.avatar || config.default.avatar,
     valid: user.secure.valid
   }
 }

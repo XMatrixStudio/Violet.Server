@@ -1,6 +1,6 @@
 {
-  "name": "violet.server",
-  "version": "1.0.0",
+  "name": "violet",
+  "version": "2.0.0-dev",
   "description": "Violet Server",
   "main": "index.js",
   "directories": {
@@ -17,12 +17,12 @@
   "keywords": [
     "Violet"
   ],
-  "author": "zhenlychen",
+  "author": "XMatrixStudio",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/XMatrixStudio/Violet.Server/issues"
+    "url": "https://github.com/XMatrixStudio/Violet/issues"
   },
-  "homepage": "https://github.com/XMatrixStudio/Violet.Server#readme",
+  "homepage": "https://github.com/XMatrixStudio/Violet#readme",
   "dependencies": {
     "captchapng": "0.0.1",
     "captchapng2": "^1.0.3",

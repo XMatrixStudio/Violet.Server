@@ -6,7 +6,7 @@ const _ = require('lodash')
 
 exports.login = async ctx => {
   let body = _.pick(ctx.request.body, ['userName', 'userPass', 'remember'])
-  assert(body.userName, 'invalid_param')
+  verify({ data: body.userName, type: 'string', message: 'invalid_param' })
   if (body.userName.toString().indexOf('@') !== -1) {
     verify({ data: body.userName, type: 'string', maxLength: 64, regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, message: 'invalid_email' })
   } else {
@@ -14,7 +14,7 @@ exports.login = async ctx => {
   }
   body.userName = body.userName.toString().toLowerCase()
   body.remember = body.remember === 'true'
-  verify({ data: body.userPass, type: 'string', message: 'invalid_pass' })
+  verify({ data: body.userPass, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_pass' })
   let result = await userService.login(body.userName, body.userPass)
   ctx.session.userId = result.id
   ctx.session.time = new Date()
@@ -27,9 +27,7 @@ exports.register = async ctx => {
   let body = _.pick(ctx.request.body, ['name', 'email', 'userPass', 'vCode'])
   verify({ data: body.email, type: 'string', regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, maxLength: 64, message: 'invalid_email' })
   verify({ data: body.name, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{5,18}$/, message: 'invalid_name' })
-  verify({ data: body.userPass, type: 'string', maxLength: 64, minLength: 6, message: 'invalid_password' })
-  let regExp = /^[0-9]$/
-  assert(!regExp.test(body.userPass), 'invalid_password') // 不允许纯数字密码
+  verify({ data: body.userPass, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_password' })
   verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
   assert(await util.checkVCode(ctx, body.vCode), 'error_code')
   let userId = await userService.register(body.email, body.name, body.userPass)

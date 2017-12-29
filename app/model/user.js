@@ -51,29 +51,6 @@ const userSchema = db.Schema({
 const UserDB = db.model('users', userSchema)
 
 /**
- * 获得成就
- *
- * @param {String} userId 用户Id
- * @param {String} clientId 授权客户端Id
- * @param {String} achievementId 成就Id
- */
-exports.addAchievement = async (userId, clientId, achievementId) => {
-  try {
-    let result = await UserDB.update({
-      _id: userId,
-      'auth.clientId': clientId
-    }, {
-      $addToSet: {
-        'auth.$.achievement': achievementId
-      }
-    })
-    return result.nModified === 1
-  } catch (error) {
-    return false
-  }
-}
-
-/**
  * 添加授权
  *
  * @param {String} userId 用户Id
@@ -143,7 +120,7 @@ exports.getAuthList = async userId => {
  * 设置用户个人简介信息
  *
  * @param {String} userId 用户Id
- * @param {Object} data
+ * @param {Object} data 用户个人简介信息
  */
 exports.setInfoById = async (userId, data) => {
   try {
