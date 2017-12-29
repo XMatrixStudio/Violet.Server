@@ -1,3 +1,7 @@
+# files ignored
 node_modules/*
 config/*
 logs/*
+
+# files not ignored
+!config/default.js

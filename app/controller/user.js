@@ -12,7 +12,6 @@ exports.login = async ctx => {
   } else {
     verify({ data: body.userName, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{3,18}$/, message: 'invalid_name' })
   }
-  body.userName = body.userName.toString().toLowerCase()
   body.remember = body.remember === 'true'
   verify({ data: body.userPass, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_pass' })
   let result = await userService.login(body.userName, body.userPass)

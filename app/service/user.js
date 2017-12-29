@@ -5,7 +5,8 @@ const config = require('../../config')
 
 exports.login = async (userName, userPassword) => {
   let user
-  if (userName.toString().indexOf('@') !== -1) {
+  userName = userName.toString().toLowerCase()
+  if (userName.indexOf('@') !== -1) {
     user = await userModel.getByEmail(userName)
   } else {
     user = await userModel.getByName(userName)
