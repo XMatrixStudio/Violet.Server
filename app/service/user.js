@@ -3,6 +3,8 @@ const assert = require('../../lib/assert')
 const util = require('../../lib/util')
 const config = require('../../config')
 const email = require('../../lib/email')
+const cos = require('../../lib/cos')
+
 exports.login = async (userName, userPassword) => {
   let user
   userName = userName.toString().toLowerCase()
@@ -100,4 +102,11 @@ exports.getEmailCode = async userEmail => {
 
 exports.patchBaseInfo = async (userId, body) => {
   await userModel.setById(userId, { detail: body })
+}
+
+exports.avatar = async (userId, avatar) => {
+  await cos.upload(userId + '.jpg', Buffer.from(avatar.replace('data:image/jpeg;base64,', ''), 'base64'))
+  await userModel.setInfoById(userId, {
+    avatar: config.cos.Url + userId + '.jpg'
+  })
 }

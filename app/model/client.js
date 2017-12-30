@@ -17,6 +17,7 @@ exports.addAuthById = async (clientId, value) => {
   try {
     let client = await DevDB.findById(clientId)
     if (!client) throw new Error('null')
+    if (!client.data.authCount) client.data.authCount = 0
     client.data.authCount += value
     await client.save()
   } catch (error) {
@@ -28,6 +29,7 @@ exports.addLoginById = async (clientId, value) => {
   try {
     let client = await DevDB.findById(clientId)
     if (!client) throw new Error('null')
+    if (!client.data.LoginCount) client.data.LoginCount = 0
     client.data.LoginCount += value
     await client.save()
   } catch (error) {
@@ -75,7 +77,7 @@ exports.setById = async (clientId, data) => {
     if (data.data) {
       let names = ['authCount', 'LoginCount']
       for (let name of names) {
-        if (data[name]) client.data[name] = data[name]
+        if (data[name]) client.data[name] = data.data[name]
       }
     }
     await client.save()

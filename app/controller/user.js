@@ -60,7 +60,7 @@ exports.validEmail = async ctx => {
 }
 
 exports.getBaseInfo = async ctx => {
-  ctx.body = await userService.getInfo(ctx.getUserId())
+  ctx.body = await userService.getInfo(ctx.getUserId(ctx))
   ctx.body = 200
 }
 
@@ -71,10 +71,17 @@ exports.patchBaseInfo = async ctx => {
   verify({ data: new Date(body.birthDate), type: 'date', message: 'error_birthDate' })
   verify({ data: body.showPhone, type: 'string', regExp: /^(true)|(false)$/, message: 'error_showPhone' })
   verify({ data: body.showDate, type: 'string', regExp: /^(true)|(false)$/, message: 'error_showDate' })
-  await userService.patchBaseInfo(ctx.getUserId(), body)
+  await userService.patchBaseInfo(ctx.getUserId(ctx), body)
   ctx.status = 200
 }
 
 exports.loginState = async ctx => {
+  ctx.status = 200
+}
+
+exports.avatar = async ctx => {
+  let body = _.pick(ctx.request.body, ['avatar'])
+  verify({ data: body.avatar, type: 'string', maxLength: 100000, message: 'invalid_avatar' })
+  userService.avatar(ctx.getUserId(ctx), body.avatar)
   ctx.status = 200
 }

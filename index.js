@@ -29,7 +29,7 @@ app.context.getUserData = async ctx => {
   return ctx.state.userData
 }
 
-app.context.getUserId = async ctx => {
+app.context.getUserId = ctx => {
   return ctx.session.userId
 }
 
