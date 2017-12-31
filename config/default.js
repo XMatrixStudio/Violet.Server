@@ -1,3 +1,3 @@
 module.exports = {
-  avatar: 'https://icytown.com/images/avatar.gif'
+  avatar: 'http://violet-1252808268.cosgz.myqcloud.com/0.png'
 }

@@ -60,8 +60,7 @@ exports.validEmail = async ctx => {
 }
 
 exports.getBaseInfo = async ctx => {
-  ctx.body = await userService.getInfo(ctx.getUserId(ctx))
-  ctx.body = 200
+  ctx.body = await userService.getBaseInfo(ctx.getUserId(ctx))
 }
 
 exports.patchBaseInfo = async ctx => {
