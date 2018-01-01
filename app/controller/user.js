@@ -64,7 +64,7 @@ exports.getBaseInfo = async ctx => {
 }
 
 exports.patchBaseInfo = async ctx => {
-  let body = _.pick(ctx.request.body, ['sex', 'web', 'phone', 'info', 'location', 'birthDate', 'showPhone', 'showDate'])
+  let body = _.pick(ctx.request.body, ['gender', 'url', 'phone', 'bio', 'location', 'birthDate', 'showPhone', 'showDate'])
   verify({ data: body.sex, type: 'string', regExp: /^[012]$/, message: 'error_sex' })
   verify({ data: body.phone, type: 'string', regExp: /^1[3|4|5|8][0-9]\d{4,8}$/, message: 'error_web' })
   verify({ data: new Date(body.birthDate), type: 'date', message: 'error_birthDate' })

@@ -36,7 +36,6 @@ exports.register = async (userEmail, userName, userPassword) => {
     email: userEmail,
     name: userName.toString().toLowerCase(),
     nikeName: userName,
-    class: 0,
     secure: {
       password: data.password,
       salt: data.salt
@@ -76,7 +75,7 @@ exports.getBaseInfo = async (userId) => {
   return {
     email: user.email,
     name: user.nikeName,
-    class: user.class,
+    userClass: user.userClass,
     info: user.info
   }
 }

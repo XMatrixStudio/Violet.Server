@@ -3,7 +3,10 @@ const userSchema = db.Schema({
   email: String, // 主邮箱, 无大写
   name: String, // 用户名, 无大写
   nikeName: String, // 昵称, 原始数据
-  class: Number, // 用户类型
+  userClass: {
+    type: Number, // 用户类型
+    default: 0
+  },
   createTime: {
     type: Date,
     default: new Date()
@@ -36,9 +39,18 @@ const userSchema = db.Schema({
     location: String,
     avatar: String,
     show: {
-      phone: Boolean,
-      gender: Boolean,
-      birth: Boolean
+      phone: {
+        type: Boolean,
+        default: true
+      },
+      birthDate: {
+        type: Boolean,
+        default: true
+      },
+      location: {
+        type: Boolean,
+        default: true
+      }
     }
   },
   auth: [{
@@ -145,7 +157,7 @@ exports.setInfoById = async (userId, data) => {
 exports.setById = async (userId, data) => {
   try {
     let user = await exports.getById(userId)
-    let names = ['email', 'name', 'nikeName', 'class', 'createTime']
+    let names = ['email', 'name', 'nikeName', 'userClass', 'createTime']
     for (let name of names) {
       if (data[name]) user[name] = data[name]
     }
