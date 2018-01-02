@@ -100,7 +100,7 @@ exports.getEmailCode = async userEmail => {
 }
 
 exports.patchBaseInfo = async (userId, body) => {
-  await userModel.setById(userId, { detail: body })
+  await userModel.setInfoById(userId, body)
 }
 
 exports.avatar = async (userId, avatar) => {
