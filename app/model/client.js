@@ -37,10 +37,11 @@ exports.addLoginById = async (clientId, value) => {
   }
 }
 
-exports.add = async () => {
+exports.add = async (data) => {
   try {
     let client = new DevDB()
     let result = await client.save()
+    if (data) await exports.setById(result._id, data)
     return result._id
   } catch (error) {
     return false

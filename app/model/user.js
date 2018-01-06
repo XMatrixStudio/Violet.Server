@@ -54,8 +54,7 @@ const userSchema = db.Schema({
     }
   },
   auth: [{
-    clientId: String, // db.Schema.Types.ObjectId
-    achievement: [String]
+    clientId: String // db.Schema.Types.ObjectId
   }]
 }, {
   collection: 'users'

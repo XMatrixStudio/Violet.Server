@@ -13,7 +13,13 @@ exports.getList = async userId => {
   let authList = await userModel.getAuthList(userId)
   let list = []
   for (let auth of authList) {
-    list.push(auth.clientId)
+    let client = await clientModel.getById(auth)
+    list.push({
+      name: client.name,
+      id: client.id,
+      icon: client.icon,
+      detail: client.detail
+    })
   }
   return list
 }
