@@ -3,6 +3,7 @@ const user = require('./user')
 const client = require('./client')
 const auth = require('./auth')
 const util = require('./util')
+const api = require('./api')
 const assert = require('../../lib/assert')
 
 // 白名单列表
@@ -10,7 +11,9 @@ const assert = require('../../lib/assert')
 const whiteList = {
   get: {
     '/v2/self/util/vCode': true,
-    '/v2/self/util/ClientInfo/:clientId': true
+    '/v2/self/util/ClientInfo/:clientId': true,
+    '/v2/verify/Token': true,
+    '/v2/users/BaseData': true
   },
   post: {
     '/v2/self/users/login': true,
@@ -51,6 +54,7 @@ router.use('/v2/self/', async (ctx, next) => {
   return next()
 })
 
+router.use('/v2/', api.routes())
 router.use('/v2/self/users', user.routes())
 router.use('/v2/self/util', util.routes())
 router.use('/v2/self/auth', auth.routes())
