@@ -21,6 +21,11 @@ async function getBaseData (token, userId, clientSecret) {
   let data = readToken(token)
   assert(client.id === data.clientId, 'invalid_token') // 检测 code 与 clientSecret 是否匹配
   let userData = await userService.getBaseInfo(data.userId)
+  userData = JSON.parse(JSON.stringify(userData))
+  for (let i in userData.info.show) {
+    if (userData.info.show[i] && userData.info[i]) delete userData.info[i]
+  }
+  delete userData.userClass
   return userData
 }
 
