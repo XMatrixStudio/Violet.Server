@@ -9,7 +9,7 @@ exports.getToken = ctx => {
   verify({ data: body.code, type: 'string', maxLength: 128, minLength: 512, message: 'invalid_code' })
   verify({ data: body.clientSecret, type: 'string', maxLength: 128, minLength: 512, message: 'invalid_clientSecret' })
   assert(body.grantType === 'authorization_code', 'invalid_grantType')
-  let res = apiService.getToken(body.code, body.clientSecret)
+  let res = await apiService.getToken(body.code, body.clientSecret)
   ctx.body = res
 }
 
@@ -18,6 +18,6 @@ exports.getBaseData = ctx => {
   verify({ data: body.accessToken, type: 'string', maxLength: 128, minLength: 512, message: 'invalid_accessToken' })
   verify({ data: body.userId, type: 'string', maxLength: 24, minLength: 24, message: 'invalid_userId' })
   verify({ data: body.clientSecret, type: 'string', maxLength: 128, minLength: 512, message: 'invalid_clientSecret' })
-  let res = apiService.getBaseData(body.accessToken, body.userId, body.clientSecret)
+  let res = await apiService.getBaseData(body.accessToken, body.userId, body.clientSecret)
   ctx.body = res
 }

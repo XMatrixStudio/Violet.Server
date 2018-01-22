@@ -1,5 +1,6 @@
 const clientModel = require('../model/client')
 const userModel = require('../model/user')
+const apiService = require('./api')
 const assert = require('../../lib/assert')
 const util = require('../../lib/util')
 
@@ -56,7 +57,7 @@ exports.auth = async (userId, clientId) => {
   assert(result, 'invalid_clientId')
   if (result.isNew) await clientModel.addAuthById(clientId, 1)
   await clientModel.addLoginById(clientId, 1)
-  let code = await util.generateCode(userId, clientId)
+  let code = apiService.generateCode(userId, clientId)
   let client = await clientModel.getById(clientId)
   return {
     code: code,
