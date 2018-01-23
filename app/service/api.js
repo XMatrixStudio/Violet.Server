@@ -10,14 +10,14 @@ module.exports = {
 }
 
 async function getToken (code, clientSecret) {
-  let client = await verifyClient(clientSecret)
+  let client = await readSecret(clientSecret)
   let data = readCode(code)
   assert(client.id === data.clientId, 'invalid_code') // 检测 code 与 clientSecret 是否匹配
   return generateToken(data.userId, data.clientId)
 }
 
 async function getBaseData (token, userId, clientSecret) {
-  let client = await verifyClient(clientSecret)
+  let client = await readSecret(clientSecret)
   let data = readToken(token)
   assert(client.id === data.clientId, 'invalid_token') // 检测 code 与 clientSecret 是否匹配
   let userData = await userService.getBaseInfo(data.userId)
@@ -51,6 +51,7 @@ function readCode (code, time) {
     clientId: data.c
   }
 }
+
 function generateToken (userId, clientId) {
   const encrypted = util.encrypt({
     c: generateCode(userId, clientId),
@@ -72,7 +73,7 @@ function readToken (token) {
   return readCode(decrypted.c, 1000 * 60 * 60 * 24 * 30) // 一个月的有效期
 }
 
-async function verifyClient (clientSecret) {
+async function readSecret (clientSecret) {
   let data = clientSecret.splice('&')
   assert(data.length === 3, 'invalid_clientSecret') // 检测数据完整性
   let client = await clientModel.getById(data[0])

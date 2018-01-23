@@ -26,7 +26,9 @@ const userSchema = db.Schema({
       type: Date,
       default: new Date('2000-1-1')
     },
-    autoLogin: Boolean
+    autoLogin: Boolean,
+    errorTime: Date,
+    errorCount: Number
   },
   info: {
     publicEmail: String,
@@ -54,7 +56,8 @@ const userSchema = db.Schema({
     }
   },
   auth: [{
-    clientId: String // db.Schema.Types.ObjectId
+    clientId: String, // db.Schema.Types.ObjectId
+    time: Date
   }]
 }, {
   collection: 'users'
@@ -76,10 +79,10 @@ exports.addAuth = async (userId, clientId) => {
       }
     }, {
       $push: {
-        auth: {
-          clientId: clientId
+          auth: {
+            clientId: clientId
+          }
         }
-      }
     })
     return {
       isNew: result.nModified === 1
@@ -102,10 +105,10 @@ exports.deleteAuth = async (userId, clientId) => {
       'auth.clientId': clientId
     }, {
       $pull: {
-        auth: {
-          clientId: clientId
+          auth: {
+            clientId: clientId
+          }
         }
-      }
     })
     return result.nModified === 1
   } catch (error) {
@@ -231,4 +234,14 @@ exports.setPasswordByEmail = async (userEmail, password, userSalt) => {
   user.secure.salt = userSalt
   await user.save()
   return true
+}
+
+exports.addError = async (userId) => {
+  let user = await exports.getById(userId)
+  if (user.secure.errorTime && new Date().getTime() - user.secure.errorTime.getTime() > 1000 * 60 * 60) {
+    user.secure.errorTime = new Date()
+  }
+  user.secure.errorCount = user.secure.errorCount || 0
+  user.secure.errorCount++
+  user.save(() => { })
 }
