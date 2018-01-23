@@ -79,10 +79,10 @@ exports.addAuth = async (userId, clientId) => {
       }
     }, {
       $push: {
-          auth: {
-            clientId: clientId
-          }
+        auth: {
+          clientId: clientId
         }
+      }
     })
     return {
       isNew: result.nModified === 1
@@ -105,10 +105,10 @@ exports.deleteAuth = async (userId, clientId) => {
       'auth.clientId': clientId
     }, {
       $pull: {
-          auth: {
-            clientId: clientId
-          }
+        auth: {
+          clientId: clientId
         }
+      }
     })
     return result.nModified === 1
   } catch (error) {
