@@ -5,6 +5,7 @@ let devSchema = db.Schema({
   icon: String,
   key: String,
   url: String,
+  callBack: String,
   detail: String,
   data: {
     authCount: Number,

@@ -22,10 +22,7 @@ exports.auth = async ctx => {
   }
   verify({ data: body.clientId, type: 'string', maxLength: 24, minLength: 24, message: 'invalid_clientId' })
   let result = await authServer.auth(ctx.getUserId(ctx), body.clientId)
-  ctx.body = {
-    url: result.url,
-    code: result.code
-  }
+  ctx.body = result
 }
 
 exports.delete = async ctx => {
