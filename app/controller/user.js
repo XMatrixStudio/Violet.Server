@@ -10,7 +10,7 @@ exports.login = async ctx => {
   if (body.userName.toString().indexOf('@') !== -1) {
     verify({ data: body.userName, type: 'string', maxLength: 64, regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, message: 'invalid_email' })
   } else {
-    verify({ data: body.userName, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{3,18}$/, message: 'invalid_name' })
+    verify({ data: body.userName, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{0,31}$/, message: 'invalid_name' })
   }
   body.remember = body.remember === 'true'
   verify({ data: body.userPass, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_pass' })
@@ -25,7 +25,7 @@ exports.login = async ctx => {
 exports.register = async ctx => {
   let body = _.pick(ctx.request.body, ['name', 'email', 'userPass', 'vCode'])
   verify({ data: body.email, type: 'string', regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, maxLength: 64, message: 'invalid_email' })
-  verify({ data: body.name, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{5,18}$/, message: 'invalid_name' })
+  verify({ data: body.name, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{0,31}$/, message: 'invalid_name' })
   verify({ data: body.userPass, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_password' })
   verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
   assert(await util.checkVCode(ctx, body.vCode), 'error_code')
