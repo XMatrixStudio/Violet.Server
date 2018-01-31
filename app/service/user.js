@@ -26,6 +26,7 @@ exports.login = async (userName, userPassword) => {
 }
 
 exports.register = async (userEmail, userName, userPassword) => {
+  assert(!util.isReservedUsername(userName), 'reserved_name')
   let user = await userModel.getByEmail(userName)
   assert(!user, 'exist_email') // 用户邮箱已存在
   user = await userModel.getByName(userName)
@@ -72,11 +73,13 @@ async function checkEmailCode (userEmail, vCode) {
 
 exports.getBaseInfo = async (userId) => {
   let user = await userModel.getById(userId)
+  let info = user.info
+  info.avatar = info.avatar || config.default.avatar
   return {
     email: user.email,
     name: user.nikeName,
     userClass: user.userClass,
-    info: user.info
+    info: info
   }
 }
 
