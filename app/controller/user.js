@@ -71,12 +71,12 @@ exports.patchBaseInfo = async ctx => {
     phone: body.showPhone,
     location: body.showLocation
   }
-  verify({ data: body.gender, type: 'string', regExp: /^[012]$/, message: 'invalid_data' })
-  verify({ data: body.bio, type: 'string', maxLength: 256, message: 'invalid_data' })
-  verify({ data: body.url, type: 'string', maxLength: 256, message: 'invalid_data' })
-  verify({ data: body.location, type: 'string', maxLength: 256, message: 'invalid_data' })
-  verify({ data: body.phone, type: 'string', regExp: /^1[3|4|5|8][0-9]\d{4,8}$/, message: 'invalid_data' })
-  verify({ data: body.birthDate, type: 'date', message: 'invalid_data' })
+  verify({ data: body.gender, require: false, type: 'string', regExp: /^[012]$/, message: 'invalid_data' })
+  verify({ data: body.bio, require: false, type: 'string', maxLength: 256, message: 'invalid_data' })
+  verify({ data: body.url, require: false, type: 'string', maxLength: 256, message: 'invalid_data' })
+  verify({ data: body.location, require: false, type: 'string', maxLength: 256, message: 'invalid_data' })
+  verify({ data: body.phone, require: false, type: 'string', regExp: /^1[3|4|5|8][0-9]\d{4,8}$/, message: 'invalid_data' })
+  verify({ data: body.birthDate, require: false, type: 'date', message: 'invalid_data' })
   verify({ data: body.show, message: 'invalid_data' })
   verify({ data: body.show.birthDate, type: 'string', regExp: /^(true)|(false)$/, message: 'invalid_data' })
   verify({ data: body.show.phone, type: 'string', regExp: /^(true)|(false)$/, message: 'invalid_data' })

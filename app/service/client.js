@@ -1,6 +1,7 @@
 const ClientModel = require('../model/client')
 const assert = require('../../lib/assert')
 const util = require('../../lib/util')
+const config = require('../../config/default')
 
 exports.getList = async userId => {
   let clients = await ClientModel.getByOwner(userId)
@@ -10,7 +11,7 @@ exports.getList = async userId => {
     result.push({
       name: client.name,
       id: client._id,
-      icon: client.icon,
+      icon: client.icon || config.avatar,
       detail: client.detail
     })
   }
