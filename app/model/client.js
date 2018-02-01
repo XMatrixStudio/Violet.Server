@@ -72,7 +72,7 @@ exports.setById = async (clientId, data) => {
   try {
     let client = await DevDB.findById(clientId)
     if (!client) throw new Error('null')
-    let names = ['name', 'ownerId', 'icon', 'key', 'url', 'detail']
+    let names = ['name', 'ownerId', 'icon', 'key', 'url', 'detail', 'callBack']
     for (let name of names) {
       if (data[name]) client[name] = data[name]
     }

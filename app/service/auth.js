@@ -1,6 +1,7 @@
 const clientModel = require('../model/client')
 const userModel = require('../model/user')
 const apiService = require('./api')
+const config = require('../../config/default')
 const assert = require('../../lib/assert')
 
 /**
@@ -18,7 +19,7 @@ exports.getList = async userId => {
       list.push({
         name: client.name,
         id: client.id,
-        icon: client.icon,
+        icon: client.icon || config.avatar,
         url: client.url,
         detail: client.detail
       })
