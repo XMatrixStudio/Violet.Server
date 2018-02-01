@@ -141,12 +141,12 @@ exports.setInfoById = async (userId, data) => {
     let user = await exports.getById(userId)
     let names = ['publicEmail', 'email', 'bio', 'url', 'phone', 'gender', 'birthDate', 'location', 'avatar']
     for (let name of names) {
-      if (data[name]) user.info[name] = data[name]
+      if (data[name] !== undefined) user.info[name] = data[name]
     }
     if (data.show) {
       let names = ['phone', 'gender', 'birth']
       for (let name of names) {
-        if (data.show[name]) user.info.show[name] = data.show[name]
+        if (data.show[name] !== undefined) user.info.show[name] = data.show[name]
       }
     }
     await user.save(() => { })
