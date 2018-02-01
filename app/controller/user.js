@@ -76,7 +76,6 @@ exports.patchBaseInfo = async ctx => {
   verify({ data: body.url, require: false, type: 'string', maxLength: 256, message: 'invalid_data' })
   verify({ data: body.location, require: false, type: 'string', maxLength: 64, message: 'invalid_data' })
   verify({ data: body.phone, require: false, type: 'string', maxLength: 16, message: 'invalid_data' })
-  verify({ data: body.birthDate, require: false, type: 'date', message: 'invalid_data' })
   verify({ data: body.show, message: 'invalid_data' })
   verify({ data: body.show.birthDate, type: 'string', regExp: /^(true)|(false)$/, message: 'invalid_data' })
   verify({ data: body.show.phone, type: 'string', regExp: /^(true)|(false)$/, message: 'invalid_data' })

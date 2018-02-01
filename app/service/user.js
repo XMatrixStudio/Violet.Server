@@ -91,9 +91,8 @@ exports.getEmailCode = async userEmail => {
     assert(time.toString() !== 'Invalid Date', 'Invalid_Date_danger!') // 不应该发生的错误
     assert(new Date() - time > 1000 * 60, 'limit_time')
   }
-  // let code = parseInt(Math.random() * 900000 + 100000)
-  // await email.sendEmailCode(userEmail, user.nikeName, code)
-  let code = 999999
+  let code = parseInt(Math.random() * 900000 + 100000)
+  await email.sendEmailCode(userEmail, user.nikeName, code)
   await userModel.setById(user._id, {
     secure: {
       emailCode: code,
