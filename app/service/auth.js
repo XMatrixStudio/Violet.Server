@@ -21,7 +21,8 @@ exports.getList = async userId => {
         id: client.id,
         icon: client.icon || config.avatar,
         url: client.url,
-        detail: client.detail
+        detail: client.detail,
+        time: auth.time
       })
     }
   }

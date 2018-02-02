@@ -84,6 +84,12 @@ exports.addAuth = async (userId, clientId) => {
         }
       }
     })
+    await UserDB.update({
+      _id: userId,
+      'auth.clientId': clientId
+    }, {
+      'auth.$.time': new Date()
+    })
     return {
       isNew: result.nModified === 1
     }

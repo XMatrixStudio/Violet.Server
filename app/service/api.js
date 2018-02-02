@@ -2,6 +2,7 @@ const assert = require('../../lib/assert')
 const clientModel = require('../model/client')
 const util = require('../../lib/util')
 const userService = require('../service/user')
+const authService = require('../service/auth')
 
 module.exports = {
   getToken: getToken,
@@ -19,7 +20,9 @@ async function getToken (code, clientSecret) {
 async function getBaseData (token, userId, clientSecret) {
   let client = await readSecret(clientSecret)
   let data = readToken(token)
-  assert(client.id === data.clientId, 'invalid_token') // 检测 code 与 clientSecret 是否匹配
+  assert(client.id === data.clientId, 'invalid_token') // 检测 token 与 clientSecret 是否匹配
+  assert(data.userId === userId, 'invalid_token') // 检测 userId 与 token 是否匹配
+  assert(await authService.get(userId, client.id), 'invalid_token') // 检测是否授权
   let userData = await userService.getBaseInfo(data.userId)
   userData = JSON.parse(JSON.stringify(userData))
   for (let i in userData.info.show) {

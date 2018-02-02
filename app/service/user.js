@@ -103,7 +103,6 @@ exports.getEmailCode = async userEmail => {
 }
 
 exports.patchBaseInfo = async (userId, body) => {
-  console.log(body)
   let res = await userModel.setInfoById(userId, body)
   assert(res, 'Invalid_data')
 }
