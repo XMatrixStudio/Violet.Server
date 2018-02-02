@@ -37,6 +37,7 @@ exports.register = async (userEmail, userName, userPassword) => {
     email: userEmail,
     name: userName.toString().toLowerCase(),
     nikeName: userName,
+    creatTime: new Date(),
     secure: {
       password: data.password,
       salt: data.salt
@@ -102,7 +103,9 @@ exports.getEmailCode = async userEmail => {
 }
 
 exports.patchBaseInfo = async (userId, body) => {
-  await userModel.setInfoById(userId, body)
+  console.log(body)
+  let res = await userModel.setInfoById(userId, body)
+  assert(res, 'Invalid_data')
 }
 
 exports.avatar = async (userId, avatar) => {

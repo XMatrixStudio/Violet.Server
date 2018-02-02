@@ -144,7 +144,7 @@ exports.setInfoById = async (userId, data) => {
       if (data[name] !== undefined) user.info[name] = data[name]
     }
     if (data.show) {
-      let names = ['phone', 'gender', 'birth']
+      let names = ['phone', 'location', 'birthDate']
       for (let name of names) {
         if (data.show[name] !== undefined) user.info.show[name] = data.show[name]
       }

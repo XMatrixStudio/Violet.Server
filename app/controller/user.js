@@ -65,7 +65,11 @@ exports.getBaseInfo = async ctx => {
 
 exports.patchBaseInfo = async ctx => {
   let body = _.pick(ctx.request.body, ['gender', 'url', 'phone', 'bio', 'location', 'birthDate', 'showPhone', 'showBirthDate', 'showLocation'])
-  body.birthDate = new Date(body.birthDate || '2018-1-1')
+  if (isNaN((new Date(body.birthDate)).getTime())) {
+    body.birthDate = ''
+  } else {
+    body.birthDate = new Date(body.birthDate)
+  }
   body.show = {
     birthDate: body.showBirthDate,
     phone: body.showPhone,
