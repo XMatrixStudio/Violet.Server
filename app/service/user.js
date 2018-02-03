@@ -37,7 +37,7 @@ exports.register = async (userEmail, userName, userPassword) => {
     email: userEmail,
     name: userName.toString().toLowerCase(),
     nikeName: userName,
-    creatTime: new Date(),
+    createTime: new Date(),
     secure: {
       password: data.password,
       salt: data.salt
