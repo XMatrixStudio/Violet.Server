@@ -54,7 +54,7 @@ router.use('/v2/self/', async (ctx, next) => {
   return next()
 })
 
-router.use('/v2/', api.routes())
+router.use('/v2', api.routes())
 router.use('/v2/self/users', user.routes())
 router.use('/v2/self/util', util.routes())
 router.use('/v2/self/auth', auth.routes())
