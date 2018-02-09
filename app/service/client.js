@@ -57,7 +57,7 @@ exports.delete = async clientId => {
 }
 
 exports.changeKey = async clientId => {
-  let newKey = util.rand(200)
+  let newKey = util.rand(200).substr(0, 24)
   let result = await ClientModel.setById(clientId, {
     key: newKey
   })
