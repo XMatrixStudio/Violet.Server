@@ -26,7 +26,7 @@ async function getBaseData (token, userId, clientSecret) {
   let userData = await userService.getBaseInfo(data.userId)
   userData = JSON.parse(JSON.stringify(userData))
   for (let i in userData.info.show) {
-    if (userData.info.show[i] && userData.info[i]) delete userData.info[i]
+    if (!userData.info.show[i] && userData.info[i]) delete userData.info[i]
   }
   delete userData.userClass
   return userData
