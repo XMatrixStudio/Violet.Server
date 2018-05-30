@@ -27,7 +27,7 @@ exports.add = async (userId) => {
     detail: '应用简介',
     url: 'https://oauth.xmatrix.studio',
     callBack: 'https://oauth.xmatrix.studio',
-    key: util.rand(200),
+    key: util.rand(200).substr(0, 24),
     icon: config.default.avatar,
     data: {
       authCount: 0,
