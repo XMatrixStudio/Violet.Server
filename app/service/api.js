@@ -3,11 +3,42 @@ const clientModel = require('../model/client')
 const util = require('../../lib/util')
 const userService = require('../service/user')
 const authService = require('../service/auth')
+const clientService = require('../service/client')
 
 module.exports = {
   getToken: getToken,
   getBaseData: getBaseData,
-  generateCode: generateCode
+  generateCode: generateCode,
+  login: login,
+  register: register,
+  getEmailCode: getEmailCode,
+  changePassword: changePassword
+}
+
+// 直接登陆接口
+async function login (userName, userPass, clientSecret) {
+  let client = await readSecret(clientSecret)
+  let userData = await userService.login(userName, userPass)
+  let authData = await authService.auth(userData.id, client.id)
+  return authData.code
+}
+
+// 直接注册接口
+async function register (userEmail, userName, userPassword, clientSecret) {
+  await readSecret(clientSecret)
+  await userService.register(userEmail, userName, userPassword)
+}
+
+// 直接获取邮件接口
+async function getEmailCode (userEmail, clientSecret) {
+  await readSecret(clientSecret)
+  await userService.getEmailCode(userEmail)
+}
+
+// 直接更改密码接口
+async function changePassword (userEmail, userPassword, vCode, clientSecret) {
+  await readSecret(clientSecret)
+  await userService.changePassword(userEmail, userPassword, vCode);
 }
 
 async function getToken (code, clientSecret) {

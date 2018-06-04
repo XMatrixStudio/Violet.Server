@@ -20,6 +20,10 @@ const whiteList = {
     '/v2/self/util/EmailCode': true,
     '/v2/self/users/register': true,
     '/v2/self/users/password': true
+    '/v2/api/Login': true
+    '/v2/api/Register': true
+    '/v2/api/ChangePassword': true
+    '/v2/api/GetEmailCode': true
   },
   delete: {
     '/v2/self/users/login': true
