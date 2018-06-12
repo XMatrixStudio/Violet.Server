@@ -54,7 +54,10 @@ async function getToken (code, clientSecret) {
   let client = await readSecret(clientSecret)
   let data = readCode(code)
   assert(client.id === data.clientId, 'invalid_code') // 检测 code 与 clientSecret 是否匹配
-  return generateToken(data.userId, data.clientId)
+  return {
+    userId: data.userId,
+    token: generateToken(data.userId, data.clientId)
+  }
 }
 
 async function getBaseData (token, userId, clientSecret) {
@@ -83,7 +86,9 @@ function generateCode (userId, clientId) {
 
 function readCode (code, time) {
   time = time || 1000 * 60 * 10
+  console.log(code)
   let data = util.decrypt(code)
+  console.log(data)
   assert(data, 'invalid_code') // 解密code
   data = JSON.parse(data)
   assert(data.t && data.c && data.u, 'invalid_code') // 检测code的完整性
@@ -97,10 +102,10 @@ function readCode (code, time) {
 }
 
 function generateToken (userId, clientId) {
-  const encrypted = util.encrypt({
+  const encrypted = util.encrypt(JSON.stringify({
     c: generateCode(userId, clientId),
     t: 'token'
-  })
+  }))
   const hash = util.hash(encrypted + 'token')
   return `${encrypted}&${hash}`
 }
@@ -124,7 +129,6 @@ async function readSecret (clientSecret) {
   assert(client, 'invalid_clientSecret') // 检测是否存在对应的ClientId
   assert(util.hash(data[1] + client.key) === data[2], 'invalid_clientSecret') // 检测数据合法性
   let validTime = util.decrypt(data[1], client.key) // 解密数据
-  console.log(validTime, data[1], client.key)
   assert(validTime, 'invalid_clientSecret') // 检测解密状态
   validTime = new Date(parseInt(validTime))
   assert(!Number.isNaN(validTime.getTime()), 'invalid_clientSecret') // 检测时间合法性

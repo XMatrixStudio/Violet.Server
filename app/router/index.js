@@ -12,14 +12,14 @@ const whiteList = {
   get: {
     '/v2/self/util/vCode': true,
     '/v2/self/util/ClientInfo/:clientId': true,
-    '/v2/verify/Token': true,
-    '/v2/users/BaseData': true
   },
   post: {
     '/v2/self/users/login': true,
     '/v2/self/util/EmailCode': true,
     '/v2/self/users/register': true,
     '/v2/self/users/password': true,
+    '/v2/api/Token': true,
+    '/v2/api/BaseData': true,
     '/v2/api/Login': true,
     '/v2/api/Register': true,
     '/v2/api/ChangePassword': true,
@@ -58,7 +58,7 @@ router.use('/v2/self/', async (ctx, next) => {
   return next()
 })
 
-router.use('/v2', api.routes())
+router.use('/v2/api', api.routes())
 router.use('/v2/self/users', user.routes())
 router.use('/v2/self/util', util.routes())
 router.use('/v2/self/auth', auth.routes())
