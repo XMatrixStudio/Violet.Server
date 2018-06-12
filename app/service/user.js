@@ -27,7 +27,7 @@ exports.login = async (userName, userPassword) => {
 
 exports.register = async (userEmail, userName, userPassword) => {
   assert(!util.isReservedUsername(userName), 'reserved_name')
-  let user = await userModel.getByEmail(userName)
+  let user = await userModel.getByEmail(userEmail)
   assert(!user, 'exist_email') // 用户邮箱已存在
   user = await userModel.getByName(userName)
   assert(!user, 'exist_name') // 用户名已存在
