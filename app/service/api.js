@@ -19,6 +19,9 @@ module.exports = {
 async function login (userName, userPass, clientSecret) {
   let client = await readSecret(clientSecret)
   let userData = await userService.login(userName, userPass)
+  if (userData.valid == false) {
+    return userData.email
+  }
   let authData = await authService.auth(userData.id, client.id)
   return authData.code
 }
@@ -64,11 +67,12 @@ async function getBaseData (token, userId, clientSecret) {
 }
 
 function generateCode (userId, clientId) {
-  return util.encrypt({
+  let str = JSON.stringify({
     t: (new Date()).getTime(),
     u: userId,
     c: clientId
   })
+  return util.encrypt(str)
 }
 
 function readCode (code, time) {
@@ -96,7 +100,7 @@ function generateToken (userId, clientId) {
 }
 
 function readToken (token) {
-  let data = token.splice('&')
+  let data = token.split('&')
   assert(data.length === 2, 'invalid_token') // 检测数据完整性
   assert(util.hash(data[0] + 'token') === data[1], 'invalid_token') // 检测签名有效性
   let decrypted = util.decrypt(data[0])
@@ -108,14 +112,15 @@ function readToken (token) {
 }
 
 async function readSecret (clientSecret) {
-  let data = clientSecret.splice('&')
+  let data = clientSecret.split('&')
   assert(data.length === 3, 'invalid_clientSecret') // 检测数据完整性
   let client = await clientModel.getById(data[0])
   assert(client, 'invalid_clientSecret') // 检测是否存在对应的ClientId
   assert(util.hash(data[1] + client.key) === data[2], 'invalid_clientSecret') // 检测数据合法性
   let validTime = util.decrypt(data[1], client.key) // 解密数据
+  console.log(validTime, data[1], client.key)
   assert(validTime, 'invalid_clientSecret') // 检测解密状态
-  validTime = new Date(validTime)
+  validTime = new Date(parseInt(validTime))
   assert(!Number.isNaN(validTime.getTime()), 'invalid_clientSecret') // 检测时间合法性
   assert((new Date().getTime()) - validTime < 1000 * 60, 'invalid_clientSecret') // 检测密钥有效期
   return client
