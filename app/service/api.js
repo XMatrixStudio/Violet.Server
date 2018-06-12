@@ -20,10 +20,16 @@ async function login (userName, userPass, clientSecret) {
   let client = await readSecret(clientSecret)
   let userData = await userService.login(userName, userPass)
   if (userData.valid == false) {
-    return userData.email
+    return {
+      valid: false,
+      email: userData.email
+    }
   }
   let authData = await authService.auth(userData.id, client.id)
-  return authData.code
+  return {
+    valid: true,
+    code: authData.code
+  }
 }
 
 // 直接注册接口
