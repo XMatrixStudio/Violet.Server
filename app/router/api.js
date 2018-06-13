@@ -8,4 +8,6 @@ api.post('/Login', apiCtrl.login)
 api.post('/Register', apiCtrl.register)
 api.post('/ChangePassword', apiCtrl.changePassword)
 api.post('/GetEmailCode', apiCtrl.getEmailCode)
+api.post('/validEmail', apiCtrl.validEmail)
+
 module.exports = api

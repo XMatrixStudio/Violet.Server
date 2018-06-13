@@ -23,6 +23,7 @@ const whiteList = {
     '/v2/api/Login': true,
     '/v2/api/Register': true,
     '/v2/api/ChangePassword': true,
+    '/v2/api/validEmail': true,
     '/v2/api/GetEmailCode': true
   },
   delete: {

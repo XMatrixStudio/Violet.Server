@@ -64,3 +64,12 @@ exports.getEmailCode = async ctx => {
   await apiService.getEmailCode(body.email, body.clientSecret)
   ctx.status = 200
 }
+
+exports.validEmail = async ctx => {
+  let body = _.pick(ctx.request.body, ['email', 'vCode', 'clientSecret'])
+  verify({ data: body.email, type: 'string', maxLength: 64, regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, message: 'invalid_email' })
+  verify({ data: body.vCode, type: 'string', maxLength: 6, minLength: 6, message: 'error_emailCode' })
+  verify({ data: body.clientSecret, type: 'string', minLength: 20, maxLength: 512, message: 'invalid_clientSecret' })
+  await userService.validEmail(body.email, body.vCode)
+  ctx.status = 200
+}
