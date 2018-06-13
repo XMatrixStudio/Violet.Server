@@ -15,7 +15,8 @@ exports.getToken = async ctx => {
 
 exports.getBaseData = async ctx => {
   let body = _.pick(ctx.request.body, ['accessToken', 'userId', 'clientSecret'])
-  verify({ data: body.accessToken, type: 'string', minLength: 128, maxLength: 512, message: 'invalid_accessToken' })
+  console.log(body.accessToken)
+  verify({ data: body.accessToken, type: 'string', minLength: 128, maxLength: 1024, message: 'invalid_accessToken' })
   verify({ data: body.userId, type: 'string', minLength: 24, maxLength: 24, message: 'invalid_userId' })
   verify({ data: body.clientSecret, type: 'string', minLength: 128, maxLength: 512, message: 'invalid_clientSecret' })
   let res = await apiService.getBaseData(body.accessToken, body.userId, body.clientSecret)
