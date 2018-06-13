@@ -15,7 +15,6 @@ exports.getToken = async ctx => {
 
 exports.getBaseData = async ctx => {
   let body = _.pick(ctx.request.body, ['accessToken', 'userId', 'clientSecret'])
-  console.log(body.accessToken)
   verify({ data: body.accessToken, type: 'string', minLength: 128, maxLength: 1024, message: 'invalid_accessToken' })
   verify({ data: body.userId, type: 'string', minLength: 24, maxLength: 24, message: 'invalid_userId' })
   verify({ data: body.clientSecret, type: 'string', minLength: 128, maxLength: 512, message: 'invalid_clientSecret' })
@@ -38,12 +37,12 @@ exports.login = async ctx => {
 }
 
 exports.register = async ctx => {
+  console.log(ctx.request.body)
   let body = _.pick(ctx.request.body, ['name', 'email', 'userPass', 'clientSecret'])
   verify({ data: body.email, type: 'string', regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, maxLength: 64, message: 'invalid_email' })
   verify({ data: body.name, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{0,31}$/, message: 'invalid_name' })
   verify({ data: body.userPass, type: 'string', maxLength: 512, message: 'invalid_password' })
   verify({ data: body.clientSecret, type: 'string', minLength: 20, maxLength: 512, message: 'invalid_clientSecret' })
-  assert(await util.checkVCode(ctx, body.vCode), 'error_code')
   await apiService.register(body.email, body.name, body.userPass, body.clientSecret)
   ctx.status = 200
 }

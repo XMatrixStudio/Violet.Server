@@ -86,9 +86,7 @@ function generateCode (userId, clientId) {
 
 function readCode (code, time) {
   time = time || 1000 * 60 * 10
-  console.log(code)
   let data = util.decrypt(code)
-  console.log(data)
   assert(data, 'invalid_code') // 解密code
   data = JSON.parse(data)
   assert(data.t && data.c && data.u, 'invalid_code') // 检测code的完整性
