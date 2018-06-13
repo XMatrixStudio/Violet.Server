@@ -58,7 +58,7 @@ exports.changePassword = async ctx => {
 }
 
 exports.getEmailCode = async ctx => {
-  let body = _.pick(ctx.request.body, ['email'])
+  let body = _.pick(ctx.request.body, ['email', 'clientSecret'])
   verify({ data: body.email, type: 'string', maxLength: 64, regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, message: 'invalid_email' })
   verify({ data: body.clientSecret, type: 'string', minLength: 20, maxLength: 512, message: 'invalid_clientSecret' })
   await apiService.getEmailCode(body.email, body.clientSecret)
