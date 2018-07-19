@@ -72,6 +72,7 @@ async function getBaseData (token, userId, clientSecret) {
     if (!userData.info.show[i] && userData.info[i]) delete userData.info[i]
   }
   delete userData.userClass
+  delete userData.info.show
   return userData
 }
 
