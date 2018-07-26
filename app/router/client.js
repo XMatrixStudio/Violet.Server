@@ -6,6 +6,7 @@ client.get('/list', clientCtrl.getList)
 client.get('/:id', clientCtrl.getInfo)
 client.post('/', clientCtrl.add)
 client.put('/key/:id', clientCtrl.changeKey)
+client.put('/icon/:id', clientCtrl.changeIcon)
 client.patch('/:id', clientCtrl.setInfo)
 client.delete('/:id', clientCtrl.delete)
 module.exports = client

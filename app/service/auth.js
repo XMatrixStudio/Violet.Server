@@ -1,7 +1,8 @@
 const clientModel = require('../model/client')
 const userModel = require('../model/user')
+const apiService = require('./api')
+const config = require('../../config/default')
 const assert = require('../../lib/assert')
-const util = require('../../lib/util')
 
 /**
  * 获取授权列表
@@ -13,7 +14,17 @@ exports.getList = async userId => {
   let authList = await userModel.getAuthList(userId)
   let list = []
   for (let auth of authList) {
-    list.push(auth.clientId)
+    let client = await clientModel.getById(auth.clientId)
+    if (client) {
+      list.push({
+        name: client.name,
+        id: client.id,
+        icon: client.icon || config.avatar,
+        url: client.url,
+        detail: client.detail,
+        time: auth.time
+      })
+    }
   }
   return list
 }
@@ -50,11 +61,12 @@ exports.auth = async (userId, clientId) => {
   assert(result, 'invalid_clientId')
   if (result.isNew) await clientModel.addAuthById(clientId, 1)
   await clientModel.addLoginById(clientId, 1)
-  let code = await util.generateCode(userId, clientId)
+  let code = apiService.generateCode(userId, clientId)
   let client = await clientModel.getById(clientId)
+  assert(client, 'invalid_clientId')
   return {
     code: code,
-    url: client.url
+    callBack: client.callBack
   }
 }
 

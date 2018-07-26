@@ -1,3 +1,4 @@
+# files ignored
 node_modules/*
 config/*
 logs/*

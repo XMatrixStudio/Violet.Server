@@ -6,16 +6,14 @@ const _ = require('lodash')
 
 exports.login = async ctx => {
   let body = _.pick(ctx.request.body, ['userName', 'userPass', 'remember'])
-  console.log('body:', body)
-  assert(body.userName, 'invalid_param')
+  verify({ data: body.userName, type: 'string', message: 'invalid_param' })
   if (body.userName.toString().indexOf('@') !== -1) {
     verify({ data: body.userName, type: 'string', maxLength: 64, regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, message: 'invalid_email' })
   } else {
-    verify({ data: body.userName, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{3,18}$/, message: 'invalid_name' })
+    verify({ data: body.userName, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{0,31}$/, message: 'invalid_name' })
   }
-  body.userName = body.userName.toString().toLowerCase()
   body.remember = body.remember === 'true'
-  verify({ data: body.userPass, type: 'string', message: 'invalid_pass' })
+  verify({ data: body.userPass, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_pass' })
   let result = await userService.login(body.userName, body.userPass)
   ctx.session.userId = result.id
   ctx.session.time = new Date()
@@ -27,49 +25,76 @@ exports.login = async ctx => {
 exports.register = async ctx => {
   let body = _.pick(ctx.request.body, ['name', 'email', 'userPass', 'vCode'])
   verify({ data: body.email, type: 'string', regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, maxLength: 64, message: 'invalid_email' })
-  verify({ data: body.name, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{3,18}$/, message: 'invalid_name' })
-  verify({ data: body.userPass, type: 'string', maxLength: 64, minLength: 6, message: 'invalid_password' })
-  let regExp = /^[0-9]$/
-  assert(!regExp.test(body.userPass), 'invalid_password') // 不允许纯数字密码
+  verify({ data: body.name, type: 'string', regExp: /^[a-zA-Z][a-zA-Z0-9_]{0,31}$/, message: 'invalid_name' })
+  verify({ data: body.userPass, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_password' })
   verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
   assert(await util.checkVCode(ctx, body.vCode), 'error_code')
-  await userService.register(body.email, body.name, body.userPass)
-  ctx.state = 200
+  let userId = await userService.register(body.email, body.name, body.userPass)
+  // 注册后自动登陆
+  ctx.session.userId = userId
+  ctx.session.time = new Date()
+  ctx.session.remember = false
+  // 注册成功
+  ctx.status = 200
 }
 
 exports.logout = async ctx => {
-  ctx.session.userId = null
-  ctx.state = 200
+  ctx.session = null
+  ctx.status = 200
 }
 
 exports.changePassword = async ctx => {
   let body = _.pick(ctx.request.body, ['email', 'password', 'vCode'])
   verify({ data: body.email, type: 'string', regExp: /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/, maxLength: 64, message: 'invalid_email' })
-  verify({ data: body.password, type: 'string', maxLength: 64, minLength: 6, message: 'invalid_password' })
-  verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
+  verify({ data: body.password, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_password' })
+  verify({ data: body.vCode, type: 'string', maxLength: 6, minLength: 6, message: 'error_emailCode' })
   await userService.changePassword(body.email, body.password, body.vCode)
-  ctx.state = 200
+  ctx.status = 200
 }
 
 exports.validEmail = async ctx => {
   let body = _.pick(ctx.request.body, ['vCode'])
-  verify({ data: body.vCode, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
-  await userService.validEmail(ctx.userData().email, body.vCode)
-  ctx.state = 200
+  verify({ data: body.vCode, type: 'string', maxLength: 6, minLength: 6, message: 'error_emailCode' })
+  await userService.validEmail((await ctx.getUserData(ctx)).email, body.vCode)
+  ctx.status = 200
 }
 
 exports.getBaseInfo = async ctx => {
-  ctx.body = await userService.getInfo(ctx.getUserId())
-  ctx.body = 200
+  ctx.body = await userService.getBaseInfo(ctx.getUserId(ctx))
 }
 
 exports.patchBaseInfo = async ctx => {
-  let body = _.pick(ctx.request.body, ['sex', 'web', 'phone', 'info', 'location', 'birthDate', 'showPhone', 'showDate'])
-  verify({ data: body.sex, type: 'string', regExp: /^[012]$/, message: 'error_sex' })
-  verify({ data: body.phone, type: 'string', regExp: /^1[3|4|5|8][0-9]\d{4,8}$/, message: 'error_web' })
-  verify({ data: new Date(body.birthDate), type: 'date', message: 'error_birthDate' })
-  verify({ data: body.showPhone, type: 'string', regExp: /^(true)|(false)$/, message: 'error_showPhone' })
-  verify({ data: body.showDate, type: 'string', regExp: /^(true)|(false)$/, message: 'error_showDate' })
-  await userService.patchBaseInfo(ctx.getUserId(), body)
-  ctx.state = 200
+  let body = _.pick(ctx.request.body, ['gender', 'url', 'phone', 'bio', 'location', 'birthDate', 'showPhone', 'showBirthDate', 'showLocation'])
+  if (isNaN((new Date(body.birthDate)).getTime())) {
+    body.birthDate = ''
+  } else {
+    body.birthDate = new Date(body.birthDate)
+  }
+  body.show = {
+    birthDate: body.showBirthDate,
+    phone: body.showPhone,
+    location: body.showLocation
+  }
+  verify({ data: body.gender, require: false, type: 'string', regExp: /^[012]$/, message: 'invalid_data' })
+  verify({ data: body.bio, require: false, type: 'string', maxLength: 512, message: 'invalid_data' })
+  verify({ data: body.url, require: false, type: 'string', maxLength: 256, message: 'invalid_data' })
+  verify({ data: body.location, require: false, type: 'string', maxLength: 64, message: 'invalid_data' })
+  verify({ data: body.phone, require: false, type: 'string', maxLength: 16, message: 'invalid_data' })
+  verify({ data: body.show, message: 'invalid_data' })
+  verify({ data: body.show.birthDate, type: 'string', regExp: /^(true)|(false)$/, message: 'invalid_data' })
+  verify({ data: body.show.phone, type: 'string', regExp: /^(true)|(false)$/, message: 'invalid_data' })
+  verify({ data: body.show.location, type: 'string', regExp: /^(true)|(false)$/, message: 'invalid_data' })
+  await userService.patchBaseInfo(ctx.getUserId(ctx), body)
+  ctx.status = 200
+}
+
+exports.loginState = async ctx => {
+  ctx.status = 200
+}
+
+exports.avatar = async ctx => {
+  let body = _.pick(ctx.request.body, ['avatar'])
+  verify({ data: body.avatar, type: 'string', maxLength: 100000, message: 'invalid_avatar' })
+  userService.avatar(ctx.getUserId(ctx), body.avatar)
+  ctx.status = 200
 }

@@ -5,6 +5,7 @@ let devSchema = db.Schema({
   icon: String,
   key: String,
   url: String,
+  callBack: String,
   detail: String,
   data: {
     authCount: Number,
@@ -17,6 +18,7 @@ exports.addAuthById = async (clientId, value) => {
   try {
     let client = await DevDB.findById(clientId)
     if (!client) throw new Error('null')
+    if (!client.data.authCount) client.data.authCount = 0
     client.data.authCount += value
     await client.save()
   } catch (error) {
@@ -28,6 +30,7 @@ exports.addLoginById = async (clientId, value) => {
   try {
     let client = await DevDB.findById(clientId)
     if (!client) throw new Error('null')
+    if (!client.data.LoginCount) client.data.LoginCount = 0
     client.data.LoginCount += value
     await client.save()
   } catch (error) {
@@ -35,10 +38,11 @@ exports.addLoginById = async (clientId, value) => {
   }
 }
 
-exports.add = async () => {
+exports.add = async (data) => {
   try {
     let client = new DevDB()
     let result = await client.save()
+    if (data) await exports.setById(result._id, data)
     return result._id
   } catch (error) {
     return false
@@ -68,14 +72,14 @@ exports.setById = async (clientId, data) => {
   try {
     let client = await DevDB.findById(clientId)
     if (!client) throw new Error('null')
-    let names = ['name', 'ownerId', 'icon', 'key', 'url', 'detail']
+    let names = ['name', 'ownerId', 'icon', 'key', 'url', 'detail', 'callBack']
     for (let name of names) {
       if (data[name]) client[name] = data[name]
     }
     if (data.data) {
       let names = ['authCount', 'LoginCount']
       for (let name of names) {
-        if (data[name]) client.data[name] = data[name]
+        if (data[name]) client.data[name] = data.data[name]
       }
     }
     await client.save()

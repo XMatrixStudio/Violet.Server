@@ -1,6 +1,8 @@
 const ClientModel = require('../model/client')
 const assert = require('../../lib/assert')
 const util = require('../../lib/util')
+const config = require('../../config')
+const cos = require('../../lib/cos')
 
 exports.getList = async userId => {
   let clients = await ClientModel.getByOwner(userId)
@@ -10,21 +12,23 @@ exports.getList = async userId => {
     result.push({
       name: client.name,
       id: client._id,
-      icon: client.icon
+      icon: client.icon || config.default.avatar,
+      detail: client.detail
     })
   }
   return result
 }
 
-exports.add = async (userId, name, detail, url) => {
+exports.add = async (userId) => {
   let clientId = await ClientModel.add()
   let result = await ClientModel.setById(clientId, {
-    name: name,
+    name: '新建应用',
     ownerId: userId,
-    detail: detail,
-    url: url,
-    key: util.rand(200),
-    icon: '', // 默认头像
+    detail: '应用简介',
+    url: 'https://oauth.xmatrix.studio',
+    callBack: 'https://oauth.xmatrix.studio',
+    key: util.rand(200).substr(0, 24),
+    icon: config.default.avatar,
     data: {
       authCount: 0,
       loginCount: 0
@@ -53,7 +57,7 @@ exports.delete = async clientId => {
 }
 
 exports.changeKey = async clientId => {
-  let newKey = util.rand(200)
+  let newKey = util.rand(200).substr(0, 24)
   let result = await ClientModel.setById(clientId, {
     key: newKey
   })
@@ -62,10 +66,21 @@ exports.changeKey = async clientId => {
 }
 
 exports.getClientInfo = async clientId => {
-  let client = await ClientModel.getClientById(clientId)
+  let client = await ClientModel.getById(clientId)
   assert(client, 'error_clientId')
-  delete client.ownerId
-  delete client.key
-  delete client.data
-  return client
+  let data = {
+    name: client.name,
+    detail: client.detail,
+    url: client.url,
+    icon: client.icon
+  }
+  return data
+}
+
+exports.changeIcon = async (userId, clientId, icon) => {
+  assert((await exports.getInfo(clientId)).ownerId === userId, 'error_token')
+  await cos.upload(clientId + '.jpg', Buffer.from(icon.replace('data:image/jpeg;base64,', ''), 'base64'))
+  await ClientModel.setById(clientId, {
+    icon: config.cos.Url + clientId + '.jpg'
+  })
 }

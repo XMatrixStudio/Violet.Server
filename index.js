@@ -20,7 +20,7 @@ app.use(require('koa-session')(config.session, app))
 
 // json and form to object
 app.use(require('koa-bodyparser')())
-
+app.context.state = {}
 // 获取用户信息
 app.context.getUserData = async ctx => {
   if (!ctx.state.userData) {
@@ -29,7 +29,7 @@ app.context.getUserData = async ctx => {
   return ctx.state.userData
 }
 
-app.context.getUserId = async ctx => {
+app.context.getUserId = ctx => {
   return ctx.session.userId
 }
 

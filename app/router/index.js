@@ -3,6 +3,7 @@ const user = require('./user')
 const client = require('./client')
 const auth = require('./auth')
 const util = require('./util')
+const api = require('./api')
 const assert = require('../../lib/assert')
 
 // 白名单列表
@@ -10,12 +11,23 @@ const assert = require('../../lib/assert')
 const whiteList = {
   get: {
     '/v2/self/util/vCode': true,
-    '/v2/self/util/EmailCode': true,
-    '/v2/self/util/ClientInfo/:clientId': true
+    '/v2/self/util/ClientInfo/:clientId': true,
   },
   post: {
     '/v2/self/users/login': true,
-    '/v2/self/users/register': true
+    '/v2/self/util/EmailCode': true,
+    '/v2/self/users/register': true,
+    '/v2/self/users/password': true,
+    '/v2/api/Token': true,
+    '/v2/api/BaseData': true,
+    '/v2/api/Login': true,
+    '/v2/api/Register': true,
+    '/v2/api/ChangePassword': true,
+    '/v2/api/validEmail': true,
+    '/v2/api/GetEmailCode': true
+  },
+  delete: {
+    '/v2/self/users/login': true
   }
 }
 
@@ -39,14 +51,15 @@ for (const method in whiteList) {
 router.use('/v2/self/', async (ctx, next) => {
   if (!ctx.state.passStatusCheck) {
     assert(ctx.session.userId, 'invalid_token')
-    assert(ctx.session.remember || (new Date(ctx.session.time) - new Date()) >= 86400000, 'timeout_token')
+    assert(ctx.session.remember || ((new Date() - new Date(ctx.session.time)) <= (86400 * 1000)), 'timeout_token')
     if (!ctx.session.remember) ctx.session.time = new Date()
-    let user = await ctx.getUserData()
+    let user = await ctx.getUserData(ctx)
     assert(user, 'invalid_token')
   }
   return next()
 })
 
+router.use('/v2/api', api.routes())
 router.use('/v2/self/users', user.routes())
 router.use('/v2/self/util', util.routes())
 router.use('/v2/self/auth', auth.routes())
