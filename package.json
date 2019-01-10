@@ -1,18 +1,20 @@
 {
   "name": "violet",
-  "version": "2.0.0-dev",
-  "description": "Violet Server",
-  "main": "index.js",
+  "version": "3.0.0-alpha",
+  "description": "Violet, a user system with OAuth 2.0",
+  "main": "index.ts",
   "directories": {
     "doc": "docs",
     "lib": "lib"
   },
   "scripts": {
-    "test": "node ./index.js"
+    "build": "tsc",
+    "dev": "npm run build && npm run serve",
+    "serve": "node ./dist/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/XMatrixStudio/Violet.Server.git"
+    "url": "git+https://github.com/XMatrixStudio/Violet.git"
   },
   "keywords": [
     "Violet"
@@ -23,36 +25,21 @@
     "url": "https://github.com/XMatrixStudio/Violet/issues"
   },
   "homepage": "https://github.com/XMatrixStudio/Violet#readme",
-  "dependencies": {
-    "captchapng": "0.0.1",
-    "captchapng2": "^1.0.3",
-    "cos-nodejs-sdk-v5": "^2.4.3",
-    "csprng": "^0.1.2",
-    "date-utils": "^1.2.21",
-    "fs-extra": "^4.0.3",
-    "github-reserved-names": "^1.0.14",
-    "kcors": "^2.2.1",
-    "koa": "^2.5.1",
-    "koa-bodyparser": "^4.2.1",
-    "koa-cors": "0.0.16",
-    "koa-helmet": "^3.3.0",
-    "koa-router": "^7.4.0",
-    "koa-session": "^5.8.1",
-    "lodash": "^4.17.10",
-    "mongoose": "^4.13.14",
-    "require-indexify": "^1.0.0",
-    "winston": "^2.4.2",
-    "winston-daily-rotate-file": "^1.7.2"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "eslint": "^4.19.1",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-html": "^3.2.2",
-    "eslint-plugin-import": "^2.12.0",
-    "eslint-plugin-node": "^5.2.1",
-    "eslint-plugin-promise": "^3.8.0",
-    "eslint-plugin-standard": "^3.1.0",
-    "koa-morgan": "^1.0.1",
-    "nodemailer": "^4.7.0"
+    "@types/node": "^10.12.18",
+    "prettier": "^1.15.3",
+    "tslint": "^5.12.0",
+    "tslint-microsoft-contrib": "^6.0.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "typescript": "^3.2.2"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 140,
+    "semi": false,
+    "bracketSpacing": true,
+    "arrowParens": "avoid",
+    "parser": "typescript"
   }
 }
