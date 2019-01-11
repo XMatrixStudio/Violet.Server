@@ -1,4 +1,15 @@
-const assert = require('./assert')
+import * as assert from './assert'
+
+interface Option {
+  data: any
+  type: string
+  message: string
+
+  require?: boolean
+  minLength?: number
+  maxLength?: number
+  regExp?: RegExp
+}
 
 /**
  * 检查类型
@@ -21,10 +32,10 @@ const assert = require('./assert')
  * @param  {regExp} [option.regExp = 0] 字符串需要匹配的正则表达式 默认不做限制
  * @param  {boolean}  [option.require = true] 如果有false 则允许为 null 或 undefined
  */
-module.exports = function (...options) {
+export default function(...options: Option[]) {
   for (const option of options) {
     const message = option.message || 'invalid data'
-    let realType = typeof option.data
+    const realType = typeof option.data
     if (option.require === false) {
       if (option.data === null || realType === 'undefined') {
         continue

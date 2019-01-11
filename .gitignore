@@ -5,3 +5,6 @@ logs/*
 
 # TypeScript Dist
 dist/*
+
+# Config
+config.yml
