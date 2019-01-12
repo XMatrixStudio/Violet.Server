@@ -13,11 +13,10 @@ export const getUser = async (ctx: Context) => {
 
 export const postUser = async (ctx: Context) => {
   const body = _.pick(ctx.request.body, ['name', 'email', 'password', 'vcode'])
-  console.log(body)
-  verify({ data: body.email, require: true, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' })
   verify({ data: body.name, require: true, type: 'string', regExp: nameExp, message: 'invalid_name' })
+  verify({ data: body.email, require: true, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' })
   verify({ data: body.password, require: true, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_password' })
-  verify({ data: body.vcode, require: true, type: 'string', maxLength: 4, minLength: 4, message: 'error_code' })
+  verify({ data: body.vcode, require: true, type: 'string', maxLength: 4, minLength: 4, message: 'invalid_code' })
 
   // TODO
   await userService.register()

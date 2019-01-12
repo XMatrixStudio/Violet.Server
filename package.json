@@ -27,6 +27,7 @@
   "homepage": "https://github.com/XMatrixStudio/Violet#readme",
   "dependencies": {
     "@koa/cors": "^2.2.3",
+    "captchapng2": "^1.0.3",
     "js-yaml": "^3.12.1",
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
