@@ -15,6 +15,10 @@ const whiteList: { method: HttpHandler; urls: [string] }[] = [
   {
     method: router.get,
     urls: ['/i/util/vcode']
+  },
+  {
+    method: router.post,
+    urls: ['/i/user']
   }
 ]
 

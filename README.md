@@ -1,6 +1,12 @@
 # Violet.Server 中文文档
 
-Violet 中央授权系统的Nodejs服务端，提供一系列的API接口
+> Violet正在重构，**next**分支无法正常工作，请切换至**master**分支。
+>
+> **master**分支版本为2.0，**next**分支版本为3.0。
+
+Violet 中央授权系统的Nodejs服务端，提供一系列的API接口。
+
+[[3.0文档](https://xmatrix.studio/docs/swagger/?url=https://xmatrix.studio/docs/api/v3-internal.yml)] (**开发中，不完整**)
 
 ## 如何使用
 

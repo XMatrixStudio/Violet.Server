@@ -5,7 +5,7 @@ import * as util from '../../lib/util'
 /**
  * 获取图形验证码
  *
- * @param {Context} ctx 上下文
+ * @param {Context} ctx Koa上下文
  */
 export const getVCode = async (ctx: Context) => {
   const rand = Math.trunc(Math.random() * 9000 + 1000)

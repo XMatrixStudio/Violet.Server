@@ -28,6 +28,8 @@
   "dependencies": {
     "@koa/cors": "^2.2.3",
     "captchapng2": "^1.0.3",
+    "csprng": "^0.1.2",
+    "github-reserved-names": "^1.1.4",
     "js-yaml": "^3.12.1",
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
@@ -39,6 +41,7 @@
     "mongoose": "^5.4.3"
   },
   "devDependencies": {
+    "@types/csprng": "^0.1.0",
     "@types/js-yaml": "^3.11.4",
     "@types/koa": "^2.0.48",
     "@types/koa-bodyparser": "^4.2.1",
