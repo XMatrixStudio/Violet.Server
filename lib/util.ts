@@ -4,6 +4,8 @@ import csprng = require('csprng')
 import * as reservedUsernames from 'github-reserved-names'
 import { Context } from 'koa'
 
+import * as assert from './assert'
+
 /**
  * 生成验证码图片
  *

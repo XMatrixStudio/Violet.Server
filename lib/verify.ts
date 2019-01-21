@@ -13,9 +13,10 @@ interface Option {
 
 /**
  * 检查类型
- * @param  {object} option
- * @param  {any} option.data
- * @param  {string} option.type
+ *
+ * @param {Option} option
+ * @param {any} option.data
+ * @param {string} option.type
  *                 boolean:          原值为 true 或者 false
  *                 number:           原值为 非NaN 非Infinity 的数字
  *                 positive:         原值为 非NaN 非Infinity 的正数
@@ -26,11 +27,11 @@ interface Option {
  *                 positive-array:   原值为 非NaN 非Infinity正数 组成的 非空数组
  *                 e-positive-array: 原值为 非NaN 非Infinity正数 组成的 可空数组
  *                 string-array:     原值为 非空字符串 组成的 非空数组
- * @param  {string}  [option.message = 'invalid data'] 不满足类型时的错误消息
- * @param  {number} [option.maxLength = 0] 字符串最大长度 默认不做限制
- * @param  {number} [option.minLength = 0] 字符串最小长度 默认不做限制
- * @param  {regExp} [option.regExp = 0] 字符串需要匹配的正则表达式 默认不做限制
- * @param  {boolean}  [option.require = true] 如果有false 则允许为 null 或 undefined
+ * @param {string} [option.message = 'invalid data'] 不满足类型时的错误消息
+ * @param {number} [option.maxLength = 0] 字符串最大长度 默认不做限制
+ * @param {number} [option.minLength = 0] 字符串最小长度 默认不做限制
+ * @param {RegExp} [option.regExp = 0] 字符串需要匹配的正则表达式 默认不做限制
+ * @param {boolean} [option.require = true] 如果有false 则允许为 null 或 undefined
  */
 export default function(...options: Option[]) {
   for (const option of options) {

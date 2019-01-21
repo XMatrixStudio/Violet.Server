@@ -1,3 +1,4 @@
+import { HttpError } from 'http-errors'
 import { Context } from 'koa'
 import * as Router from 'koa-router'
 
@@ -35,6 +36,19 @@ for (const rule of whiteList) {
     rule.method.call(router, url, withoutLogin)
   }
 }
+
+// 错误处理
+router.use('/', async (ctx: Context, next: () => Promise<any>) => {
+  return next().catch((err: HttpError) => {
+    if (err.expose) {
+      ctx.status = err.status || 500
+      ctx.type = 'application/json'
+      ctx.body = { error: err.message }
+    } else {
+      throw err
+    }
+  })
+})
 
 // 兜底判断，如果没有被白名单检查，则必须登录
 router.use('/i/', async (ctx: Context, next: () => Promise<any>) => {

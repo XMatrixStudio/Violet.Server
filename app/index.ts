@@ -40,12 +40,5 @@ app.use(bodyParser())
 // Routes
 app.use(router.routes())
 
-// 异常处理
-// 404的错误不会捕捉
-app.on('error', (error: Error) => {
-  // TODO: err.expose判断
-  console.log(error.stack)
-})
-
 app.listen(port)
 console.log('Listen at port', port)

@@ -11,7 +11,6 @@ const assert = <Assert>function(value: any, message?: string | Error | undefined
   } catch (err) {
     err.status = 400
     err.expose = true
-    // log.warn(err.stack)
     throw err
   }
 }
