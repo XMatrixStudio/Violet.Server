@@ -34,3 +34,32 @@ export const postUser = async (ctx: Context) => {
   ctx.session!.remember = false
   ctx.status = userId ? 201 : 500
 }
+
+export const postUserSession = async (ctx: Context) => {
+  const body = _.pick(ctx.request.body, ['user', 'password', 'remember'])
+  let email: string | null = null
+  let name: string | null = null
+  verify({ data: body.user, require: true, type: 'string', message: 'invalid_user' })
+  if (body.user.indexOf('@') !== -1) {
+    verify({ data: body.user, require: true, type: 'string', maxLength: 64, regExp: emailExp, message: 'invalid_email' })
+    email = body.user
+  } else {
+    verify({ data: body.user, require: true, type: 'string', regExp: nameExp, message: 'invalid_name' })
+    name = body.user
+  }
+  verify({ data: body.password, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_password' })
+  body.remember = body.remember === 'true'
+
+  const user = await userService.login(email, name, body.password)
+  ctx.session!.userId = user.id
+  ctx.session!.time = new Date()
+  ctx.session!.remember = body.remember
+  delete user.id
+  ctx.body = user
+  ctx.status = 201
+}
+
+export const deleteUserSession = async (ctx: Context) => {
+  ctx.session = null
+  ctx.status = 204
+}

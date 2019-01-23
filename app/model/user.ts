@@ -1,12 +1,16 @@
 import * as db from '../../lib/mongo'
 
-interface User extends db.Document {
-  email: String // 登录邮箱，全小写
-  name: String // 用户名，全小写
-  nickname: String // 原始用户名
+export interface User extends db.Document {
+  email: string // 登录邮箱，全小写
+  name: string // 用户名，全小写
+  nickname: string // 原始用户名
   secure: {
-    password: String
-    salt: String
+    password: string
+    salt: string
+    valid: boolean
+  }
+  info: {
+    avatar: string
   }
 }
 
@@ -16,7 +20,11 @@ const userSchema = new db.Schema({
   nickname: String,
   secure: {
     password: String,
-    salt: String
+    salt: String,
+    valid: Boolean
+  },
+  info: {
+    avatar: String
   }
 })
 
