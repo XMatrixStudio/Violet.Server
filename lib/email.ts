@@ -1,25 +1,27 @@
-require('date-utils')
-const Mailer = require('nodemailer')
-const mailConfig = require('../config/email')
+import * as moment from 'moment'
+import * as Mailer from 'nodemailer'
 
-let mailer = Mailer.createTransport({
-  host: mailConfig.host,
-  port: mailConfig.port,
+import * as config from './config'
+
+const mailer = Mailer.createTransport({
+  host: config.email.host,
+  port: config.email.port,
   secure: false,
   auth: {
-    user: mailConfig.user,
-    pass: mailConfig.password
-  }, tls: {
+    user: config.email.user,
+    pass: config.email.password
+  },
+  tls: {
     ciphers: 'SSLv3'
   }
 })
 
-let mailOptions = {
-  from: mailConfig.from
+const mailOptions = {
+  from: config.email.from
 }
 
-exports.sendEmailCode = async (email, name, code) => {
-  let contentOptions = {
+export const sendEmailCode = async (email: string, name: string, code: string) => {
+  const contentOptions = {
     to: email,
     subject: '【Violet】邮箱验证码',
     html: `
@@ -44,7 +46,7 @@ exports.sendEmailCode = async (email, name, code) => {
               </p>
             </div>
             <p style="margin:20px 0 30px;padding:0;text-align:right;font-weight:bold">XMatrix Studio</p>
-            <p style="margin:20px 0 30px;padding:0;text-align:right;font-weight:bold">${(new Date()).toFormat('YYYY-MM-DD HH24:MI:SS')}</p>
+            <p style="margin:20px 0 30px;padding:0;text-align:right;font-weight:bold">${moment().format('YYYY-MM-DD HH:mm:ss')}</p>
           </div>
         </td>
       </tr>
@@ -68,14 +70,11 @@ exports.sendEmailCode = async (email, name, code) => {
   </table>
     `
   }
-  mailer.sendMail(
-    Object.assign({}, mailOptions, contentOptions),
-    (error, info) => {
-      if (error) {
-        console.log(error)
-      } else {
-        console.log(info)
-      }
+  mailer.sendMail(Object.assign({}, mailOptions, contentOptions), (error: Error | null, info: any) => {
+    if (error) {
+      console.log(error)
+    } else {
+      console.log(info)
     }
-  )
+  })
 }

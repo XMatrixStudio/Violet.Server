@@ -9,7 +9,7 @@ import * as userService from '../service/user'
 const emailExp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
 const nameExp = /^[a-zA-Z][a-zA-Z0-9_-]{0,31}$/
 
-export const getUser = async (ctx: Context) => {
+export const get = async (ctx: Context) => {
   ctx.status = 200
 }
 
@@ -18,7 +18,7 @@ export const getUser = async (ctx: Context) => {
  *
  * @param {Context} ctx Koa上下文
  */
-export const postUser = async (ctx: Context) => {
+export const post = async (ctx: Context) => {
   const body = _.pick(ctx.request.body, ['name', 'email', 'password', 'vcode'])
   verify({ data: body.name, require: true, type: 'string', regExp: nameExp, message: 'invalid_name' })
   verify({ data: body.email, require: true, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' })
@@ -35,7 +35,18 @@ export const postUser = async (ctx: Context) => {
   ctx.status = userId ? 201 : 500
 }
 
-export const postUserSession = async (ctx: Context) => {
+/**
+ * 发送邮箱认证邮件
+ *
+ * @param {Context} ctx Koa上下文
+ */
+export const postEmail = async (ctx: Context) => {
+  const body = _.pick(ctx.request.body, ['operator', 'vcode', 'email'])
+  verify({ data: body.operator, require: true, type: 'string', message: 'invalid_operator' })
+  assert(body.operator === 'register', 'invalid_operator')
+}
+
+export const postSession = async (ctx: Context) => {
   const body = _.pick(ctx.request.body, ['user', 'password', 'remember'])
   let email: string | null = null
   let name: string | null = null
@@ -59,7 +70,7 @@ export const postUserSession = async (ctx: Context) => {
   ctx.status = 201
 }
 
-export const deleteUserSession = async (ctx: Context) => {
+export const deleteSession = async (ctx: Context) => {
   ctx.session = null
   ctx.status = 204
 }
