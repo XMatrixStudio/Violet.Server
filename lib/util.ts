@@ -1,39 +1,6 @@
-import * as Captchapng from 'captchapng2'
 import * as crypto from 'crypto'
 import csprng = require('csprng')
 import * as reservedUsernames from 'github-reserved-names'
-import { Context } from 'koa'
-
-import * as assert from './assert'
-
-/**
- * 生成验证码图片
- *
- * @param {number} value 四位验证码
- * @returns {string} PNG 图片验证码的Base64
- */
-export const getVCode = (value: number): string => {
-  const png = new Captchapng(80, 30, value)
-  return 'data:image/png;base64,'.concat(png.getBase64())
-}
-
-/**
- * 检查图形验证码
- *
- * @param {Context} ctx Koa上下文
- * @param {string | number} vcode 图形验证码
- * @returns {boolean} 验证码是否正确
- */
-export const checkVCode = (ctx: Context, vcode: string | number): boolean => {
-  if (ctx.session!.vcode === 0) return false
-  if (ctx.session!.vcode.toString() === vcode) {
-    ctx.session!.vcode = 0
-    return true
-  } else {
-    ctx.session!.vcode = 0
-    return false
-  }
-}
 
 /**
  * SHA512 hash

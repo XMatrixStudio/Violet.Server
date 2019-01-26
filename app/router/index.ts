@@ -12,14 +12,14 @@ type HttpHandler = (path: string | RegExp | (string | RegExp)[], ...middleware: 
 
 // 白名单列表
 // 凡是在此白名单，均不检查是否登陆
-const whiteList: { method: HttpHandler; urls: [string] }[] = [
+const whiteList: { method: HttpHandler; urls: string[] }[] = [
   {
     method: router.get,
     urls: ['/i/util/vcode']
   },
   {
     method: router.post,
-    urls: ['/i/user']
+    urls: ['/i/user', '/i/user/email']
   }
 ]
 

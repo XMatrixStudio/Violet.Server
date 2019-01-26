@@ -1,15 +1,11 @@
 import { Context } from 'koa'
 
-import * as util from '../../lib/util'
+import * as verify from '../../lib/verify'
 
 /**
- * 获取图形验证码
- *
- * @param {Context} ctx Koa上下文
+ * 获取图形验证码，验证码存储在`ctx.session!.vcode`中
  */
-export const getVCode = async (ctx: Context) => {
-  const rand = Math.trunc(Math.random() * 9000 + 1000)
-  ctx.session!.vcode = rand
-  ctx.body = await util.getVCode(rand)
+export const getCaptcha = async (ctx: Context) => {
+  ctx.body = await verify.getCaptcha(ctx)
   ctx.status = 200
 }
