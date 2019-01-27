@@ -35,18 +35,31 @@ export const post = async (ctx: Context) => {
 }
 
 /**
- * 发送邮箱认证邮件
+ * 发送邮箱验证邮件
  */
-export const postEmail = async (ctx: Context) => {
+export async function postEmail(ctx: Context): Promise<void> {
   const body = _.pick(ctx.request.body, ['operator', 'captcha', 'email'])
   assert.v({ data: body.operator, type: 'string', enums: ['register'], message: 'invalid_operator' })
   assert.v({ data: body.captcha, type: 'string', minLength: 4, maxLength: 4, message: 'invalid_captcha' })
   assert.v({ data: body.email, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' })
-  // assert(ctx.session!.verify, 'not_exist_captcha')
-  // assert(ctx.session!.verify.captcha, 'not_exist_captcha')
-  // assert(verify.checkCaptcha(ctx, body.captcha), 'error_captcha')
-  verify.sendEmailCode(ctx, body.email, '大肥真')
+  assert(ctx.session!.verify.captcha, 'not_exist_captcha')
+  assert(verify.checkCaptcha(ctx, body.captcha), 'error_captcha')
+  assert((await userService.checkIfExistUserByEmail(body.email)) === false, 'exist_email')
+  assert(await verify.sendEmailCode(ctx, body.email, '大肥真'), 'send_fail')
   ctx.status = 201
+}
+
+/**
+ * 验证邮箱
+ */
+export async function putEmail(ctx: Context): Promise<void> {
+  const body = _.pick(ctx.request.body, ['operator', 'code'])
+  assert.v({ data: body.operator, type: 'string', enums: ['register'], message: 'invalid_operator' })
+  assert.v({ data: body.code, type: 'string', minLength: 6, maxLength: 6, message: 'invalid_code' })
+  assert(ctx.session!.verify.emailTime, 'not_exist_code')
+  assert(Date.now() - ctx.session!.verify.emailTime! < 300 * 1000, 'timeout_code')
+  assert(verify.checkEmailCode(ctx, body.code), 'error_code')
+  ctx.status = 200
 }
 
 export const postSession = async (ctx: Context) => {

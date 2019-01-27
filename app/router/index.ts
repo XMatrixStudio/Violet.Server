@@ -15,16 +15,20 @@ type HttpHandler = (path: string | RegExp | (string | RegExp)[], ...middleware: 
 const whiteList: { method: HttpHandler; urls: string[] }[] = [
   {
     method: router.get,
-    urls: ['/i/util/vcode']
+    urls: ['/i/util/captcha']
   },
   {
     method: router.post,
     urls: ['/i/user', '/i/user/email']
+  },
+  {
+    method: router.put,
+    urls: ['/i/user/email']
   }
 ]
 
 // 检查是否登录
-const withoutLogin = (ctx: Context, next: () => Promise<any>) => {
+const withoutLogin = (ctx: Context, next: () => Promise<void>) => {
   ctx.state.passStatusCheck = true
   return next()
 }
@@ -38,7 +42,7 @@ for (const rule of whiteList) {
 }
 
 // 错误处理
-router.use('/', async (ctx: Context, next: () => Promise<any>) => {
+router.use('/', async (ctx: Context, next: () => Promise<void>) => {
   return next().catch((err: HttpError) => {
     if (err.expose) {
       ctx.status = err.status || 500
@@ -51,7 +55,10 @@ router.use('/', async (ctx: Context, next: () => Promise<any>) => {
 })
 
 // 兜底判断，如果没有被白名单检查，则必须登录
-router.use('/i/', async (ctx: Context, next: () => Promise<any>) => {
+router.use('/i/', async (ctx: Context, next: () => Promise<void>) => {
+  if (ctx.session && ctx.session.isNew) {
+    ctx.session.verify = {}
+  }
   if (!ctx.state.passStatusCheck) {
     assert(ctx.session, 'invalid_token')
     assert(ctx.session!.userId, 'invalid_token')

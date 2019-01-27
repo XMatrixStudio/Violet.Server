@@ -3,7 +3,6 @@
 // 扩展内容：Violet中所有使用到的Session参数
 
 import * as session from 'koa-session'
-import { email } from '../lib/config';
 
 declare module 'koa-session' {
   /**
@@ -20,18 +19,19 @@ declare module 'koa-session' {
     /**
      * 图形验证码
      */
-    captcha: string | undefined
+    captcha?: string
 
     /**
-     * 邮箱验证码，5分钟过期
+     * 邮箱验证，5分钟过期
      */
-    emailCode: string | undefined
-    emailTime: Date
+    email?: string
+    emailCode?: string
+    emailTime?: number
 
     /**
      * 手机验证码，5分钟过期
      */
-    phoneCode: string | undefined
-    phoneTime: Date
+    phoneCode?: string
+    phoneTime?: number
   }
 }

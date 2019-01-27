@@ -2,6 +2,16 @@ import * as assert from '../../lib/assert'
 import * as util from '../../lib/util'
 import * as userModel from '../model/user'
 
+/**
+ * 检查是否存在用户使用该邮箱
+ *
+ * @param {string} email 用户唯一邮箱
+ * @returns {boolean} 邮箱是否已使用
+ */
+export async function checkIfExistUserByEmail(email: string): Promise<boolean> {
+  return (await userModel.getByEmail(email)) !== null
+}
+
 export const login = async (email: string | null, name: string | null, password: string) => {
   let user: userModel.User | null
   if (email !== null) {

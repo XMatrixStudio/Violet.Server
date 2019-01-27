@@ -13,7 +13,7 @@ import * as config from './config'
  * @param {Context} ctx - Koa上下文
  * @returns {string} 验证码图片的Base64字符串
  */
-export const getCaptcha = (ctx: Context): string => {
+export function getCaptcha(ctx: Context): string {
   const rand = Math.trunc(Math.random() * 9000 + 1000)
   const png = new Captchapng(80, 30, rand)
   ctx.session!.verify.captcha = rand.toString()
@@ -27,10 +27,14 @@ export const getCaptcha = (ctx: Context): string => {
  * @param {string} vcode 图形验证码
  * @returns {boolean} 验证码是否正确
  */
-export const checkCaptcha = (ctx: Context, vcode: string): boolean => {
-  if (ctx.session!.verify.captcha === undefined) return false
-  ctx.session!.verify.captcha = undefined
-  return ctx.session!.verify.captcha === vcode
+export function checkCaptcha(ctx: Context, vcode: string): boolean {
+  if (ctx.session!.verify.captcha === vcode) {
+    ctx.session!.verify.captcha = undefined
+    return true
+  } else {
+    ctx.session!.verify.captcha = undefined
+    return false
+  }
 }
 
 const mailer = Mailer.createTransport({
@@ -50,10 +54,19 @@ const mailOptions: Mailer.SendMailOptions = {
   from: config.email.from
 }
 
-export const sendEmailCode = (ctx: Context, email: string, name?: string): void => {
-  const rand = Math.trunc(Math.random() * 9000 + 1000)
-  // ctx.session!.verify.emailCode = rand.toString()
-  // ctx.session!.verify.emailTime = new Date()
+/**
+ * 发送验证码邮件
+ *
+ * @param {Context} ctx Koa上下文
+ * @param {string} email 邮箱地址
+ * @param {string | undefined} name 名字
+ * @returns {boolean} 是否发送成功
+ */
+export async function sendEmailCode(ctx: Context, email: string, name?: string): Promise<boolean> {
+  const rand = Math.trunc(Math.random() * 900000 + 100000)
+  ctx.session!.verify.email = email
+  ctx.session!.verify.emailCode = rand.toString()
+  ctx.session!.verify.emailTime = Date.now()
   const contentOptions = {
     to: email,
     subject: '【Violet】邮箱验证码',
@@ -63,11 +76,30 @@ export const sendEmailCode = (ctx: Context, email: string, name?: string): void 
       time: moment().format('YYYY-MM-DD HH:mm:ss')
     })
   }
-  mailer.sendMail(Object.assign({}, mailOptions, contentOptions), (error: Error | null, info: any) => {
-    if (error) {
-      console.log(error)
-    } else {
-      console.log(info)
-    }
-  })
+  try {
+    const info = await mailer.sendMail(Object.assign({}, mailOptions, contentOptions))
+    console.log(info)
+    return true
+  } catch (err) {
+    console.log(err)
+    return false
+  }
+}
+
+/**
+ * 检查邮箱验证码，并且清除Session中的验证码记录
+ * 该方法不检查超时
+ *
+ * @param ctx Koa上下文
+ * @param code 邮箱验证码
+ */
+export function checkEmailCode(ctx: Context, code: string): boolean {
+  ctx.session!.verify.emailTime = undefined
+  if (ctx.session!.verify.emailCode === code) {
+    ctx.session!.verify.emailCode = undefined
+    return true
+  } else {
+    ctx.session!.verify.emailCode = undefined
+    return false
+  }
 }
