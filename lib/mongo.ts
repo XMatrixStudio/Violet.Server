@@ -7,6 +7,7 @@ mongoose.connect(
   { useNewUrlParser: true }
 )
 mongoose.Promise = global.Promise
+mongoose.set('useCreateIndex', true)
 
 const db = mongoose.connection
 

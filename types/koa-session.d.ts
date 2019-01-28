@@ -29,8 +29,9 @@ declare module 'koa-session' {
     emailTime?: number
 
     /**
-     * 手机验证码，5分钟过期
+     * 手机验证，5分钟过期
      */
+    phone?: string
     phoneCode?: string
     phoneTime?: number
   }

@@ -1,14 +1,14 @@
 import * as Router from 'koa-router'
 
-import * as ctrl from '../controller/user'
+import * as userCtrl from '../controller/user'
 
 const user = new Router()
 
-user.get('/', ctrl.get) // 获取用户基本信息
-user.post('/', ctrl.post) // 注册
-user.post('/email', ctrl.postEmail) // 发送邮箱验证邮件
-user.put('/email', ctrl.putEmail) // 验证邮箱
-user.post('/session', ctrl.postSession) // 用户登陆
-user.delete('/session', ctrl.deleteSession) // 用户退出登录
+user.get('/', userCtrl.get) // 获取用户基本信息
+user.post('/', userCtrl.post) // 注册
+user.post('/email', userCtrl.postEmail) // 发送邮箱验证邮件
+user.put('/email', userCtrl.putEmail) // 验证邮箱
+user.post('/session', userCtrl.postSession) // 用户登陆
+user.delete('/session', userCtrl.deleteSession) // 用户退出登录
 
 export = user
