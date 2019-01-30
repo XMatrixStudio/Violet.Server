@@ -1,4 +1,5 @@
 import * as assert from '../../lib/assert'
+import * as config from '../../lib/config'
 import * as util from '../../lib/util'
 import * as userModel from '../model/user'
 
@@ -12,24 +13,29 @@ export async function checkIfExistUserByEmail(email: string): Promise<boolean> {
   return (await userModel.getByEmail(email)) !== null
 }
 
-export const login = async (email: string | null, name: string | null, password: string) => {
+/**
+ * 用户登陆
+ *
+ * @param {RequireOnlyOne<Record<'email' | 'phone' | 'name', string>>} data 用户唯一标识
+ * @param {string} password 密码的SHA512散列值
+ */
+export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'name', string>>, password: string) {
   let user: userModel.User | null
-  if (email !== null) {
-    user = await userModel.getByEmail(email)
-  } else if (name !== null) {
-    user = await userModel.getByName(name)
+  if (data.email) {
+    user = await userModel.getByEmail(data.email)
+  } else if (data.phone) {
+    user = await userModel.getByPhone(data.phone)
   } else {
-    user = null
+    user = await userModel.getByName(data.name!)
   }
   assert(user, 'error_user_or_password') // 用户不存在
   const hash = util.hash(util.hash(password).concat(user!.secure.salt))
   assert(hash === user!.secure.password, 'error_user_or_password') // 密码错误
-  // TODO: default avatar
   return {
     id: user!._id,
     name: user!.nickname,
     email: user!.email,
-    avatar: user!.info.avatar
+    avatar: user!.info.avatar || config.avatar.default
   }
 }
 

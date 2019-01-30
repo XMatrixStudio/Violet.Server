@@ -58,12 +58,12 @@ router.use('/', async (ctx: Context, next: () => Promise<void>) => {
 router.use('/i/', async (ctx: Context, next: () => Promise<void>) => {
   if (ctx.session && ctx.session.isNew) {
     ctx.session.verify = {}
+    ctx.session.user = {}
   }
   if (!ctx.state.passStatusCheck) {
-    assert(ctx.session, 'invalid_token')
-    assert(ctx.session!.userId, 'invalid_token')
-    assert(ctx.session!.remember || +new Date() - +new Date(ctx.session!.time) <= 86400 * 1000, 'timeout_token')
-    if (!ctx.session!.remember) ctx.session!.time = new Date()
+    assert(ctx.session!.user.id, 'invalid_token')
+    assert(ctx.session!.user.remember || Date.now() - ctx.session!.user.time! <= 86400 * 1000, 'timeout_token')
+    if (!ctx.session!.user.remember) ctx.session!.user.time = Date.now()
   }
   return next()
 })

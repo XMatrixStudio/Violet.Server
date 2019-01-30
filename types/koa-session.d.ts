@@ -9,10 +9,14 @@ declare module 'koa-session' {
    * Session扩展模型
    */
   interface Session {
-    /**
-     * 验证
-     */
+    user: User
     verify: Verification
+  }
+
+  interface User {
+    id?: string
+    time?: number
+    remember?: boolean
   }
 
   interface Verification {

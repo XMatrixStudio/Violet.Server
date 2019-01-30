@@ -5,18 +5,22 @@ import * as assert from '../../lib/assert'
 import * as util from '../../lib/util'
 import * as verify from '../../lib/verify'
 import * as userService from '../service/user'
+import { User } from '../model/user'
 
 const emailExp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
 const nameExp = /^[a-zA-Z][a-zA-Z0-9_-]{0,31}$/
 
-export const get = async (ctx: Context) => {
+/**
+ * 获取用户信息
+ */
+export async function get(ctx: Context) {
   ctx.status = 200
 }
 
 /**
  * 注册用户
  */
-export const post = async (ctx: Context) => {
+export async function post(ctx: Context) {
   const body = _.pick(ctx.request.body, ['name', 'nickname', 'password'])
   assert.v({ data: body.name, type: 'string', regExp: nameExp, message: 'invalid_name' })
   assert.v({ data: body.nickname, require: false, type: 'string', maxLength: 32, message: 'invalid_nickname' })
@@ -59,30 +63,36 @@ export async function putEmail(ctx: Context): Promise<void> {
   ctx.status = 200
 }
 
-export const postSession = async (ctx: Context) => {
-  // const body = _.pick(ctx.request.body, ['user', 'password', 'remember'])
-  // let email: string | null = null
-  // let name: string | null = null
-  // verify({ data: body.user, require: true, type: 'string', message: 'invalid_user' })
-  // if (body.user.indexOf('@') !== -1) {
-  //   verify({ data: body.user, require: true, type: 'string', maxLength: 64, regExp: emailExp, message: 'invalid_email' })
-  //   email = body.user
-  // } else {
-  //   verify({ data: body.user, require: true, type: 'string', regExp: nameExp, message: 'invalid_name' })
-  //   name = body.user
-  // }
-  // verify({ data: body.password, type: 'string', maxLength: 128, minLength: 128, message: 'invalid_password' })
-  // body.remember = body.remember === 'true'
-  // const user = await userService.login(email, name, body.password)
-  // ctx.session!.userId = user.id
-  // ctx.session!.time = new Date()
-  // ctx.session!.remember = body.remember
-  // delete user.id
-  // ctx.body = user
-  // ctx.status = 201
+/**
+ * 用户登陆
+ */
+export async function postSession(ctx: Context) {
+  const body = _.pick(ctx.request.body, ['user', 'password', 'remember'])
+  assert.v({ data: body.user, type: 'string', message: 'invalid_user' })
+  assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+  body.remember = body.remember === 'true'
+
+  let user
+  if (body.user.indexOf('@') !== -1) {
+    assert.v({ data: body.user, type: 'string', maxLength: 64, regExp: emailExp, message: 'invalid_email' })
+    user = await userService.login({ email: body.user }, body.password)
+  } else if (body.user[0] >= '0' && body.user[0] <= '9') {
+    assert.v({ data: body.user, type: 'string', minLength: 11, maxLength: 11, message: 'invalid_phone' })
+    user = await userService.login({ phone: body.user }, body.password)
+  } else {
+    assert.v({ data: body.user, type: 'string', regExp: nameExp, message: 'invalid_name' })
+    user = await userService.login({ name: body.user }, body.password)
+  }
+
+  ctx.session!.user.id = user.id
+  ctx.session!.user.time = Date.now()
+  ctx.session!.user.remember = body.remember
+  delete user.id
+  ctx.body = user
+  ctx.status = 201
 }
 
-export const deleteSession = async (ctx: Context) => {
+export async function deleteSession(ctx: Context) {
   ctx.session = null
   ctx.status = 204
 }

@@ -61,7 +61,7 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
   }
 }
 
-export const getByEmail = async (email: string): Promise<User | null> => {
+export async function getByEmail(email: string): Promise<User | null> {
   try {
     const user = await userDB.findOne({
       email: email.toLowerCase()
@@ -73,12 +73,23 @@ export const getByEmail = async (email: string): Promise<User | null> => {
   }
 }
 
-export const getByName = async (name: string): Promise<User | null> => {
+export async function getByName(name: string): Promise<User | null> {
   try {
     const user = await userDB.findOne({
       name: name.toLowerCase()
     })
     return user
+  } catch (err) {
+    console.log(err)
+    return null
+  }
+}
+
+export async function getByPhone(phone: string): Promise<User | null> {
+  try {
+    return await userDB.findOne({
+      phone: phone
+    })
   } catch (err) {
     console.log(err)
     return null

@@ -2,8 +2,13 @@ import * as fs from 'fs'
 import * as yaml from 'js-yaml'
 
 interface Config {
+  avatar: Avatar
   email: Email
   mongo: Mongo
+}
+
+interface Avatar {
+  default: string
 }
 
 interface Email {
@@ -25,5 +30,4 @@ interface Mongo {
 
 const doc: Config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'))
 
-export const email = doc.email
-export const mongo = doc.mongo
+export = doc
