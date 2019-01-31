@@ -73,6 +73,16 @@ export async function getByEmail(email: string): Promise<User | null> {
   }
 }
 
+export async function getById(id: string): Promise<User | null> {
+  try {
+    const user = await userDB.findById(id)
+    return user
+  } catch (err) {
+    console.log(err)
+    return null
+  }
+}
+
 export async function getByName(name: string): Promise<User | null> {
   try {
     const user = await userDB.findOne({

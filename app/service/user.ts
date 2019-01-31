@@ -14,6 +14,24 @@ export async function checkIfExistUserByEmail(email: string): Promise<boolean> {
 }
 
 /**
+ * 获取用户信息
+ *
+ * @param {string} id 用户主键
+ */
+export async function getInfo(id: string) {
+  const user = await userModel.getById(id)
+  assert(user, 'error_user_or_password') // 用户不存在
+  return {
+    id: user!._id,
+    name: user!.rawName,
+    nickname: user!.nickname,
+    email: user!.email,
+    phone: user!.name,
+    avatar: user!.info.avatar || config.avatar.default
+  }
+}
+
+/**
  * 用户登陆
  *
  * @param {RequireOnlyOne<Record<'email' | 'phone' | 'name', string>>} data 用户唯一标识
