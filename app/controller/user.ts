@@ -5,7 +5,6 @@ import * as assert from '../../lib/assert'
 import * as util from '../../lib/util'
 import * as verify from '../../lib/verify'
 import * as userService from '../service/user'
-import { User } from '../model/user'
 
 const emailExp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
 const nameExp = /^[a-zA-Z][a-zA-Z0-9_-]{0,31}$/
@@ -13,14 +12,14 @@ const nameExp = /^[a-zA-Z][a-zA-Z0-9_-]{0,31}$/
 /**
  * 获取用户信息
  */
-export async function get(ctx: Context) {
+export async function get(ctx: Context): Promise<void> {
   ctx.status = 200
 }
 
 /**
  * 注册用户
  */
-export async function post(ctx: Context) {
+export async function post(ctx: Context): Promise<void> {
   const body = _.pick(ctx.request.body, ['name', 'nickname', 'password'])
   assert.v({ data: body.name, type: 'string', regExp: nameExp, message: 'invalid_name' })
   assert.v({ data: body.nickname, require: false, type: 'string', maxLength: 32, message: 'invalid_nickname' })
@@ -66,7 +65,7 @@ export async function putEmail(ctx: Context): Promise<void> {
 /**
  * 用户登陆
  */
-export async function postSession(ctx: Context) {
+export async function postSession(ctx: Context): Promise<void> {
   const body = _.pick(ctx.request.body, ['user', 'password', 'remember'])
   assert.v({ data: body.user, type: 'string', message: 'invalid_user' })
   assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
@@ -92,7 +91,7 @@ export async function postSession(ctx: Context) {
   ctx.status = 201
 }
 
-export async function deleteSession(ctx: Context) {
+export async function deleteSession(ctx: Context): Promise<void> {
   ctx.session = null
   ctx.status = 204
 }
