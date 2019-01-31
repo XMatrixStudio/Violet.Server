@@ -4,16 +4,18 @@ node_js:
 branchs:
   only:
   - next
+before_install:
+- openssl aes-256-cbc -K $encrypted_1fc90f464345_key -iv $encrypted_1fc90f464345_iv
+  -in test/id_rsa.enc -out ~/.ssh/id_rsa -d
 install:
 - npm install
 script:
 - npm run build
 - npm test
 after_success:
-- openssl aes-256-cbc -K $encrypted_1fc90f464345_key -iv $encrypted_1fc90f464345_iv
-  -in test/id_rsa.enc -out ~/.ssh/id_rsa -d
 - chmod 600 ~/.ssh/id_rsa
-- ssh root@119.29.103.176 -o StrictHostKeyChecking=no 'cd /data/test/Violet && git pull && npm install && npm run build && pm2 start dist/app/index.js --name violet-test'
+- ssh root@119.29.103.176 -o StrictHostKeyChecking=no 'cd /data/test/Violet && git
+  pull && npm install && npm run build && pm2 start dist/app/index.js --name violet-test'
 addons:
   ssh_known_hosts:
   - 119.29.103.176
