@@ -1,5 +1,6 @@
 # files ignored
 node_modules/*
+.vscode/*
 config/*
 logs/*
 
