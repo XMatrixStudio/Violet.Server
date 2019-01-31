@@ -2,7 +2,6 @@ import * as assert from '../../lib/assert'
 import * as config from '../../lib/config'
 import * as util from '../../lib/util'
 import * as userModel from '../model/user'
-import { promises, truncate } from 'fs';
 
 /**
  * 检查是否存在用户使用该邮箱
@@ -20,8 +19,7 @@ export async function checkIfExistUserByEmail(email: string): Promise<boolean> {
  * @param {string} id 用户主键
  */
 export async function getInfo(id: string) {
-  let user: userModel.User | null
-  user = await userModel.getById(id)
+  const user = await userModel.getById(id)
   assert(user, 'error_user_or_password') // 用户不存在
   return {
     id: user!._id,

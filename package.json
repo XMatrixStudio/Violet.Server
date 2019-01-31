@@ -10,7 +10,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "npm run build && npm run serve",
-    "serve": "node ./dist/app/index.js"
+    "serve": "node dist/app/index.js",
+    "test": "jest --forceExit",
+    "testWithCoverage": "jest --forceExit --coverage --verbose"
   },
   "repository": {
     "type": "git",
@@ -46,6 +48,7 @@
   "devDependencies": {
     "@types/csprng": "^0.1.0",
     "@types/http-errors": "^1.6.1",
+    "@types/jest": "^23.3.13",
     "@types/js-yaml": "^3.11.4",
     "@types/koa": "^2.0.48",
     "@types/koa-bodyparser": "^4.2.1",
@@ -59,7 +62,11 @@
     "@types/mustache": "^0.8.32",
     "@types/node": "^10.12.20",
     "@types/nodemailer": "^4.6.5",
+    "@types/supertest": "^2.0.7",
+    "jest": "^24.0.0",
     "prettier": "^1.15.3",
+    "supertest": "^3.4.2",
+    "ts-jest": "^23.10.5",
     "tslint": "^5.12.0",
     "tslint-microsoft-contrib": "^6.0.0",
     "tslint-plugin-prettier": "^2.0.1",

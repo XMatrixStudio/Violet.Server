@@ -63,7 +63,7 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
 
 export async function getByEmail(email: string): Promise<User | null> {
   try {
-    const user = await userDB.findById({
+    const user = await userDB.findOne({
       email: email.toLowerCase()
     })
     return user
@@ -74,10 +74,8 @@ export async function getByEmail(email: string): Promise<User | null> {
 }
 
 export async function getById(id: string): Promise<User | null> {
-  try{
-    const user = await userDB.findOne({
-      id: id
-    })
+  try {
+    const user = await userDB.findById(id)
     return user
   } catch (err) {
     console.log(err)

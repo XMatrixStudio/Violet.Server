@@ -40,5 +40,5 @@ app.use(bodyParser())
 // Routes
 app.use(router.routes())
 
-app.listen(port)
+export = app.listen(port)
 console.log('Listen at port', port)
