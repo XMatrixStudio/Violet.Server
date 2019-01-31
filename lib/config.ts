@@ -5,6 +5,7 @@ interface Config {
   avatar: Avatar
   email: Email
   mongo: Mongo
+  server: Server
 }
 
 interface Avatar {
@@ -28,6 +29,28 @@ interface Mongo {
   dbName: string
 }
 
-const doc: Config = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'))
+interface Server {
+  port: number
+}
+
+const defaultDoc: Config = {
+  avatar: {
+    default: 'http://violet-1252808268.cosgz.myqcloud.com/0.png'
+  },
+  email: {} as any,
+  mongo: {} as any,
+  server: {
+    port: 40002
+  }
+}
+
+let configDoc
+try {
+  configDoc = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'))
+} catch (err) {
+  console.log(err)
+}
+
+const doc: Config = Object.assign(defaultDoc, configDoc)
 
 export = doc

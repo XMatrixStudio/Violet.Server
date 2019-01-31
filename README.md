@@ -6,6 +6,8 @@
 
 Violet 中央授权系统的Nodejs服务端，提供一系列的API接口。
 
+[![Build Status](https://travis-ci.com/XMatrixStudio/Violet.svg?branch=next)](https://travis-ci.com/XMatrixStudio/Violet)
+
 [[3.0文档](https://xmatrix.studio/docs/swagger/?url=https://xmatrix.studio/docs/api/v3-internal.yml)] (**开发中，不完整**)
 
 ## 如何使用

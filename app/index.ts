@@ -5,11 +5,11 @@ import * as helmet from 'koa-helmet'
 import * as morgan from 'koa-morgan'
 import * as session from 'koa-session'
 
+import * as config from '../lib/config'
 import * as router from './router'
 
 const app = new Koa()
 const isDev = process.env.NODE_ENV !== 'production'
-const port = process.env.PORT || 30002
 
 // HTTP log
 if (isDev) app.use(morgan('dev'))
@@ -40,5 +40,5 @@ app.use(bodyParser())
 // Routes
 app.use(router.routes())
 
-export = app.listen(port)
-console.log('Listen at port', port)
+export = app.listen(config.server.port)
+console.log('Listen at port', config.server.port)
