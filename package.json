@@ -57,7 +57,7 @@
     "@types/lodash": "^4.14.119",
     "@types/mongoose": "^5.3.7",
     "@types/mustache": "^0.8.32",
-    "@types/node": "^10.12.18",
+    "@types/node": "^10.12.20",
     "@types/nodemailer": "^4.6.5",
     "prettier": "^1.15.3",
     "tslint": "^5.12.0",
