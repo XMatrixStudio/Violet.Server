@@ -1,14 +1,12 @@
-# files ignored
-node_modules/*
-.vscode/*
-config/*
-logs/*
+# Dev Files Ignored
+.vscode/
+node_modules/
 
-# TypeScript Dist
-dist/*
-
-# Config
+# Config Files Ignored
 config.yml
 
+# Dist Files Ignored
+dist/
+
 # Test Files Ignored
-coverage/*
+coverage/
