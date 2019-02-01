@@ -13,7 +13,7 @@ const nameExp = /^[a-zA-Z][a-zA-Z0-9_-]{0,31}$/
  * 获取用户信息
  */
 export async function get(ctx: Context): Promise<void> {
-  ctx.body = userService.getInfo(ctx.session!.user.id!)
+  ctx.body = await userService.getInfo(ctx.session!.user.id!)
   ctx.status = 200
 }
 
