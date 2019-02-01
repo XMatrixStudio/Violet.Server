@@ -24,7 +24,7 @@ export async function getInfo(id: string) {
   return {
     id: user!._id,
     name: user!.rawName,
-    nickname: user!.nickname,
+    nickname: user!.info.nickname,
     email: user!.email,
     phone: user!.name,
     avatar: user!.info.avatar || config.avatar.default
@@ -51,7 +51,7 @@ export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'nam
   assert(hash === user!.secure.password, 'error_user_or_password') // 密码错误
   return {
     id: user!._id,
-    name: user!.nickname,
+    name: user!.info.nickname,
     email: user!.email,
     avatar: user!.info.avatar || config.avatar.default
   }

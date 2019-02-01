@@ -19,7 +19,7 @@ const whiteList: { method: HttpHandler; urls: string[] }[] = [
   },
   {
     method: router.post,
-    urls: ['/i/user', '/i/user/email']
+    urls: ['/i/user', '/i/user/email', '/i/user/session']
   },
   {
     method: router.put,
@@ -56,10 +56,8 @@ router.use('/', async (ctx: Context, next: () => Promise<void>) => {
 
 // 兜底判断，如果没有被白名单检查，则必须登录
 router.use('/i/', async (ctx: Context, next: () => Promise<void>) => {
-  if (ctx.session && ctx.session.isNew) {
-    ctx.session.verify = {}
-    ctx.session.user = {}
-  }
+  if (!ctx.session!.verify) ctx.session!.verify = {}
+  if (!ctx.session!.user) ctx.session!.user = {}
   if (!ctx.state.passStatusCheck) {
     assert(ctx.session!.user.id, 'invalid_token')
     assert(ctx.session!.user.remember || Date.now() - ctx.session!.user.time! <= 86400 * 1000, 'timeout_token')

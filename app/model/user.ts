@@ -5,13 +5,25 @@ export interface User extends db.Document {
   phone: string // 用户登陆手机，11位
   name: string // 用户名，全小写，用于索引
   rawName: string // 原始用户名
-  nickname: string // 昵称
+  class: number // 用户级别
+  createTime: Date // 注册时间
+  auth: {
+    appId: string // 应用的ObjectId
+  }[]
+  info: {
+    avatar: string // 头像URL
+    bio: string // 个人简介
+    email: string // 联系邮箱
+    gender: number // 性别
+    location: string // 个人地址
+    nickname: string // 昵称
+    url: string // 个人URL
+  }
   secure: {
     password: string // 经过加盐与多次SHA512的密码
     salt: string // 盐
-  }
-  info: {
-    avatar: string // 头像URL
+    errorCount: number // 连续登陆失败的次数
+    errorTime: Date // 第一次登陆失败的时间
   }
 }
 
@@ -20,16 +32,31 @@ const userSchema = new db.Schema({
   phone: { type: String, index: true },
   name: { type: String, index: true, required: true },
   rawName: { type: String, required: true },
-  nickname: String,
-  secure: {
-    type: {
-      password: String,
-      salt: String
-    },
-    required: true
+  class: { type: Number, default: 0 },
+  createTime: {
+    type: Date,
+    default: new Date()
+  },
+  auth: {
+    appId: String
   },
   info: {
-    avatar: String
+    avatar: String,
+    bio: String,
+    email: String,
+    gender: Number,
+    location: String,
+    nickname: String,
+    url: String
+  },
+  secure: {
+    type: {
+      password: { type: String, required: true },
+      salt: { type: String, required: true },
+      errorCount: Number,
+      errorTime: Date
+    },
+    required: true
   }
 })
 
@@ -48,7 +75,9 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
       phone: data.phone,
       name: data.name.toLowerCase(),
       rawName: data.name,
-      nickname: data.nickname,
+      info: {
+        nickname: data.nickname
+      },
       secure: {
         password: data.password,
         salt: data.salt
