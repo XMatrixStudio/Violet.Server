@@ -16,18 +16,18 @@ export async function checkIfExistUserByEmail(email: string): Promise<boolean> {
 /**
  * 获取用户信息
  *
- * @param {string} id 用户主键
+ * @param {string} id ObjectId
  */
-export async function getInfo(id: string) {
+export async function getInfo(id: string): Promise<User.GET.Body> {
   const user = await userModel.getById(id)
-  assert(user, 'error_user_or_password') // 用户不存在
+  user!.info.avatar = user!.info.avatar || config.avatar.default
   return {
-    id: user!._id,
-    name: user!.rawName,
-    nickname: user!.info.nickname,
     email: user!.email,
-    phone: user!.name,
-    avatar: user!.info.avatar || config.avatar.default
+    phone: user!.phone,
+    name: user!.rawName,
+    class: user!.class,
+    createTime: user!.createTime,
+    info: user!.info
   }
 }
 

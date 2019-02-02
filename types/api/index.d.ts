@@ -1,6 +1,19 @@
-declare namespace Util {
-  namespace Captcha {
-    type Body = string
-    type Status = 200 | 500
+declare namespace User {
+  namespace GET {
+    interface Body {
+      email: string
+      phone: string
+      name: string
+      class: number
+      createTime: Date
+      info: {
+        avatar: string
+        bio: string
+        email: string
+        location: string
+        nickname: string
+        url: string
+      }
+    }
   }
 }

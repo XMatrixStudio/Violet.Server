@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "coveralls": "npm run testWithCoverage && cat ./tests/coverage/lcov.info | coveralls",
+    "coveralls": "npm run testWithCoverage && cat coverage/lcov.info | coveralls",
     "dev": "npm run build && npm run serve",
     "serve": "node dist/app/index.js",
     "test": "jest --forceExit",

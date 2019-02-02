@@ -69,25 +69,20 @@ const userDB = db.model<User>('users', userSchema)
  * @return {boolean} 是否添加成功
  */
 export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' | 'password' | 'salt', string>): Promise<boolean> {
-  try {
-    const user = await userDB.create({
-      email: data.email,
-      phone: data.phone,
-      name: data.name.toLowerCase(),
-      rawName: data.name,
-      info: {
-        nickname: data.nickname
-      },
-      secure: {
-        password: data.password,
-        salt: data.salt
-      }
-    })
-    return user !== null
-  } catch (err) {
-    console.log(err)
-    return false
-  }
+  const user = await userDB.create({
+    email: data.email,
+    phone: data.phone,
+    name: data.name.toLowerCase(),
+    rawName: data.name,
+    info: {
+      nickname: data.nickname
+    },
+    secure: {
+      password: data.password,
+      salt: data.salt
+    }
+  })
+  return user !== null
 }
 
 export async function getByEmail(email: string): Promise<User | null> {
@@ -102,14 +97,13 @@ export async function getByEmail(email: string): Promise<User | null> {
   }
 }
 
+/**
+ * 获取用户信息
+ *
+ * @param {string} id ObjectId
+ */
 export async function getById(id: string): Promise<User | null> {
-  try {
-    const user = await userDB.findById(id)
-    return user
-  } catch (err) {
-    console.log(err)
-    return null
-  }
+  return await userDB.findById(id)
 }
 
 export async function getByName(name: string): Promise<User | null> {

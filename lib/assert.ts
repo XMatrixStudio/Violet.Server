@@ -6,12 +6,13 @@ import * as _ from 'lodash'
  */
 interface Assert {
   /**
-   * 简单断言，错误返回400状态码
+   * 简单断言，错误返回特定状态码
    *
    * @param {any} value 需要断言的值
    * @param {string | Error} message 断言消息
+   * @param {number} status 状态码，默认为400
    */
-  (value: any, message?: string | Error): void
+  (value: any, message: string | Error, status?: number): void
 
   /**
    * 验证断言，通过选项进行验证，错误返回400状态码
@@ -54,11 +55,11 @@ interface Option {
   regExp?: RegExp
 }
 
-const assert = <Assert>function(value: any, message?: string | Error) {
+const assert = <Assert>function(value: any, message: string | Error, status: number = 400) {
   try {
     _assert(value, message)
   } catch (err) {
-    err.status = 400
+    err.status = status
     err.expose = true
     throw err
   }

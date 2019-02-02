@@ -28,7 +28,7 @@ export async function post(ctx: Context): Promise<void> {
   body.nickname = body.nickname || body.name
 
   assert(ctx.session!.verify.email, 'not_exist_email')
-  assert(await userService.register(ctx.session!.verify.email!, '', body.name, body.nickname, body.password), 'unknown_error')
+  await userService.register(ctx.session!.verify.email!, '', body.name, body.nickname, body.password)
   ctx.session!.verify.email = undefined
   ctx.status = 201
 }
@@ -45,7 +45,7 @@ export async function postEmail(ctx: Context): Promise<void> {
   assert(ctx.session!.verify.captcha, 'not_exist_captcha')
   assert(verify.checkCaptcha(ctx, body.captcha), 'error_captcha')
   assert((await userService.checkIfExistUserByEmail(body.email)) === false, 'exist_email')
-  assert(await verify.sendEmailCode(ctx, body.email, '大肥真'), 'unknown_error')
+  assert(await verify.sendEmailCode(ctx, body.email, '大肥真'), 'send_fail')
   ctx.status = 201
 }
 
@@ -87,8 +87,6 @@ export async function postSession(ctx: Context): Promise<void> {
   ctx.session!.user.id = user.id
   ctx.session!.user.time = Date.now()
   ctx.session!.user.remember = body.remember
-  delete user.id
-  ctx.body = user
   ctx.status = 201
 }
 
