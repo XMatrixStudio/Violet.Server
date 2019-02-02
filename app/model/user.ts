@@ -13,10 +13,12 @@ export interface User extends db.Document {
   info: {
     avatar: string // 头像URL
     bio: string // 个人简介
+    birthday: Date // 生日
     email: string // 联系邮箱
     gender: number // 性别
     location: string // 个人地址
     nickname: string // 昵称
+    phone: string // 联系电话
     url: string // 个人URL
   }
   secure: {
@@ -43,10 +45,12 @@ const userSchema = new db.Schema({
   info: {
     avatar: String,
     bio: String,
+    birthday: Date,
     email: String,
     gender: Number,
     location: String,
     nickname: String,
+    phone: String,
     url: String
   },
   secure: {

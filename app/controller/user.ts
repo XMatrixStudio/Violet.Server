@@ -7,6 +7,7 @@ import * as verify from '../../lib/verify'
 import * as userService from '../service/user'
 
 const emailExp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
+const genderExp = /^[012]$/
 const nameExp = /^[a-zA-Z][a-zA-Z0-9_-]{0,31}$/
 
 /**
@@ -31,6 +32,28 @@ export async function post(ctx: Context): Promise<void> {
   await userService.register(ctx.session!.verify.email!, '', body.name, body.nickname, body.password)
   ctx.session!.verify.email = undefined
   ctx.status = 201
+}
+
+/**
+ * 修改用户个人信息
+ */
+export async function patch(ctx: Context): Promise<void> {
+  const body = _.pick(ctx.request.body, ['secure', 'info'])
+  body.secure = _.pick(body.secure, ['old_password', 'password'])
+  body.info = _.pick(body.info, ['avatar', 'bio', 'birthday', 'email', 'gender', 'location', 'nickname', 'phone', 'url'])
+  assert.v({ data: body.secure.old_password, require: false, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+  assert.v({ data: body.secure.password, require: false, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+  assert.v({ data: body.info.avatar, require: false, type: 'string', maxLength: 102400, message: 'invalid_info' })
+  assert.v({ data: body.info.bio, require: false, type: 'string', maxLength: 256, message: 'invalid_info' })
+  assert.v({ data: body.info.birthday, require: false, type: 'past', message: 'invalid_birthday' })
+  assert.v({ data: body.info.email, require: false, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_info' })
+  assert.v({ data: body.info.gender, require: false, type: 'number', regExp: genderExp, message: 'invalid_info' })
+  assert.v({ data: body.info.location, require: false, type: 'string', maxLength: 128, message: 'invalid_info' })
+  assert.v({ data: body.info.nickname, require: false, type: 'string', maxLength: 32, message: 'invalid_info' })
+  assert.v({ data: body.info.phone, require: false, type: 'string', message: 'invalid_info' })
+  assert.v({ data: body.info.url, require: false, type: 'string', maxLength: 128, message: 'invalid_info' })
+
+  ctx.status = 200
 }
 
 /**
@@ -72,19 +95,19 @@ export async function postSession(ctx: Context): Promise<void> {
   assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
   body.remember = body.remember === 'true'
 
-  let user
+  let userId
   if (body.user.indexOf('@') !== -1) {
     assert.v({ data: body.user, type: 'string', maxLength: 64, regExp: emailExp, message: 'invalid_email' })
-    user = await userService.login({ email: body.user }, body.password)
+    userId = await userService.login({ email: body.user }, body.password)
   } else if (body.user[0] >= '0' && body.user[0] <= '9') {
     assert.v({ data: body.user, type: 'string', minLength: 11, maxLength: 11, message: 'invalid_phone' })
-    user = await userService.login({ phone: body.user }, body.password)
+    userId = await userService.login({ phone: body.user }, body.password)
   } else {
     assert.v({ data: body.user, type: 'string', regExp: nameExp, message: 'invalid_name' })
-    user = await userService.login({ name: body.user }, body.password)
+    userId = await userService.login({ name: body.user }, body.password)
   }
 
-  ctx.session!.user.id = user.id
+  ctx.session!.user.id = userId
   ctx.session!.user.time = Date.now()
   ctx.session!.user.remember = body.remember
   ctx.status = 201

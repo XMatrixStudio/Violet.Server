@@ -36,8 +36,9 @@ export async function getInfo(id: string): Promise<User.GET.Body> {
  *
  * @param {RequireOnlyOne<Record<'email' | 'phone' | 'name', string>>} data 用户唯一标识
  * @param {string} password 密码的SHA512散列值
+ * @returns {string} ObjectId
  */
-export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'name', string>>, password: string) {
+export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'name', string>>, password: string): Promise<string> {
   let user: userModel.User | null
   if (data.email) {
     user = await userModel.getByEmail(data.email)
@@ -49,12 +50,7 @@ export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'nam
   assert(user, 'error_user_or_password') // 用户不存在
   const hash = util.hash(util.hash(password).concat(user!.secure.salt))
   assert(hash === user!.secure.password, 'error_user_or_password') // 密码错误
-  return {
-    id: user!._id,
-    name: user!.info.nickname,
-    email: user!.email,
-    avatar: user!.info.avatar || config.avatar.default
-  }
+  return user!._id
 }
 
 /**
