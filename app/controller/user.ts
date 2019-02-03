@@ -2,13 +2,14 @@ import { Context } from 'koa'
 import * as _ from 'lodash'
 
 import * as assert from '../../lib/assert'
-import * as util from '../../lib/util'
 import * as verify from '../../lib/verify'
 import * as userService from '../service/user'
 
 const emailExp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
 const genderExp = /^[012]$/
 const nameExp = /^[a-zA-Z][a-zA-Z0-9_-]{0,31}$/
+const nicknameExp = /^([a-zA-Z0-9_-]|\p{Script=Hani})+$/gu
+const urlExp = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/
 
 /**
  * 获取用户信息
@@ -24,7 +25,7 @@ export async function get(ctx: Context): Promise<void> {
 export async function post(ctx: Context): Promise<void> {
   const body = _.pick(ctx.request.body, ['name', 'nickname', 'password'])
   assert.v({ data: body.name, type: 'string', regExp: nameExp, message: 'invalid_name' })
-  assert.v({ data: body.nickname, require: false, type: 'string', maxLength: 32, message: 'invalid_nickname' })
+  assert.v({ data: body.nickname, require: false, type: 'string', regExp: nicknameExp, maxLength: 32, message: 'invalid_nickname' })
   assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
   body.nickname = body.nickname || body.name
 
@@ -39,20 +40,25 @@ export async function post(ctx: Context): Promise<void> {
  */
 export async function patch(ctx: Context): Promise<void> {
   const body = _.pick(ctx.request.body, ['secure', 'info'])
-  body.secure = _.pick(body.secure, ['old_password', 'password'])
-  body.info = _.pick(body.info, ['avatar', 'bio', 'birthday', 'email', 'gender', 'location', 'nickname', 'phone', 'url'])
-  assert.v({ data: body.secure.old_password, require: false, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
-  assert.v({ data: body.secure.password, require: false, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
-  assert.v({ data: body.info.avatar, require: false, type: 'string', maxLength: 102400, message: 'invalid_info' })
-  assert.v({ data: body.info.bio, require: false, type: 'string', maxLength: 256, message: 'invalid_info' })
-  assert.v({ data: body.info.birthday, require: false, type: 'past', message: 'invalid_birthday' })
-  assert.v({ data: body.info.email, require: false, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_info' })
-  assert.v({ data: body.info.gender, require: false, type: 'number', regExp: genderExp, message: 'invalid_info' })
-  assert.v({ data: body.info.location, require: false, type: 'string', maxLength: 128, message: 'invalid_info' })
-  assert.v({ data: body.info.nickname, require: false, type: 'string', maxLength: 32, message: 'invalid_info' })
-  assert.v({ data: body.info.phone, require: false, type: 'string', message: 'invalid_info' })
-  assert.v({ data: body.info.url, require: false, type: 'string', maxLength: 128, message: 'invalid_info' })
-
+  if (body.secure) {
+    body.secure = _.pick(body.secure, ['old_password', 'new_password'])
+    assert.v({ data: body.secure.old_password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+    assert.v({ data: body.secure.new_password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+    await userService.updatePassword(ctx.session!.user.id!, body.secure.old_password, body.secure.new_password)
+  }
+  if (body.info && !_.isEmpty(body.info)) {
+    body.info = _.pick(body.info, ['avatar', 'bio', 'birthday', 'email', 'gender', 'location', 'nickname', 'phone', 'url'])
+    assert.v({ data: body.info.avatar, require: false, type: 'string', maxLength: 102400, message: 'invalid_info' })
+    assert.v({ data: body.info.bio, require: false, type: 'string', maxLength: 128, message: 'invalid_info' })
+    assert.v({ data: body.info.birthday, require: false, type: 'past', message: 'invalid_birthday' })
+    assert.v({ data: body.info.email, require: false, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_info' })
+    assert.v({ data: body.info.gender, require: false, type: 'number', regExp: genderExp, message: 'invalid_info' })
+    assert.v({ data: body.info.location, require: false, type: 'string', maxLength: 64, message: 'invalid_info' })
+    assert.v({ data: body.info.nickname, require: false, type: 'string', regExp: nicknameExp, maxLength: 32, message: 'invalid_info' })
+    assert.v({ data: body.info.phone, require: false, type: 'string', message: 'invalid_info' })
+    assert.v({ data: body.info.url, require: false, type: 'string', regExp: urlExp, maxLength: 128, message: 'invalid_info' })
+    await userService.updateInfo(ctx.session!.user.id!)
+  }
   ctx.status = 200
 }
 

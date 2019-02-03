@@ -10,23 +10,25 @@ export interface User extends db.Document {
   auth: {
     appId: string // 应用的ObjectId
   }[]
-  info: {
-    avatar: string // 头像URL
-    bio: string // 个人简介
-    birthday: Date // 生日
-    email: string // 联系邮箱
-    gender: number // 性别
-    location: string // 个人地址
-    nickname: string // 昵称
-    phone: string // 联系电话
-    url: string // 个人URL
-  }
+  info: UserInfo
   secure: {
     password: string // 经过加盐与多次SHA512的密码
     salt: string // 盐
     errorCount: number // 连续登陆失败的次数
     errorTime: Date // 第一次登陆失败的时间
   }
+}
+
+interface UserInfo {
+  avatar: string // 头像URL
+  bio: string // 个人简介
+  birthday: Date // 生日
+  email: string // 联系邮箱
+  gender: number // 性别
+  location: string // 个人地址
+  nickname: string // 昵称
+  phone: string // 联系电话
+  url: string // 个人URL
 }
 
 const userSchema = new db.Schema({
@@ -70,10 +72,9 @@ const userDB = db.model<User>('users', userSchema)
  * 添加用户
  *
  * @param {Record<'email' | 'phone' | 'name' | 'nickname' | 'password' | 'salt', string>} data 用户数据
- * @return {boolean} 是否添加成功
  */
-export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' | 'password' | 'salt', string>): Promise<boolean> {
-  const user = await userDB.create({
+export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' | 'password' | 'salt', string>): Promise<void> {
+  await userDB.create({
     email: data.email,
     phone: data.phone,
     name: data.name.toLowerCase(),
@@ -86,49 +87,65 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
       salt: data.salt
     }
   })
-  return user !== null
 }
 
+/**
+ * 获取用户信息
+ *
+ * @param {string} email 登陆邮箱
+ * @returns {User | null} 用户信息
+ */
 export async function getByEmail(email: string): Promise<User | null> {
-  try {
-    const user = await userDB.findOne({
-      email: email.toLowerCase()
-    })
-    return user
-  } catch (err) {
-    console.log(err)
-    return null
-  }
+  return await userDB.findOne({ email: email.toLowerCase() })
 }
 
 /**
  * 获取用户信息
  *
  * @param {string} id ObjectId
+ * @returns {User | null} 用户信息
  */
 export async function getById(id: string): Promise<User | null> {
   return await userDB.findById(id)
 }
 
+/**
+ * 获取用户信息
+ *
+ * @param {string} name 用户名
+ * @returns {User | null} 用户信息
+ */
 export async function getByName(name: string): Promise<User | null> {
-  try {
-    const user = await userDB.findOne({
-      name: name.toLowerCase()
-    })
-    return user
-  } catch (err) {
-    console.log(err)
-    return null
-  }
+  return await userDB.findOne({ name: name.toLowerCase() })
 }
 
+/**
+ * 获取用户信息
+ *
+ * @param {string} phone 登陆手机
+ * @returns {User | null} 用户信息
+ */
 export async function getByPhone(phone: string): Promise<User | null> {
-  try {
-    return await userDB.findOne({
-      phone: phone
-    })
-  } catch (err) {
-    console.log(err)
-    return null
-  }
+  return await userDB.findOne({ phone: phone })
+}
+
+/**
+ * 更新用户个人信息
+ *
+ * @param {string} id ObjectId
+ * @param {UserInfo} info 用户个人信息
+ */
+export async function updateInfo(id: string, info: UserInfo): Promise<void> {
+  await userDB.findByIdAndUpdate(id, { info: info })
+}
+
+/**
+ * 更新用户密码
+ *
+ * @param {string} id ObjectId
+ * @param {string} password 经过加盐和哈希的密码
+ * @param {string} salt 盐
+ */
+export async function updatePassword(id: string, password: string, salt: string): Promise<void> {
+  await userDB.findByIdAndUpdate(id, { secure: { password: password, salt: salt } })
 }
