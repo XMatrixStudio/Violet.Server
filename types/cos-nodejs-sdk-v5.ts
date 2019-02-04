@@ -17,9 +17,11 @@ declare module 'cos-nodejs-sdk-v5' {
     Body: Buffer
   }
 
-  export class COS {
+  class COS {
     constructor(config: Config)
 
     putObject(params: Params, callback: (err: Error, data: any) => void): void
   }
+
+  export = COS
 }

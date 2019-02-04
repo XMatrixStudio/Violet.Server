@@ -42,8 +42,8 @@ export async function patch(ctx: Context): Promise<void> {
   const body = _.pick(ctx.request.body, ['secure', 'info'])
   if (body.secure) {
     body.secure = _.pick(body.secure, ['old_password', 'new_password'])
-    assert.v({ data: body.secure.old_password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
-    assert.v({ data: body.secure.new_password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+    assert.v({ data: body.secure.old_password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_secure' })
+    assert.v({ data: body.secure.new_password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_secure' })
     await userService.updatePassword(ctx.session!.user.id!, body.secure.old_password, body.secure.new_password)
   }
   if (body.info && !_.isEmpty(body.info)) {

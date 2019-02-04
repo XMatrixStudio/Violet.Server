@@ -1,4 +1,4 @@
-import { COS, Params } from 'cos-nodejs-sdk-v5'
+import COS = require('cos-nodejs-sdk-v5')
 
 import * as config from '../lib/config'
 
@@ -11,7 +11,7 @@ const cos = new COS({
 })
 
 export async function upload(name: string, file: Buffer): Promise<void> {
-  const params: Params = {
+  const params = {
     Bucket: config.avatar.cos.bucket,
     Region: config.avatar.cos.region,
     Key: name,
