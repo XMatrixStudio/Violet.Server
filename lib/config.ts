@@ -10,6 +10,13 @@ interface Config {
 
 interface Avatar {
   default: string
+  cos: {
+    secretId: string
+    secretKey: string
+    bucket: string
+    region: string
+    url: string
+  }
 }
 
 interface Email {
@@ -35,7 +42,8 @@ interface Server {
 
 const defaultDoc: Config = {
   avatar: {
-    default: 'http://violet-1252808268.cosgz.myqcloud.com/0.png'
+    default: 'http://violet-1252808268.cosgz.myqcloud.com/0.png',
+    cos: {} as any
   },
   email: {} as any,
   mongo: {} as any,

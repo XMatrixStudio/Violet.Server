@@ -1,6 +1,7 @@
 import * as assert from '../../lib/assert'
 import * as config from '../../lib/config'
 import * as crypto from '../../lib/crypto'
+import * as file from '../../lib/file'
 import * as util from '../../lib/util'
 import * as userModel from '../model/user'
 
@@ -70,7 +71,13 @@ export async function register(email: string, phone: string, name: string, nickn
   await userModel.add({ email: email, phone: phone, name: name, nickname: nickname, password: hash.password, salt: hash.salt })
 }
 
-export async function updateInfo(id: string): Promise<void> {}
+export async function updateInfo(id: string, info: userModel.UserInfo): Promise<void> {
+  if (info.avatar) {
+    await file.upload(id + '.jpg', Buffer.from(info.avatar.replace('data:image/jpeg;base64,', ''), 'base64'))
+    info.avatar = config.avatar.cos.url + id + '.jpg'
+  }
+  await userModel.updateInfo(id, info)
+}
 
 /**
  * 更新用户密码

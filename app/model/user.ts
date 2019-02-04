@@ -19,7 +19,7 @@ export interface User extends db.Document {
   }
 }
 
-interface UserInfo {
+export interface UserInfo {
   avatar: string // 头像URL
   bio: string // 个人简介
   birthday: Date // 生日

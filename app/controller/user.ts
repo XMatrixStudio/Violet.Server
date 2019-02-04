@@ -57,7 +57,7 @@ export async function patch(ctx: Context): Promise<void> {
     assert.v({ data: body.info.nickname, require: false, type: 'string', regExp: nicknameExp, maxLength: 32, message: 'invalid_info' })
     assert.v({ data: body.info.phone, require: false, type: 'string', message: 'invalid_info' })
     assert.v({ data: body.info.url, require: false, type: 'string', regExp: urlExp, maxLength: 128, message: 'invalid_info' })
-    await userService.updateInfo(ctx.session!.user.id!)
+    await userService.updateInfo(ctx.session!.user.id!, body.info)
   }
   ctx.status = 200
 }
