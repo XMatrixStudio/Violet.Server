@@ -62,9 +62,10 @@ const mailOptions: Mailer.SendMailOptions = {
  * @param {string | undefined} name 名字
  * @returns {boolean} 是否发送成功
  */
-export async function sendEmailCode(ctx: Context, email: string, name?: string): Promise<boolean> {
+export async function sendEmailCode(ctx: Context, type: string, email: string, name?: string): Promise<boolean> {
   const rand = Math.trunc(Math.random() * 900000 + 100000)
   ctx.session!.verify.email = email
+  ctx.session!.verify.emailType = type
   ctx.session!.verify.emailCode = rand.toString()
   ctx.session!.verify.emailTime = Date.now()
   const contentOptions = {

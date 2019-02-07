@@ -62,7 +62,7 @@ export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'nam
  * @param {string} phone 用户登陆手机
  * @param {string} name 用户名
  * @param {string} nickname 昵称
- * @param {string} password 密码的SHA512哈希值
+ * @param {string} password 密码的SHA512散列值
  */
 export async function register(email: string, phone: string, name: string, nickname: string, password: string): Promise<void> {
   assert(!util.isReservedUsername(name), 'reserved_name')
@@ -71,6 +71,39 @@ export async function register(email: string, phone: string, name: string, nickn
   await userModel.add({ email: email, phone: phone, name: name, nickname: nickname, password: hash.password, salt: hash.salt })
 }
 
+/**
+ * 重置用户密码
+ *
+ * @param {string} email 用户邮箱
+ * @param {string} password 新密码的SHA512散列值
+ */
+export async function resetPassword(email: string, password: string): Promise<void> {
+  const user = await userModel.getByEmail(email)
+  // TODO: check user in post email
+  assert(user, 'not_exist_user')
+  const hash = crypto.hashPassword(password)
+  await userModel.updatePassword(user!._id, hash.password, hash.salt)
+}
+
+/**
+ * 更新用户登陆邮箱
+ *
+ * @param {string} id ObjectId
+ * @param {string} email 用户登陆邮箱
+ */
+export async function updateEmail(id: string, email: string): Promise<void> {
+  const user = await userModel.getByEmail(email)
+  assert(user && user._id === id, 'same_email')
+  assert(!user, 'exist_user')
+  await userModel.updateEmail(id, email)
+}
+
+/**
+ * 更新用户个人信息
+ *
+ * @param {string} id ObjectId
+ * @param {UserInfo} info 用户个人信息
+ */
 export async function updateInfo(id: string, info: userModel.UserInfo): Promise<void> {
   if (info.avatar) {
     await file.upload(id + '.jpg', Buffer.from(info.avatar.replace('data:image/jpeg;base64,', ''), 'base64'))
@@ -83,13 +116,14 @@ export async function updateInfo(id: string, info: userModel.UserInfo): Promise<
  * 更新用户密码
  *
  * @param {string} id ObjectId
- * @param {string} oldPassword 旧密码
- * @param {string} newPassword 新密码
+ * @param {string} oldPassword 旧密码的SHA512散列值
+ * @param {string} newPassword 新密码的SHA512散列值
  */
 export async function updatePassword(id: string, oldPassword: string, newPassword: string): Promise<void> {
   const user = await userModel.getById(id)
   let hash = crypto.hashPassword(oldPassword, user!.secure.salt)
   assert(hash.password === user!.secure.password, 'error_password')
+  assert(oldPassword !== newPassword, 'same_password')
   hash = crypto.hashPassword(newPassword)
   await userModel.updatePassword(id, hash.password, hash.salt)
 }

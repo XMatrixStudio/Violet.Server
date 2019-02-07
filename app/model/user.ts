@@ -130,6 +130,26 @@ export async function getByPhone(phone: string): Promise<User | null> {
 }
 
 /**
+ * 更新用户登陆邮箱
+ *
+ * @param {string} id ObjectId
+ * @param {string} email 用户登陆邮箱
+ */
+export async function updateEmail(id: string, email: string): Promise<void> {
+  await userDB.findByIdAndUpdate(id, { email: email.toLowerCase() })
+}
+
+/**
+ * 更新用户登陆手机
+ *
+ * @param {string} id ObjectId
+ * @param {string} phone 用户登陆手机
+ */
+export async function updatePhone(id: string, phone: string): Promise<void> {
+  await userDB.findByIdAndUpdate(id, { phone: phone })
+}
+
+/**
  * 更新用户个人信息
  *
  * @param {string} id ObjectId

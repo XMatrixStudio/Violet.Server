@@ -29,6 +29,7 @@ declare module 'koa-session' {
      * 邮箱验证，5分钟过期
      */
     email?: string
+    emailType?: string
     emailCode?: string
     emailTime?: number
 

@@ -42,21 +42,22 @@ export async function patch(ctx: Context): Promise<void> {
   const body = _.pick(ctx.request.body, ['secure', 'info'])
   if (body.secure) {
     body.secure = _.pick(body.secure, ['old_password', 'new_password'])
-    assert.v({ data: body.secure.old_password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_secure' })
-    assert.v({ data: body.secure.new_password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_secure' })
+    assert.v({ data: body.secure.old_password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_old_password' })
+    assert.v({ data: body.secure.new_password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_new_password' })
     await userService.updatePassword(ctx.session!.user.id!, body.secure.old_password, body.secure.new_password)
   }
   if (body.info && !_.isEmpty(body.info)) {
     body.info = _.pick(body.info, ['avatar', 'bio', 'birthday', 'email', 'gender', 'location', 'nickname', 'phone', 'url'])
-    assert.v({ data: body.info.avatar, require: false, type: 'string', maxLength: 102400, message: 'invalid_info' })
-    assert.v({ data: body.info.bio, require: false, type: 'string', maxLength: 128, message: 'invalid_info' })
+    if (body.info.birthday) body.info.birthday = new Date(body.info.birthday)
+    assert.v({ data: body.info.avatar, require: false, type: 'string', maxLength: 102400, message: 'invalid_avatar' })
+    assert.v({ data: body.info.bio, require: false, type: 'string', maxLength: 128, message: 'invalid_bio' })
     assert.v({ data: body.info.birthday, require: false, type: 'past', message: 'invalid_birthday' })
-    assert.v({ data: body.info.email, require: false, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_info' })
-    assert.v({ data: body.info.gender, require: false, type: 'number', regExp: genderExp, message: 'invalid_info' })
-    assert.v({ data: body.info.location, require: false, type: 'string', maxLength: 64, message: 'invalid_info' })
-    assert.v({ data: body.info.nickname, require: false, type: 'string', regExp: nicknameExp, maxLength: 32, message: 'invalid_info' })
-    assert.v({ data: body.info.phone, require: false, type: 'string', message: 'invalid_info' })
-    assert.v({ data: body.info.url, require: false, type: 'string', regExp: urlExp, maxLength: 128, message: 'invalid_info' })
+    assert.v({ data: body.info.email, require: false, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' })
+    assert.v({ data: body.info.gender, require: false, type: 'number', regExp: genderExp, message: 'invalid_gender' })
+    assert.v({ data: body.info.location, require: false, type: 'string', maxLength: 64, message: 'invalid_location' })
+    assert.v({ data: body.info.nickname, require: false, type: 'string', regExp: nicknameExp, maxLength: 32, message: 'invalid_nickname' })
+    assert.v({ data: body.info.phone, require: false, type: 'string', message: 'invalid_phone' })
+    assert.v({ data: body.info.url, require: false, type: 'string', regExp: urlExp, maxLength: 128, message: 'invalid_url' })
     await userService.updateInfo(ctx.session!.user.id!, body.info)
   }
   ctx.status = 200
@@ -67,14 +68,14 @@ export async function patch(ctx: Context): Promise<void> {
  */
 export async function postEmail(ctx: Context): Promise<void> {
   const body = _.pick(ctx.request.body, ['operator', 'captcha', 'email'])
-  assert.v({ data: body.operator, type: 'string', enums: ['register'], message: 'invalid_operator' })
+  assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
   assert.v({ data: body.captcha, type: 'string', minLength: 4, maxLength: 4, message: 'invalid_captcha' })
   assert.v({ data: body.email, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' })
 
   assert(ctx.session!.verify.captcha, 'not_exist_captcha')
   assert(verify.checkCaptcha(ctx, body.captcha), 'error_captcha')
   assert((await userService.checkIfExistUserByEmail(body.email)) === false, 'exist_email')
-  assert(await verify.sendEmailCode(ctx, body.email, '大肥真'), 'send_fail')
+  assert(await verify.sendEmailCode(ctx, body.operator, body.email, '大肥真'), 'send_fail')
   ctx.status = 201
 }
 
@@ -82,13 +83,23 @@ export async function postEmail(ctx: Context): Promise<void> {
  * 验证邮箱
  */
 export async function putEmail(ctx: Context): Promise<void> {
-  const body = _.pick(ctx.request.body, ['operator', 'code'])
-  assert.v({ data: body.operator, type: 'string', enums: ['register'], message: 'invalid_operator' })
+  const body = _.pick(ctx.request.body, ['operator', 'code', 'password'])
+  assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
   assert.v({ data: body.code, type: 'string', minLength: 6, maxLength: 6, message: 'invalid_code' })
+  assert.v({ data: body.password, require: false, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
 
+  assert(ctx.session!.verify.emailType === body.operator, 'error_operator')
   assert(ctx.session!.verify.emailTime, 'not_exist_code')
   assert(Date.now() - ctx.session!.verify.emailTime! < 300 * 1000, 'timeout_code')
   assert(verify.checkEmailCode(ctx, body.code), 'error_code')
+  switch (body.operator) {
+    case 'reset':
+      await userService.resetPassword(ctx.session!.verify.email!, body.password)
+      break
+    case 'update':
+      await userService.updateEmail(ctx.session!.user.id!, ctx.session!.verify.email!)
+      break
+  }
   ctx.status = 200
 }
 
@@ -119,6 +130,9 @@ export async function postSession(ctx: Context): Promise<void> {
   ctx.status = 201
 }
 
+/**
+ * 用户登出
+ */
 export async function deleteSession(ctx: Context): Promise<void> {
   ctx.session = null
   ctx.status = 204
