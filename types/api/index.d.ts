@@ -48,3 +48,13 @@ declare namespace User {
     }
   }
 }
+
+declare namespace User.Email {
+  namespace POST {
+    interface RequestBody {
+      operator: string
+      captcha: string
+      email: string
+    }
+  }
+}

@@ -6,10 +6,46 @@ import * as mustache from 'mustache'
 import * as Mailer from 'nodemailer'
 import * as Sms from 'qcloudsms_js'
 
+import * as assert from './assert'
 import * as config from './config'
 
 /**
- * 生成验证码图片，并将验证码记录存储到Session中
+ * 检查图形验证码, 并且清除Session中的验证码记录
+ *
+ * 当记录不存在时, 抛出`not_exist_captcha`错误;
+ * 当记录超过5分钟后, 抛出`timeout_captcha`错误.
+ *
+ * @param {Context} ctx Koa上下文
+ * @param {string} vcode 图形验证码
+ * @returns {boolean} 验证码是否正确
+ */
+export function checkCaptcha(ctx: Context, vcode: string): void {
+  assert(ctx.session!.verify.captcha, 'not_exist_captcha')
+  assert(Date.now() - ctx.session!.verify.captchaTime! < 300 * 1000, 'timeout_captcha')
+  if (ctx.session!.verify.captcha === vcode) {
+    ctx.session!.verify.captcha = undefined
+  } else {
+    ctx.session!.verify.captcha = undefined
+    assert(false, 'error_captcha')
+  }
+}
+
+/**
+ * 检查登陆状态
+ *
+ * 当不存在登陆记录时, 抛出`invalid_token`错误;
+ * 当登陆记录过期时, 抛出`timeout_token`错误.
+ *
+ * @param {Context} ctx Koa上下文
+ */
+export function checkLoginState(ctx: Context): void {
+  assert(ctx.session!.user.id, 'invalid_token', 401)
+  assert(ctx.session!.user.remember || Date.now() - ctx.session!.user.time! <= 86400 * 1000, 'timeout_token', 401)
+  if (!ctx.session!.user.remember) ctx.session!.user.time = Date.now()
+}
+
+/**
+ * 生成验证码图片, 并将验证码记录存储到Session中
  *
  * @param {Context} ctx - Koa上下文
  * @returns {string} 验证码图片的Base64字符串
@@ -18,24 +54,8 @@ export function getCaptcha(ctx: Context): string {
   const rand = Math.trunc(Math.random() * 9000 + 1000)
   const png = new Captchapng(80, 30, rand)
   ctx.session!.verify.captcha = rand.toString()
+  ctx.session!.verify.captchaTime = Date.now()
   return 'data:image/png;base64,'.concat(png.getBase64())
-}
-
-/**
- * 检查图形验证码，并且清除Session中的验证码记录
- *
- * @param {Context} ctx Koa上下文
- * @param {string} vcode 图形验证码
- * @returns {boolean} 验证码是否正确
- */
-export function checkCaptcha(ctx: Context, vcode: string): boolean {
-  if (ctx.session!.verify.captcha === vcode) {
-    ctx.session!.verify.captcha = undefined
-    return true
-  } else {
-    ctx.session!.verify.captcha = undefined
-    return false
-  }
 }
 
 const mailer = Mailer.createTransport({
@@ -63,7 +83,8 @@ const mailOptions: Mailer.SendMailOptions = {
  * @param {string | undefined} name 名字
  * @returns {boolean} 是否发送成功
  */
-export async function sendEmailCode(ctx: Context, type: string, email: string, name?: string): Promise<boolean> {
+export async function sendEmailCode(ctx: Context, type: string, email: string, name?: string): Promise<void> {
+  assert(ctx.session!.verify.emailTime && Date.now() - ctx.session!.verify.emailTime! < 60 * 1000, 'limit_time')
   const rand = Math.trunc(Math.random() * 900000 + 100000)
   ctx.session!.verify.email = email
   ctx.session!.verify.emailType = type
@@ -81,10 +102,9 @@ export async function sendEmailCode(ctx: Context, type: string, email: string, n
   try {
     const info = await mailer.sendMail(Object.assign({}, mailOptions, contentOptions))
     console.log(info)
-    return true
   } catch (err) {
     console.log(err)
-    return false
+    assert(false, 'send_fail')
   }
 }
 

@@ -2,7 +2,7 @@ import { HttpError } from 'http-errors'
 import { Context } from 'koa'
 import * as Router from 'koa-router'
 
-import * as assert from '../../lib/assert'
+import * as verify from '../../lib/verify'
 import * as user from './user'
 import * as util from './util'
 
@@ -63,9 +63,7 @@ router.use('/i/', async (ctx: Context, next: () => Promise<void>) => {
   if (!ctx.session!.verify) ctx.session!.verify = {}
   if (!ctx.session!.user) ctx.session!.user = {}
   if (!ctx.state.passStatusCheck) {
-    assert(ctx.session!.user.id, 'invalid_token', 401)
-    assert(ctx.session!.user.remember || Date.now() - ctx.session!.user.time! <= 86400 * 1000, 'timeout_token', 401)
-    if (!ctx.session!.user.remember) ctx.session!.user.time = Date.now()
+    verify.checkLoginState(ctx)
   }
   return next()
 })

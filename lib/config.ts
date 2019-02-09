@@ -58,7 +58,9 @@ const defaultDoc: Config = {
   server: {
     port: 40002
   },
-  sms: {} as any
+  sms: {
+    qcloud: {} as any
+  }
 }
 
 let configDoc

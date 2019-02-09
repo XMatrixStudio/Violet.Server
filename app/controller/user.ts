@@ -81,15 +81,31 @@ export async function patch(ctx: Context): Promise<void> {
  * 发送邮箱验证邮件
  */
 export async function postEmail(ctx: Context): Promise<void> {
-  const body = _.pick(ctx.request.body, ['operator', 'captcha', 'email'])
+  const body = _.pick<User.Email.POST.RequestBody>(ctx.request.body, ['operator', 'captcha', 'email'])
   assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
   assert.v({ data: body.captcha, type: 'string', minLength: 4, maxLength: 4, message: 'invalid_captcha' })
   assert.v({ data: body.email, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' })
 
-  assert(ctx.session!.verify.captcha, 'not_exist_captcha')
-  assert(verify.checkCaptcha(ctx, body.captcha), 'error_captcha')
-  assert((await userService.checkIfExistUserByEmail(body.email)) === false, 'exist_email')
-  assert(await verify.sendEmailCode(ctx, body.operator, body.email, '大肥真'), 'send_fail')
+  verify.checkCaptcha(ctx, body.captcha!)
+  switch (body.operator) {
+    case 'register': {
+      assert((await userService.getUserNameByEmail(body.email!)) === null, 'exist_email')
+      await verify.sendEmailCode(ctx, body.operator, body.email!)
+      break
+    }
+    case 'reset': {
+      const name = await userService.getUserNameByEmail(body.email!)
+      assert(name, 'not_exist_email')
+      await verify.sendEmailCode(ctx, body.operator, body.email!, name!)
+      break
+    }
+    case 'update': {
+      verify.checkLoginState(ctx)
+      const name = (await userService.getInfo(ctx.session!.user.id!)).name
+      await verify.sendEmailCode(ctx, body.operator, body.email!, name)
+      break
+    }
+  }
   ctx.status = 201
 }
 

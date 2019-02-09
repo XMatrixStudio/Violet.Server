@@ -6,13 +6,14 @@ import * as util from '../../lib/util'
 import * as userModel from '../model/user'
 
 /**
- * 检查是否存在用户使用该邮箱
+ * 根据登陆邮箱获取用户名, 如果用户不存在则返回`null`
  *
  * @param {string} email 用户登陆邮箱
- * @returns {boolean} 邮箱是否已使用
+ * @returns {string | null} 用户名或
  */
-export async function checkIfExistUserByEmail(email: string): Promise<boolean> {
-  return (await userModel.getByEmail(email)) !== null
+export async function getUserNameByEmail(email: string): Promise<string | null> {
+  const user = await userModel.getByEmail(email)
+  return user !== null ? user.name : null
 }
 
 /**

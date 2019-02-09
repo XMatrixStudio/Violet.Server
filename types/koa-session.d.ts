@@ -13,6 +13,9 @@ declare module 'koa-session' {
     verify: Verification
   }
 
+  /**
+   * 用户登陆记录, 通过`id`来判断是否存在记录
+   */
   interface User {
     id?: string
     time?: number
@@ -21,12 +24,13 @@ declare module 'koa-session' {
 
   interface Verification {
     /**
-     * 图形验证码
+     * 图形验证码, 5分钟过期, 通过`captcha`来判断是否存在记录
      */
     captcha?: string
+    captchaTime?: number
 
     /**
-     * 邮箱验证，5分钟过期
+     * 邮箱验证, 5分钟过期, 通过`emailType`来判断是否存在记录
      */
     email?: string
     emailType?: string
@@ -34,7 +38,7 @@ declare module 'koa-session' {
     emailTime?: number
 
     /**
-     * 手机验证，5分钟过期
+     * 手机验证, 5分钟过期
      */
     phone?: string
     phoneType?: string
