@@ -8,7 +8,7 @@ import * as userModel from '../model/user'
 /**
  * 检查是否存在用户使用该邮箱
  *
- * @param {string} email 用户唯一邮箱
+ * @param {string} email 用户登陆邮箱
  * @returns {boolean} 邮箱是否已使用
  */
 export async function checkIfExistUserByEmail(email: string): Promise<boolean> {
@@ -16,11 +16,21 @@ export async function checkIfExistUserByEmail(email: string): Promise<boolean> {
 }
 
 /**
+ * 检查是否存在用户使用该手机
+ *
+ * @param {string} phone 用户登陆手机
+ * @returns {boolean} 手机是否已使用
+ */
+export async function checkIfExistUserByPhone(phone: string): Promise<boolean> {
+  return (await userModel.getByPhone(phone)) !== null
+}
+
+/**
  * 获取用户信息
  *
  * @param {string} id ObjectId
  */
-export async function getInfo(id: string): Promise<User.GET.Body> {
+export async function getInfo(id: string): Promise<User.GET.ResponseBody> {
   const user = await userModel.getById(id)
   user!.info.avatar = user!.info.avatar || config.avatar.default
   return {
@@ -104,7 +114,7 @@ export async function updateEmail(id: string, email: string): Promise<void> {
  * @param {string} id ObjectId
  * @param {UserInfo} info 用户个人信息
  */
-export async function updateInfo(id: string, info: userModel.UserInfo): Promise<void> {
+export async function updateInfo(id: string, info: Partial<userModel.UserInfo>): Promise<void> {
   if (info.avatar) {
     await file.upload(id + '.jpg', Buffer.from(info.avatar.replace('data:image/jpeg;base64,', ''), 'base64'))
     info.avatar = config.avatar.cos.url + id + '.jpg'

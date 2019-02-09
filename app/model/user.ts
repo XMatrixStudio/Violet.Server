@@ -126,7 +126,7 @@ export async function getByName(name: string): Promise<User | null> {
  * @returns {User | null} 用户信息
  */
 export async function getByPhone(phone: string): Promise<User | null> {
-  return await userDB.findOne({ phone: phone })
+  return await userDB.findOne({ phone: phone.replace('+86', '') })
 }
 
 /**
@@ -146,7 +146,7 @@ export async function updateEmail(id: string, email: string): Promise<void> {
  * @param {string} phone 用户登陆手机
  */
 export async function updatePhone(id: string, phone: string): Promise<void> {
-  await userDB.findByIdAndUpdate(id, { phone: phone })
+  await userDB.findByIdAndUpdate(id, { phone: phone.replace('+86', '') })
 }
 
 /**
@@ -155,7 +155,7 @@ export async function updatePhone(id: string, phone: string): Promise<void> {
  * @param {string} id ObjectId
  * @param {UserInfo} info 用户个人信息
  */
-export async function updateInfo(id: string, info: UserInfo): Promise<void> {
+export async function updateInfo(id: string, info: Partial<UserInfo>): Promise<void> {
   await userDB.findByIdAndUpdate(id, { info: info })
 }
 

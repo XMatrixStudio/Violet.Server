@@ -6,6 +6,7 @@ interface Config {
   email: Email
   mongo: Mongo
   server: Server
+  sms: Sms
 }
 
 interface Avatar {
@@ -40,6 +41,13 @@ interface Server {
   port: number
 }
 
+interface Sms {
+  qcloud: {
+    appId: string
+    appKey: string
+  }
+}
+
 const defaultDoc: Config = {
   avatar: {
     default: 'http://violet-1252808268.cosgz.myqcloud.com/0.png',
@@ -49,7 +57,8 @@ const defaultDoc: Config = {
   mongo: {} as any,
   server: {
     port: 40002
-  }
+  },
+  sms: {} as any
 }
 
 let configDoc

@@ -37,6 +37,7 @@ declare module 'koa-session' {
      * 手机验证，5分钟过期
      */
     phone?: string
+    phoneType?: string
     phoneCode?: string
     phoneTime?: number
   }

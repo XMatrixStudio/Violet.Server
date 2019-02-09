@@ -4,6 +4,7 @@ import { Context } from 'koa'
 import * as moment from 'moment'
 import * as mustache from 'mustache'
 import * as Mailer from 'nodemailer'
+import * as Sms from 'qcloudsms_js'
 
 import * as config from './config'
 
@@ -91,8 +92,8 @@ export async function sendEmailCode(ctx: Context, type: string, email: string, n
  * 检查邮箱验证码，并且清除Session中的验证码记录
  * 该方法不检查超时
  *
- * @param ctx Koa上下文
- * @param code 邮箱验证码
+ * @param {Context} ctx Koa上下文
+ * @param {string} code 邮箱验证码
  */
 export function checkEmailCode(ctx: Context, code: string): boolean {
   ctx.session!.verify.emailTime = undefined
@@ -101,6 +102,44 @@ export function checkEmailCode(ctx: Context, code: string): boolean {
     return true
   } else {
     ctx.session!.verify.emailCode = undefined
+    return false
+  }
+}
+
+const sender = Sms(config.sms.qcloud.appId, config.sms.qcloud.appKey).SmsSingleSender()
+
+export async function sendPhoneCode(ctx: Context, type: string, phone: string, name?: string): Promise<boolean> {
+  const rand = Math.trunc(Math.random() * 900000 + 100000)
+  ctx.session!.verify.phone = phone
+  ctx.session!.verify.phoneType = type
+  ctx.session!.verify.phoneCode = rand.toString()
+  ctx.session!.verify.phoneTime = Date.now()
+  return new Promise((resolve, reject) => {
+    sender.send(0, 86, phone, `【Violet】验证码:${rand}`, '', '', (err: Error, res: any, resData: any) => {
+      console.log(resData)
+      if (err) {
+        reject(err)
+      } else {
+        resolve(resData)
+      }
+    })
+  })
+}
+
+/**
+ * 检查手机验证码，并且清除Session中的验证码记录
+ * 该方法不检查超时
+ *
+ * @param {Context} ctx Koa上下文
+ * @param {string} code 手机验证码
+ */
+export function checkPhoneCode(ctx: Context, code: string): boolean {
+  ctx.session!.verify.phoneTime = undefined
+  if (ctx.session!.verify.phoneCode === code) {
+    ctx.session!.verify.phoneCode = undefined
+    return true
+  } else {
+    ctx.session!.verify.phoneCode = undefined
     return false
   }
 }

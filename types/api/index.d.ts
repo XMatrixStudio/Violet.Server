@@ -1,6 +1,6 @@
 declare namespace User {
   namespace GET {
-    interface Body {
+    interface ResponseBody {
       email: string
       phone: string
       name: string
@@ -16,6 +16,34 @@ declare namespace User {
         nickname: string
         phone: string
         url: string
+      }
+    }
+  }
+
+  namespace POST {
+    interface RequestBody {
+      name: string
+      password: string
+      nickname?: string
+    }
+  }
+
+  namespace PATCH {
+    interface RequestBody {
+      info?: {
+        avatar?: string
+        bio?: string
+        birthday?: Date | string
+        email?: string
+        gender?: 0 | 1 | 2
+        location?: string
+        nickname?: string
+        phone?: string
+        url?: string
+      }
+      secure?: {
+        old_password: string
+        new_password: string
       }
     }
   }
