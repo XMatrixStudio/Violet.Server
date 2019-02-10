@@ -89,19 +89,20 @@ export async function postEmail(ctx: Context): Promise<void> {
   verify.checkCaptcha(ctx, body.captcha!)
   switch (body.operator) {
     case 'register': {
-      assert((await userService.getUserNameByEmail(body.email!)) === null, 'exist_email')
+      assert((await userService.getUserNameByEmail(body.email!)) === null, 'exist_user')
       await verify.sendEmailCode(ctx, body.operator, body.email!)
       break
     }
     case 'reset': {
       const name = await userService.getUserNameByEmail(body.email!)
-      assert(name, 'not_exist_email')
+      assert(name, 'not_exist_user')
       await verify.sendEmailCode(ctx, body.operator, body.email!, name!)
       break
     }
     case 'update': {
       verify.checkLoginState(ctx)
-      const name = (await userService.getInfo(ctx.session!.user.id!)).name
+      const user = await userService.getInfo(ctx.session!.user.id!)
+      assert(user.email !== body.email!.toLowerCase(), 'same_email')
       await verify.sendEmailCode(ctx, body.operator, body.email!, name)
       break
     }
@@ -113,40 +114,82 @@ export async function postEmail(ctx: Context): Promise<void> {
  * 验证邮箱
  */
 export async function putEmail(ctx: Context): Promise<void> {
-  const body = _.pick(ctx.request.body, ['operator', 'code', 'password'])
+  const body = _.pick<User.Email.PUT.RequestBody>(ctx.request.body, ['operator', 'code', 'password'])
   assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
   assert.v({ data: body.code, type: 'string', minLength: 6, maxLength: 6, message: 'invalid_code' })
   assert.v({ data: body.password, require: false, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
 
-  assert(ctx.session!.verify.emailType === body.operator, 'error_operator')
-  assert(ctx.session!.verify.emailTime, 'not_exist_code')
-  assert(Date.now() - ctx.session!.verify.emailTime! < 300 * 1000, 'timeout_code')
-  assert(verify.checkEmailCode(ctx, body.code), 'error_code')
+  verify.checkEmailCode(ctx, body.code!, body.operator!)
   switch (body.operator) {
-    case 'reset':
-      await userService.resetPassword(ctx.session!.verify.email!, body.password)
+    case 'reset': {
+      await userService.resetPassword({ email: ctx.session!.verify.email! }, body.password!)
       break
-    case 'update':
-      await userService.updateEmail(ctx.session!.user.id!, ctx.session!.verify.email!)
+    }
+    case 'update': {
+      verify.checkLoginState(ctx)
+      await userService.updateEmailOrPhone(ctx.session!.user.id!, { email: ctx.session!.verify.email! })
       break
+    }
   }
   ctx.status = 200
 }
 
+/**
+ * 发送手机验证短信, 目前固定验证码为`123456`
+ */
 export async function postPhone(ctx: Context): Promise<void> {
-  const body = _.pick(ctx.request.body, ['operator', 'captcha', 'phone'])
+  const body = _.pick<User.Phone.POST.RequestBody>(ctx.request.body, ['operator', 'captcha', 'phone'])
   assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
   assert.v({ data: body.captcha, type: 'string', minLength: 4, maxLength: 4, message: 'invalid_captcha' })
   assert.v({ data: body.phone, type: 'string', regExp: phoneExp, message: 'invalid_phone' })
 
-  assert(ctx.session!.verify.captcha, 'not_exist_captcha')
-  assert(verify.checkCaptcha(ctx, body.captcha), 'error_captcha')
-  assert((await userService.checkIfExistUserByPhone(body.phone)) === false, 'exist_phone')
-  assert(await verify.sendPhoneCode(ctx, body.operator, body.phone), 'send_fail')
+  verify.checkCaptcha(ctx, body.captcha!)
+  switch (body.operator) {
+    case 'register': {
+      assert((await userService.getUserNameByPhone(body.phone!)) === null, 'exist_user')
+      await verify.sendPhoneCode(ctx, body.operator, body.phone!)
+      break
+    }
+    case 'reset': {
+      const name = await userService.getUserNameByPhone(body.phone!)
+      assert(name, 'not_exist_user')
+      await verify.sendPhoneCode(ctx, body.operator, body.phone!, name!)
+      break
+    }
+    case 'update': {
+      verify.checkLoginState(ctx)
+      const user = await userService.getInfo(ctx.session!.user.id!)
+      assert(user.phone !== body.phone!.replace('+86', ''), 'same_phone')
+      await verify.sendPhoneCode(ctx, body.operator, body.phone!, name)
+      break
+    }
+  }
   ctx.status = 201
 }
 
-export async function putPhone(ctx: Context): Promise<void> {}
+/**
+ * 验证手机
+ */
+export async function putPhone(ctx: Context): Promise<void> {
+  const body = _.pick<User.Phone.PUT.RequestBody>(ctx.request.body, ['operator', 'code', 'password'])
+  assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
+  assert.v({ data: body.code, type: 'string', minLength: 6, maxLength: 6, message: 'invalid_code' })
+  assert.v({ data: body.password, require: false, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+
+  verify.checkPhoneCode(ctx, body.code!, body.operator!)
+  switch (body.operator) {
+    case 'reset': {
+      await userService.resetPassword({ phone: ctx.session!.verify.phone! }, body.password!)
+      break
+    }
+    case 'update': {
+      verify.checkLoginState(ctx)
+      await userService.updateEmailOrPhone(ctx.session!.user.id!, { phone: ctx.session!.verify.phone! })
+      break
+    }
+  }
+  ctx.status = 200
+}
 
 /**
  * 用户登陆

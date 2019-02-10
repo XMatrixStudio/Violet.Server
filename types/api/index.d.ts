@@ -52,9 +52,35 @@ declare namespace User {
 declare namespace User.Email {
   namespace POST {
     interface RequestBody {
-      operator: string
+      operator: 'register' | 'reset' | 'update'
       captcha: string
       email: string
+    }
+  }
+
+  namespace PUT {
+    interface RequestBody {
+      operator: 'register' | 'reset' | 'update'
+      code: string
+      password?: string
+    }
+  }
+}
+
+declare namespace User.Phone {
+  namespace POST {
+    interface RequestBody {
+      operator: 'register' | 'reset' | 'update'
+      captcha: string
+      phone: string
+    }
+  }
+
+  namespace PUT {
+    interface RequestBody {
+      operator: 'register' | 'reset' | 'update'
+      code: string
+      password?: string
     }
   }
 }

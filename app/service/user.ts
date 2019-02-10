@@ -17,13 +17,14 @@ export async function getUserNameByEmail(email: string): Promise<string | null> 
 }
 
 /**
- * 检查是否存在用户使用该手机
+ * 根据登陆手机获取用户名, 如果用户不存在则返回`null`
  *
  * @param {string} phone 用户登陆手机
- * @returns {boolean} 手机是否已使用
+ * @returns {string | null} 用户名或
  */
-export async function checkIfExistUserByPhone(phone: string): Promise<boolean> {
-  return (await userModel.getByPhone(phone)) !== null
+export async function getUserNameByPhone(phone: string): Promise<string | null> {
+  const user = await userModel.getByPhone(phone)
+  return user !== null ? user.name : null
 }
 
 /**
@@ -85,28 +86,32 @@ export async function register(email: string, phone: string, name: string, nickn
 /**
  * 重置用户密码
  *
- * @param {string} email 用户邮箱
+ * @param {RequireOnlyOne<Record<'email' | 'phone', string>>} user 用户登陆邮箱或手机
  * @param {string} password 新密码的SHA512散列值
  */
-export async function resetPassword(email: string, password: string): Promise<void> {
-  const user = await userModel.getByEmail(email)
-  // TODO: check user in post email
-  assert(user, 'not_exist_user')
+export async function resetPassword(user: RequireOnlyOne<Record<'email' | 'phone', string>>, password: string): Promise<void> {
+  let id: string
+  if (user.email) {
+    id = (await userModel.getByEmail(user.email))!._id
+  } else {
+    id = (await userModel.getByPhone(user.phone!))!._id
+  }
   const hash = crypto.hashPassword(password)
-  await userModel.updatePassword(user!._id, hash.password, hash.salt)
+  await userModel.updatePassword(id, hash.password, hash.salt)
 }
 
 /**
- * 更新用户登陆邮箱
+ * 更新用户登陆信息
  *
  * @param {string} id ObjectId
- * @param {string} email 用户登陆邮箱
+ * @param {RequireOnlyOne<Record<'email' | 'phone', string>>} user 用户登陆邮箱或手机
  */
-export async function updateEmail(id: string, email: string): Promise<void> {
-  const user = await userModel.getByEmail(email)
-  assert(user && user._id === id, 'same_email')
-  assert(!user, 'exist_user')
-  await userModel.updateEmail(id, email)
+export async function updateEmailOrPhone(id: string, user: RequireOnlyOne<Record<'email' | 'phone', string>>): Promise<void> {
+  if (user.email) {
+    await userModel.updateEmail(id, user.email)
+  } else {
+    await userModel.updatePhone(id, user.phone!)
+  }
 }
 
 /**
