@@ -23,7 +23,7 @@ const whiteList: { method: HttpHandler; urls: string[] }[] = [
   },
   {
     method: router.put,
-    urls: ['/i/user/email']
+    urls: ['/i/user/email', '/i/user/phone']
   },
   {
     method: router.delete,

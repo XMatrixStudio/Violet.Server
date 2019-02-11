@@ -62,8 +62,13 @@ export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'nam
     user = await userModel.getByName(data.name!)
   }
   assert(user, 'error_user_or_password') // 用户不存在
+  assert(user!.secure.errorCount <= 3 || Date.now() - user!.secure.errorTime.getTime() >= 1800 * 1000, 'limit_error_count')
   const hash = crypto.hashPassword(password, user!.secure.salt)
-  assert(hash.password === user!.secure.password, 'error_user_or_password') // 密码错误
+  if (hash.password !== user!.secure.password) {
+    await userModel.updateLoginError(user!._id, user!.secure.errorCount + 1)
+    assert(false, 'error_user_or_password') // 密码错误
+  }
+  await userModel.updateLoginError(user!._id, 0)
   return user!._id
 }
 
@@ -98,6 +103,7 @@ export async function resetPassword(user: RequireOnlyOne<Record<'email' | 'phone
   }
   const hash = crypto.hashPassword(password)
   await userModel.updatePassword(id, hash.password, hash.salt)
+  await userModel.updateLoginError(id, 0)
 }
 
 /**

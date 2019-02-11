@@ -32,9 +32,9 @@ export interface UserInfo {
 }
 
 const userSchema = new db.Schema({
-  email: { type: String, index: true },
-  phone: { type: String, index: true },
-  name: { type: String, index: true, required: true },
+  email: { type: String, index: { unique: true } },
+  phone: { type: String, index: { unique: true } },
+  name: { type: String, index: { unique: true }, required: true },
   rawName: { type: String, required: true },
   class: { type: Number, default: 0 },
   createTime: {
@@ -137,6 +137,22 @@ export async function getByPhone(phone: string): Promise<User | null> {
  */
 export async function updateEmail(id: string, email: string): Promise<void> {
   await userDB.findByIdAndUpdate(id, { email: email.toLowerCase() })
+}
+
+/**
+ * 更新用户登陆错误状态
+ *
+ * @param {string} id ObjectId
+ * @param {number} count 登陆错误次数
+ */
+export async function updateLoginError(id: string, count: number): Promise<void> {
+  if (count > 3) {
+    await userDB.findByIdAndUpdate(id, { secure: { errorCount: count - 3, errorTime: new Date() } })
+  } else if (count !== 0) {
+    await userDB.findByIdAndUpdate(id, { secure: { errorCount: count } })
+  } else {
+    await userDB.findByIdAndUpdate(id, { secure: { errorCount: 0, errorTime: new Date() } })
+  }
 }
 
 /**

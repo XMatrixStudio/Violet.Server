@@ -195,21 +195,21 @@ export async function putPhone(ctx: Context): Promise<void> {
  * 用户登陆
  */
 export async function postSession(ctx: Context): Promise<void> {
-  const body = _.pick(ctx.request.body, ['user', 'password', 'remember'])
+  const body = _.pick<User.Session.POST.RequestBody>(ctx.request.body, ['user', 'password', 'remember'])
   assert.v({ data: body.user, type: 'string', message: 'invalid_user' })
   assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
-  body.remember = body.remember === 'true'
+  body.remember = body.remember === true
 
   let userId
-  if (body.user.indexOf('@') !== -1) {
+  if (body.user!.indexOf('@') !== -1) {
     assert.v({ data: body.user, type: 'string', maxLength: 64, regExp: emailExp, message: 'invalid_email' })
-    userId = await userService.login({ email: body.user }, body.password)
-  } else if (body.user[0] >= '0' && body.user[0] <= '9') {
+    userId = await userService.login({ email: body.user! }, body.password!)
+  } else if (body.user![0] >= '0' && body.user![0] <= '9') {
     assert.v({ data: body.user, type: 'string', minLength: 11, maxLength: 11, message: 'invalid_phone' })
-    userId = await userService.login({ phone: body.user }, body.password)
+    userId = await userService.login({ phone: body.user! }, body.password!)
   } else {
     assert.v({ data: body.user, type: 'string', regExp: nameExp, message: 'invalid_name' })
-    userId = await userService.login({ name: body.user }, body.password)
+    userId = await userService.login({ name: body.user! }, body.password!)
   }
 
   ctx.session!.user.id = userId

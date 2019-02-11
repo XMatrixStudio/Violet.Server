@@ -84,3 +84,13 @@ declare namespace User.Phone {
     }
   }
 }
+
+declare namespace User.Session {
+  namespace POST {
+    interface RequestBody {
+      user: string
+      password: string
+      remember?: boolean
+    }
+  }
+}
