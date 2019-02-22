@@ -4,6 +4,7 @@ node_modules/
 
 # Config Files Ignored
 config.yml
+config/*
 
 # Dist Files Ignored
 dist/
