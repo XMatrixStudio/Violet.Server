@@ -26,6 +26,7 @@ interface Assert {
    *                 non-negative:     原值为 非NaN 非Infinity 的非负数字
    *                 string:           原值为 非空 字符串
    *                 date:             原值为 非Invalid Date
+   *                 past:             原值为 非Invalid 且小于现在的Date
    *                 future:           原值为 非Invalid 且大于现在的Date
    *                 positive-array:   原值为 非NaN 非Infinity正数 组成的 非空数组
    *                 e-positive-array: 原值为 非NaN 非Infinity正数 组成的 可空数组
@@ -51,7 +52,7 @@ interface Option {
   require?: boolean
   minLength?: number
   maxLength?: number
-  enums?: [any]
+  enums?: any[]
   regExp?: RegExp
 }
 
@@ -96,6 +97,9 @@ assert.v = function(...options: Option[]) {
         break
       case 'date':
         assert(option.data instanceof Date && !isNaN(option.data.getTime()), message)
+        break
+      case 'past':
+        assert(option.data instanceof Date && !isNaN(option.data.getTime()) && option.data < new Date(), message)
         break
       case 'future':
         assert(option.data instanceof Date && !isNaN(option.data.getTime()) && option.data > new Date(), message)
