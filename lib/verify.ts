@@ -172,7 +172,7 @@ const sender = Sms(config.sms.qcloud.appId, config.sms.qcloud.appKey).SmsSingleS
  * @returns {boolean} 是否发送成功
  */
 export async function sendPhoneCode(ctx: Context, type: string, phone: string, name?: string): Promise<void> {
-  assert(!ctx.session!.verify.phoneTime || Date.now() - ctx.session!.verify.phoneTime! < 60 * 1000, 'limit_time')
+  assert(!ctx.session!.verify.phoneTime || Date.now() - ctx.session!.verify.phoneTime! > 60 * 1000, 'limit_time')
   // const rand = Math.trunc(Math.random() * 900000 + 100000)
   const rand = 123456
   ctx.session!.verify.phone = phone
