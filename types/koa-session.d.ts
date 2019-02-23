@@ -20,6 +20,7 @@ declare module 'koa-session' {
     id?: string
     time?: number
     remember?: boolean
+    register?: 'email' | 'phone'
   }
 
   interface Verification {

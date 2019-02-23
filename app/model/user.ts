@@ -14,8 +14,6 @@ export interface User extends db.Document {
   secure: {
     password: string // 经过加盐与多次SHA512的密码
     salt: string // 盐
-    errorCount: number // 连续登陆失败的次数
-    errorTime: Date // 第一次登陆失败的时间
   }
 }
 
@@ -58,9 +56,7 @@ const userSchema = new db.Schema({
   secure: {
     type: {
       password: { type: String, required: true },
-      salt: { type: String, required: true },
-      errorCount: Number,
-      errorTime: Date
+      salt: { type: String, required: true }
     },
     required: true
   }
@@ -142,6 +138,7 @@ export async function updateEmail(id: string, email: string): Promise<void> {
 /**
  * 更新用户登陆错误状态
  *
+ * @deprecated
  * @param {string} id ObjectId
  * @param {number} count 登陆错误次数
  */

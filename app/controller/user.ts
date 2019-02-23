@@ -30,22 +30,18 @@ export async function post(ctx: Context): Promise<void> {
   assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
   body.nickname = body.nickname || body.name!
 
-  assert(ctx.session!.verify.emailType === 'register' || ctx.session!.verify.phoneType === 'register', 'not_exist_register_record')
-  if (ctx.session!.verify.emailType === 'register' && ctx.session!.verify.phoneType !== 'register') {
-    await userService.register(ctx.session!.verify.email!, '', body.name!, body.nickname, body.password!)
-    ctx.session!.verify.emailType = undefined
-  } else if (ctx.session!.verify.emailType !== 'register' && ctx.session!.verify.phoneType === 'register') {
-    await userService.register('', ctx.session!.verify.phone!, body.name!, body.nickname, body.password!)
-    ctx.session!.verify.phoneType = undefined
-  } else {
-    if (ctx.session!.verify.emailTime! >= ctx.session!.verify.phoneTime!) {
+  assert(ctx.session!.user.register, 'not_exist_register_record')
+  switch (ctx.session!.user.register) {
+    case 'email': {
       await userService.register(ctx.session!.verify.email!, '', body.name!, body.nickname, body.password!)
-      ctx.session!.verify.emailType = undefined
-    } else {
+      break
+    }
+    case 'phone': {
       await userService.register('', ctx.session!.verify.phone!, body.name!, body.nickname, body.password!)
-      ctx.session!.verify.phoneType = undefined
+      break
     }
   }
+  ctx.session!.user.register = undefined
   ctx.status = 201
 }
 
@@ -121,6 +117,10 @@ export async function putEmail(ctx: Context): Promise<void> {
 
   verify.checkEmailCode(ctx, body.code!, body.operator!)
   switch (body.operator) {
+    case 'register': {
+      ctx.session!.user.register = 'email'
+      break
+    }
     case 'reset': {
       await userService.resetPassword({ email: ctx.session!.verify.email! }, body.password!)
       break
@@ -178,6 +178,10 @@ export async function putPhone(ctx: Context): Promise<void> {
 
   verify.checkPhoneCode(ctx, body.code!, body.operator!)
   switch (body.operator) {
+    case 'register': {
+      ctx.session!.user.register = 'phone'
+      break
+    }
     case 'reset': {
       await userService.resetPassword({ phone: ctx.session!.verify.phone! }, body.password!)
       break
