@@ -4,7 +4,7 @@ import app = require('../../../app')
 
 const url = '/i/util/captcha'
 
-describe('/GET', () => {
+describe(`GET ${url}`, () => {
   it('should get captcha successfully', () => {
     return request(app)
       .get(url)

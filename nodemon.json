@@ -1,0 +1,6 @@
+{
+  "watch": ["app", "lib"],
+  "ext": "ts",
+  "ignore": [],
+  "exec": "npm run build && npm run serve"
+}

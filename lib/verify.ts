@@ -160,7 +160,7 @@ export async function sendEmailCode(ctx: Context, type: string, email: string, n
   }
 }
 
-const sender = Sms(config.sms.qcloud.appId, config.sms.qcloud.appKey).SmsSingleSender()
+// const sender = Sms(config.sms.qcloud.appId, config.sms.qcloud.appKey).SmsSingleSender()
 
 /**
  * 发送验证码短信

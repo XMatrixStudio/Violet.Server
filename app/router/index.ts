@@ -3,8 +3,9 @@ import { Context } from 'koa'
 import * as Router from 'koa-router'
 
 import * as verify from '../../lib/verify'
-import * as user from './user'
-import * as util from './util'
+import * as classRouter from './class'
+import * as userRouter from './user'
+import * as utilRouter from './util'
 
 const router = new Router()
 
@@ -68,7 +69,8 @@ router.use('/i/', async (ctx: Context, next: () => Promise<void>) => {
   return next()
 })
 
-router.use('/i/user', user.routes())
-router.use('/i/util', util.routes())
+router.use('/i/classes', classRouter.routes())
+router.use('/i/user', userRouter.routes())
+router.use('/i/util', utilRouter.routes())
 
 export = router
