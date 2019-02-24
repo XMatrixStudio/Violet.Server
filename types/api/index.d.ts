@@ -1,7 +1,7 @@
 declare namespace Classes.Users {
   namespace POST {
     interface RequestBody {
-      class: number
+      level: number
       reason: string
     }
   }
@@ -13,7 +13,7 @@ declare namespace User {
       email: string
       phone: string
       name: string
-      class: number
+      level: number
       createTime: Date
       info: {
         avatar: string

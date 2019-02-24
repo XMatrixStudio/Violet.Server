@@ -5,7 +5,7 @@ export interface User extends db.Document {
   phone: string // 用户登陆手机，11位
   name: string // 用户名，全小写，用于索引
   rawName: string // 原始用户名
-  class: number // 用户级别
+  level: number // 用户等级
   createTime: Date // 注册时间
   auth: {
     appId: string // 应用的ObjectId
@@ -34,7 +34,7 @@ const userSchema = new db.Schema({
   phone: { type: String, index: { unique: true } },
   name: { type: String, index: { unique: true }, required: true },
   rawName: { type: String, required: true },
-  class: { type: Number, default: 0 },
+  level: { type: Number, default: 0 },
   createTime: {
     type: Date,
     default: new Date()
@@ -133,23 +133,6 @@ export async function getByPhone(phone: string): Promise<User | null> {
  */
 export async function updateEmail(id: string, email: string): Promise<void> {
   await userDB.findByIdAndUpdate(id, { email: email.toLowerCase() })
-}
-
-/**
- * 更新用户登陆错误状态
- *
- * @deprecated
- * @param {string} id ObjectId
- * @param {number} count 登陆错误次数
- */
-export async function updateLoginError(id: string, count: number): Promise<void> {
-  if (count > 3) {
-    await userDB.findByIdAndUpdate(id, { secure: { errorCount: count - 3, errorTime: new Date() } })
-  } else if (count !== 0) {
-    await userDB.findByIdAndUpdate(id, { secure: { errorCount: count } })
-  } else {
-    await userDB.findByIdAndUpdate(id, { secure: { errorCount: 0, errorTime: new Date() } })
-  }
 }
 
 /**

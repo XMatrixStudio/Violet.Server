@@ -39,7 +39,7 @@ export async function getInfo(id: string): Promise<User.GET.ResponseBody> {
     email: user!.email,
     phone: user!.phone,
     name: user!.rawName,
-    class: user!.class,
+    level: user!.level,
     createTime: user!.createTime,
     info: user!.info
   }
@@ -98,7 +98,6 @@ export async function resetPassword(user: RequireOnlyOne<Record<'email' | 'phone
   }
   const hash = crypto.hashPassword(password)
   await userModel.updatePassword(id, hash.password, hash.salt)
-  await userModel.updateLoginError(id, 0)
 }
 
 /**

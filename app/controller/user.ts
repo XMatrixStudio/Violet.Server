@@ -217,7 +217,7 @@ export async function postSession(ctx: Context): Promise<void> {
   }
 
   ctx.session!.user.id = user._id
-  ctx.session!.user.class = user.class
+  ctx.session!.user.level = user.level
   ctx.session!.user.time = Date.now()
   ctx.session!.user.remember = body.remember
   ctx.status = 201

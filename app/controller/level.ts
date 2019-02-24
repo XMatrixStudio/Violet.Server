@@ -5,10 +5,14 @@ import * as assert from '../../lib/assert'
 import * as verify from '../../lib/verify'
 import * as userService from '../service/user'
 
+/**
+ * 申请修改用户等级
+ */
 export async function postUsers(ctx: Context): Promise<void> {
-  const body = _.pick<Classes.Users.POST.RequestBody>(ctx.request.body, ['class', 'reason'])
-  assert.v({ data: body.class, type: 'number', message: 'invalid_class' })
+  const body = _.pick<Classes.Users.POST.RequestBody>(ctx.request.body, ['level', 'reason'])
+  assert.v({ data: body.level, type: 'number', min: -99, max: 99, message: 'invalid_level' })
   assert.v({ data: body.reason, type: 'string', maxLength: 256, message: 'invalid_reason' })
 
+  assert(ctx.session!.user.level === -1 - body.level!, 'ban_user', 403)
   ctx.status = 201
 }

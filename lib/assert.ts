@@ -36,6 +36,8 @@ interface Assert {
    * @param {number} [option.minLength = 0] 字符串最小长度 默认不做限制
    * @param {RegExp} [option.regExp = 0] 字符串需要匹配的正则表达式 默认不做限制
    * @param {boolean} [option.require = true] 如果有false 则允许为 null 或 undefined
+   * @param {any} [option.min] 用于<=比较
+   * @param {any} [option.max] 用于>=比较
    * @param {any[]} [option.enums = []] 枚举数组
    */
   v: (...options: Option[]) => void
@@ -52,6 +54,8 @@ interface Option {
   require?: boolean
   minLength?: number
   maxLength?: number
+  min?: any
+  max?: any
   enums?: any[]
   regExp?: RegExp
 }
@@ -132,6 +136,12 @@ assert.v = function(...options: Option[]) {
         }
       }
       assert(flag, message)
+    }
+    if (option.min) {
+      assert(option.min <= option.data, message)
+    }
+    if (option.max) {
+      assert(option.max >= option.data, message)
     }
   }
 }
