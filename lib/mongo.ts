@@ -2,10 +2,10 @@ import mongoose = require('mongoose')
 
 import { mongo } from './config'
 
-mongoose.connect(
-  `mongodb://${mongo.user}:${mongo.password}@${mongo.host}:${mongo.port}/${mongo.dbName}`,
-  { useNewUrlParser: true }
-)
+mongoose.connect(`mongodb://${mongo.user}:${mongo.password}@${mongo.host}:${mongo.port}/${mongo.dbName}`, {
+  useNewUrlParser: true,
+  useFindAndModify: false
+})
 mongoose.Promise = global.Promise
 mongoose.set('useCreateIndex', true)
 

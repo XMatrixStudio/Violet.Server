@@ -10,6 +10,17 @@ import * as assert from './assert'
 import * as config from './config'
 
 /**
+ * 检查封禁状态
+ *
+ * 当用户已被封禁时, 抛出`ban_user`错误.
+ *
+ * @param {Context} ctx Koa上下文
+ */
+export function checkBannedState(ctx: Context): void {
+  assert(ctx.session!.user.level! >= 0, 'ban_user', 403)
+}
+
+/**
  * 检查图形验证码, 并且清除Session中的验证码记录
  *
  * 当记录不存在时, 抛出`not_exist_captcha`错误;
@@ -136,7 +147,7 @@ const mailOptions: Mailer.SendMailOptions = {
  * @returns {boolean} 是否发送成功
  */
 export async function sendEmailCode(ctx: Context, type: string, email: string, name?: string): Promise<void> {
-  assert(!ctx.session!.verify.emailTime || Date.now() - ctx.session!.verify.emailTime! < 60 * 1000, 'limit_time')
+  assert(!ctx.session!.verify.emailTime || Date.now() - ctx.session!.verify.emailTime! > 60 * 1000, 'limit_time')
   const rand = Math.trunc(Math.random() * 900000 + 100000)
   ctx.session!.verify.email = email
   ctx.session!.verify.emailType = type

@@ -12,15 +12,15 @@ const router = new Router()
 type HttpHandler = (path: string | RegExp | (string | RegExp)[], ...middleware: Array<Router.IMiddleware>) => Router
 
 // 白名单列表
-// 凡是在此白名单，均不检查是否登陆
-const whiteList: { method: HttpHandler; urls: string[] }[] = [
+// 凡是在此白名单, 均不检查是否登陆
+const whiteLoginList: { method: HttpHandler; urls: string[] }[] = [
   {
     method: router.get,
     urls: ['/i/util/captcha']
   },
   {
     method: router.post,
-    urls: ['/i/user', '/i/user/email', '/i/user/phone', '/i/user/session']
+    urls: ['/i/levels/users', '/i/user', '/i/user/email', '/i/user/phone', '/i/user/session']
   },
   {
     method: router.put,
@@ -32,17 +32,35 @@ const whiteList: { method: HttpHandler; urls: string[] }[] = [
   }
 ]
 
+// 白名单列表
+// 凡是在此白名单, 均不检查是否封禁, 前提已登陆
+const whiteBannedList: { method: HttpHandler; urls: string[] }[] = [
+  { method: router.get, urls: ['/i/user'] },
+  { method: router.post, urls: ['/i/levels/users'] }
+]
+
 // 检查是否登录
 const withoutLogin = (ctx: Context, next: () => Promise<void>) => {
-  ctx.state.passStatusCheck = true
+  ctx.state.passLoginStatusCheck = true
+  return next()
+}
+
+// 检查是否被封禁
+const withoutBanned = (ctx: Context, next: () => Promise<void>) => {
+  ctx.state.passBannedStatusCheck = true
   return next()
 }
 
 // 对白名单里面的每个规则创建一个路由
 // 按需求检查登录状态
-for (const rule of whiteList) {
+for (const rule of whiteLoginList) {
   for (const url of rule.urls) {
     rule.method.call(router, url, withoutLogin)
+  }
+}
+for (const rule of whiteBannedList) {
+  for (const url of rule.urls) {
+    rule.method.call(router, url, withoutBanned)
   }
 }
 
@@ -63,8 +81,9 @@ router.use('/', async (ctx: Context, next: () => Promise<void>) => {
 router.use('/i/', async (ctx: Context, next: () => Promise<void>) => {
   if (!ctx.session!.verify) ctx.session!.verify = {}
   if (!ctx.session!.user) ctx.session!.user = {}
-  if (!ctx.state.passStatusCheck) {
+  if (!ctx.state.passLoginStatusCheck) {
     verify.checkLoginState(ctx)
+    if (!ctx.state.passBannedStatusCheck) verify.checkBannedState(ctx)
   }
   return next()
 })

@@ -135,6 +135,10 @@ export async function updateEmail(id: string, email: string): Promise<void> {
   await userDB.findByIdAndUpdate(id, { email: email.toLowerCase() })
 }
 
+export async function updateLevel(id: string, level: number): Promise<void> {
+  await userDB.findByIdAndUpdate(id, { level: level })
+}
+
 /**
  * 更新用户登陆手机
  *
