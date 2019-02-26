@@ -8,6 +8,16 @@ import * as levelService from '../service/level'
  * 获取申请列表
  */
 export async function getUsers(ctx: Context): Promise<void> {
+  const body = _.pick<Levels.Users.GET.Query>(ctx.request.query, ['page', 'limit', 'state', 'self'])
+  body.page = typeof body.page === 'string' ? parseInt(body.page) : undefined
+  body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : undefined
+  body.state = typeof body.state === 'string' ? parseInt(body.state) : undefined
+  assert.v({ data: body.page, type: 'positive', message: 'invalid_page' })
+  assert.v({ data: body.limit, type: 'positive', message: 'invalid_limit' })
+  assert.v({ data: body.state, require: false, type: 'number', min: 0, max: 3, message: 'invalid_state' })
+  body.self = body.self === 'true'
+
+  assert(!body.self && ctx.session!.user.level! >= 50, 'permission_deny')
   ctx.status = 201
 }
 
@@ -15,7 +25,7 @@ export async function getUsers(ctx: Context): Promise<void> {
  * 申请修改用户等级
  */
 export async function postUsers(ctx: Context): Promise<void> {
-  const body = _.pick<Classes.Users.POST.RequestBody>(ctx.request.body, ['level', 'reason'])
+  const body = _.pick<Levels.Users.POST.RequestBody>(ctx.request.body, ['level', 'reason'])
   assert.v({ data: body.level, type: 'number', min: -99, max: 99, message: 'invalid_level' })
   assert.v({ data: body.reason, type: 'string', maxLength: 256, message: 'invalid_reason' })
 

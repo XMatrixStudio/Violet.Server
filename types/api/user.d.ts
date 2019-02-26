@@ -1,12 +1,3 @@
-declare namespace Classes.Users {
-  namespace POST {
-    interface RequestBody {
-      level: number
-      reason: string
-    }
-  }
-}
-
 declare namespace User {
   namespace GET {
     interface ResponseBody {

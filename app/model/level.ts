@@ -56,6 +56,66 @@ export async function getOpenRequestByUserId(userId: string): Promise<LevelReque
 }
 
 /**
+ * 获取所有用户的申请
+ *
+ * @param {number} page 页数
+ * @param {number} limit 每页数量限制
+ */
+export async function getRequests(page: number, limit: number): Promise<LevelRequest[]> {
+  return await levelRequestDB
+    .find({})
+    .sort({ time: -1 })
+    .skip(limit * (page - 1))
+    .limit(limit)
+}
+
+/**
+ * 获取所有用户指定状态的申请
+ *
+ * @param {number} state 状态
+ * @param {number} page 页数
+ * @param {number} limit 每页数量限制
+ */
+export async function getRequestsByState(state: number, page: number, limit: number): Promise<LevelRequest[]> {
+  return await levelRequestDB
+    .find({ state: state })
+    .sort({ time: -1 })
+    .skip(limit * (page - 1))
+    .limit(limit)
+}
+
+/**
+ * 获取指定用户的申请
+ *
+ * @param {string} userId 用户ObjectId
+ * @param {number} page 页数
+ * @param {number} limit 每页数量限制
+ */
+export async function getRequestsByUserId(userId: string, page: number, limit: number): Promise<LevelRequest[]> {
+  return await levelRequestDB
+    .find({ userId: userId })
+    .sort({ time: -1 })
+    .skip(limit * (page - 1))
+    .limit(limit)
+}
+
+/**
+ * 获取指定用户指定状态的申请
+ *
+ * @param {string} userId 用户ObjectId
+ * @param {number} state 状态
+ * @param {number} page 页数
+ * @param {number} limit 每页数量限制
+ */
+export async function getRequestsByUserIdAndState(userId: string, state: number, page: number, limit: number): Promise<LevelRequest[]> {
+  return await levelRequestDB
+    .find({ userId: userId, state: state })
+    .sort({ time: -1 })
+    .skip(limit * (page - 1))
+    .limit(limit)
+}
+
+/**
  * 初始化等级系统
  */
 export async function init(): Promise<void> {
