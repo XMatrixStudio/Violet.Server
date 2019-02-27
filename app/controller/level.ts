@@ -17,7 +17,12 @@ export async function getUsers(ctx: Context): Promise<void> {
   assert.v({ data: body.state, require: false, type: 'number', min: 0, max: 3, message: 'invalid_state' })
   body.self = body.self === 'true'
 
-  assert(!body.self && ctx.session!.user.level! >= 50, 'permission_deny')
+  if (body.self) {
+    ctx.body = await levelService.getRequests(ctx.session!.user.id!, body.state, body.page!, body.limit!)
+  } else {
+    assert(ctx.session!.user.level! >= 50, 'permission_deny')
+    ctx.body = await levelService.getRequests(undefined, body.state, body.page!, body.limit!)
+  }
   ctx.status = 201
 }
 

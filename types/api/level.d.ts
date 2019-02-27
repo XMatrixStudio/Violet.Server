@@ -13,14 +13,16 @@ declare namespace Levels.Users {
         limit: number
         total: number
       }
-      data: {
-        name: string
-        old_level: number
-        level: number
-        reason: string
-        time: Date
-        state: 0 | 1 | 2 | 3
-      }
+      data: Data[]
+    }
+
+    interface Data {
+      name: string
+      old_level: number
+      level: number
+      reason: string
+      time: Date
+      state: 0 | 1 | 2 | 3
     }
   }
 

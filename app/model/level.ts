@@ -1,5 +1,6 @@
 import * as db from '../../lib/mongo'
 import { ObjectId } from 'bson'
+import { User } from './user'
 
 interface Level extends db.Document {
   level: number // 用户级别
@@ -13,16 +14,16 @@ const levelSchema = new db.Schema({
   adminPermission: { type: Boolean, default: false }
 })
 
-interface LevelRequest extends db.Document {
-  userId: ObjectId // 用户ObjectId
+export interface LevelRequest extends db.Document {
+  _user: User // 用户信息
   level: number // 申请的用户等级
   reason: string // 申请理由
   time: Date // 申请时间
-  state: number // 申请状态: 0 - 待审核, 1 - 已通过, 2 - 已拒绝, 3 - 已关闭
+  state: 0 | 1 | 2 | 3 // 申请状态: 0 - 待审核, 1 - 已通过, 2 - 已拒绝, 3 - 已关闭
 }
 
 const levelRequestSchema = new db.Schema({
-  userId: { type: ObjectId, index: true, required: true },
+  _user: { type: ObjectId, ref: 'users', index: true, required: true },
   level: { type: Number, required: true },
   reason: { type: String, required: true },
   time: { type: Date, default: new Date() },
@@ -32,8 +33,15 @@ const levelRequestSchema = new db.Schema({
 const levelDB = db.model<Level>('levels', levelSchema)
 const levelRequestDB = db.model<LevelRequest>('levels.requests', levelRequestSchema)
 
+/**
+ * 添加申请
+ *
+ * @param {string} userId 用户ObjectId
+ * @param {number} level 申请的等级
+ * @param {string} reason 申请理由
+ */
 export async function addRequest(userId: string, level: number, reason: string): Promise<void> {
-  await levelRequestDB.create({ userId: userId, level: level, reason: reason })
+  await levelRequestDB.create({ _user: userId, level: level, reason: reason })
 }
 
 /**
@@ -52,64 +60,33 @@ export async function getByLevel(level: number): Promise<Level | null> {
  * @param {string} userId 用户ObjectId
  */
 export async function getOpenRequestByUserId(userId: string): Promise<LevelRequest | null> {
-  return await levelRequestDB.findOne({ userId: userId, state: 0 })
+  return await levelRequestDB.findOne({ _user: userId, state: 0 })
 }
 
 /**
- * 获取所有用户的申请
+ * 获取申请数量
  *
- * @param {number} page 页数
- * @param {number} limit 每页数量限制
+ * @param {Partial<{ _user: string; state: number }>} option 筛选选项
  */
-export async function getRequests(page: number, limit: number): Promise<LevelRequest[]> {
-  return await levelRequestDB
-    .find({})
-    .sort({ time: -1 })
-    .skip(limit * (page - 1))
-    .limit(limit)
+export async function getRequestsCount(option: Partial<{ _user: string; state: number }> = {}): Promise<number> {
+  return await levelRequestDB.countDocuments(option)
 }
 
 /**
- * 获取所有用户指定状态的申请
+ * 获取申请
  *
- * @param {number} state 状态
  * @param {number} page 页数
  * @param {number} limit 每页数量限制
+ * @param {Partial<{ _user: string; state: number }>} option 筛选选项
  */
-export async function getRequestsByState(state: number, page: number, limit: number): Promise<LevelRequest[]> {
+export async function getRequests(
+  page: number,
+  limit: number,
+  option: Partial<{ _user: string; state: number }> = {}
+): Promise<LevelRequest[]> {
   return await levelRequestDB
-    .find({ state: state })
-    .sort({ time: -1 })
-    .skip(limit * (page - 1))
-    .limit(limit)
-}
-
-/**
- * 获取指定用户的申请
- *
- * @param {string} userId 用户ObjectId
- * @param {number} page 页数
- * @param {number} limit 每页数量限制
- */
-export async function getRequestsByUserId(userId: string, page: number, limit: number): Promise<LevelRequest[]> {
-  return await levelRequestDB
-    .find({ userId: userId })
-    .sort({ time: -1 })
-    .skip(limit * (page - 1))
-    .limit(limit)
-}
-
-/**
- * 获取指定用户指定状态的申请
- *
- * @param {string} userId 用户ObjectId
- * @param {number} state 状态
- * @param {number} page 页数
- * @param {number} limit 每页数量限制
- */
-export async function getRequestsByUserIdAndState(userId: string, state: number, page: number, limit: number): Promise<LevelRequest[]> {
-  return await levelRequestDB
-    .find({ userId: userId, state: state })
+    .find(option)
+    .populate('_user', 'rawName level')
     .sort({ time: -1 })
     .skip(limit * (page - 1))
     .limit(limit)
