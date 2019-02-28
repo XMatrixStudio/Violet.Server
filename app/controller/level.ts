@@ -3,6 +3,17 @@ import * as _ from 'lodash'
 
 import * as assert from '../../lib/assert'
 import * as levelService from '../service/level'
+import * as verify from '../../lib/verify';
+
+/**
+ * 获取用户等级列表
+ */
+
+export async function get(ctx: Context): Promise<void> {
+  verify.checkLoginState(ctx)
+  ctx.body = await levelService.getLevels()
+  ctx.status = 200
+}
 
 /**
  * 获取申请列表

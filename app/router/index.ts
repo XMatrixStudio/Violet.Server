@@ -35,7 +35,7 @@ const whiteLoginList: { method: HttpHandler; urls: string[] }[] = [
 // 白名单列表
 // 凡是在此白名单, 均不检查是否封禁, 前提已登陆
 const whiteBannedList: { method: HttpHandler; urls: string[] }[] = [
-  { method: router.get, urls: ['/i/levels/users', '/i/user'] },
+  { method: router.get, urls: ['/i/levels', '/i/levels/users', '/i/user'] },
   { method: router.post, urls: ['/i/levels/users'] }
 ]
 

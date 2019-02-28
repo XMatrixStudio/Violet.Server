@@ -1,3 +1,13 @@
+declare namespace Levels {
+  namespace GET {
+    interface ResponseBody {
+      level: number | string
+      app: number | string
+      admin: boolean | string
+    }
+  }
+}
+
 declare namespace Levels.Users {
   namespace GET {
     interface Query {
