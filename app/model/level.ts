@@ -45,6 +45,15 @@ export async function addRequest(userId: string, level: number, reason: string):
 }
 
 /**
+ * 获取所有用户等级信息
+ *
+ * @return {Level[]} 所有等级信息
+ */
+export async function getAllLevels(): Promise<Level[]> {
+  return await levelDB.find({})
+}
+
+/**
  * 获取等级信息
  *
  * @param {number} level 等级

@@ -2,6 +2,19 @@ import * as assert from '../../lib/assert'
 import * as levelModel from '../model/level'
 import * as userModel from '../model/user'
 
+export async function getLevels(): Promise<Levels.GET.ResponseBody[]> {
+ const levels = await levelModel.getAllLevels()
+ const data = new Array<Levels.GET.ResponseBody>()
+ for (const i in levels) {
+   data[i] = {
+     level: levels[i].level,
+     app: levels[i].appLimit,
+     admin: levels[i].adminPermission
+   }
+ }
+ return data
+}
+
 /**
  * 获取用户申请
  *
