@@ -2,6 +2,7 @@ import { Context } from 'koa'
 import * as _ from 'lodash'
 
 import * as assert from '../../lib/assert'
+import * as store from '../../lib/store'
 import * as verify from '../../lib/verify'
 import * as userService from '../service/user'
 
@@ -97,7 +98,7 @@ export async function postEmail(ctx: Context): Promise<void> {
     }
     case 'update': {
       verify.checkLoginState(ctx)
-      verify.checkBannedState(ctx)
+      await verify.checkBannedState(ctx)
       const user = await userService.getInfo(ctx.session!.user.id!)
       assert(user.email !== body.email!.toLowerCase(), 'same_email')
       await verify.sendEmailCode(ctx, body.operator, body.email!, name)
@@ -128,7 +129,7 @@ export async function putEmail(ctx: Context): Promise<void> {
     }
     case 'update': {
       verify.checkLoginState(ctx)
-      verify.checkBannedState(ctx)
+      await verify.checkBannedState(ctx)
       await userService.updateEmailOrPhone(ctx.session!.user.id!, { email: ctx.session!.verify.email! })
       break
     }
@@ -160,7 +161,7 @@ export async function postPhone(ctx: Context): Promise<void> {
     }
     case 'update': {
       verify.checkLoginState(ctx)
-      verify.checkBannedState(ctx)
+      await verify.checkBannedState(ctx)
       const user = await userService.getInfo(ctx.session!.user.id!)
       assert(user.phone !== body.phone!.replace('+86', ''), 'same_phone')
       await verify.sendPhoneCode(ctx, body.operator, body.phone!, name)
@@ -191,7 +192,7 @@ export async function putPhone(ctx: Context): Promise<void> {
     }
     case 'update': {
       verify.checkLoginState(ctx)
-      verify.checkBannedState(ctx)
+      await verify.checkBannedState(ctx)
       await userService.updateEmailOrPhone(ctx.session!.user.id!, { phone: ctx.session!.verify.phone! })
       break
     }
@@ -221,9 +222,9 @@ export async function postSession(ctx: Context): Promise<void> {
   }
 
   ctx.session!.user.id = user._id
-  ctx.session!.user.level = user.level
   ctx.session!.user.time = Date.now()
   ctx.session!.user.remember = body.remember
+  await store.setUserLevelById(user._id, user.level)
   ctx.status = 201
 }
 

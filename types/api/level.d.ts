@@ -1,6 +1,10 @@
 declare namespace Levels {
   namespace GET {
     interface ResponseBody {
+      [key: number]: Data
+    }
+
+    interface Data {
       level: number | string
       app: number | string
       admin: boolean | string
@@ -43,4 +47,3 @@ declare namespace Levels.Users {
     }
   }
 }
-

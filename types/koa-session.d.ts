@@ -18,7 +18,6 @@ declare module 'koa-session' {
    */
   interface User {
     id?: string
-    level?: number
     time?: number
     remember?: boolean
     register?: 'email' | 'phone'

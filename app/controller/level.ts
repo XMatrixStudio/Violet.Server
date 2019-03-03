@@ -2,8 +2,9 @@ import { Context } from 'koa'
 import * as _ from 'lodash'
 
 import * as assert from '../../lib/assert'
+import * as store from '../../lib/store'
 import * as levelService from '../service/level'
-import * as verify from '../../lib/verify';
+import * as verify from '../../lib/verify'
 
 /**
  * 获取用户等级列表
@@ -31,7 +32,7 @@ export async function getUsers(ctx: Context): Promise<void> {
   if (body.self) {
     ctx.body = await levelService.getRequests(ctx.session!.user.id!, body.state, body.page!, body.limit!)
   } else {
-    assert(ctx.session!.user.level! >= 50, 'permission_deny')
+    assert((await store.getUserLevelById(ctx.session!.user.id!)) >= 50, 'permission_deny')
     ctx.body = await levelService.getRequests(undefined, body.state, body.page!, body.limit!)
   }
   ctx.status = 201
@@ -45,8 +46,9 @@ export async function postUsers(ctx: Context): Promise<void> {
   assert.v({ data: body.level, type: 'number', min: -99, max: 99, message: 'invalid_level' })
   assert.v({ data: body.reason, type: 'string', maxLength: 256, message: 'invalid_reason' })
 
-  assert(ctx.session!.user.level! >= 0 || ctx.session!.user.level === -1 - body.level!, 'ban_user', 403)
-  assert(ctx.session!.user.level !== body.level, 'now_level')
+  const level = await store.getUserLevelById(ctx.session!.user.id!)
+  assert(level >= 0 || level === -1 - body.level!, 'ban_user', 403)
+  assert(level !== body.level, 'now_level')
   await levelService.requestUpdateUserLevel(ctx.session!.user.id!, body.level!, body.reason!)
   ctx.status = 201
 }

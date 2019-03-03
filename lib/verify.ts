@@ -4,10 +4,10 @@ import { Context } from 'koa'
 import * as moment from 'moment'
 import * as mustache from 'mustache'
 import * as Mailer from 'nodemailer'
-import * as Sms from 'qcloudsms_js'
 
 import * as assert from './assert'
 import * as config from './config'
+import * as store from './store'
 
 /**
  * 检查封禁状态
@@ -16,8 +16,8 @@ import * as config from './config'
  *
  * @param {Context} ctx Koa上下文
  */
-export function checkBannedState(ctx: Context): void {
-  assert(ctx.session!.user.level! >= 0, 'ban_user', 403)
+export async function checkBannedState(ctx: Context): Promise<void> {
+  assert((await store.getUserLevelById(ctx.session!.user.id!)) >= 0, 'ban_user', 403)
 }
 
 /**
