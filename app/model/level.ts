@@ -6,12 +6,14 @@ import { User } from './user'
 interface Level extends db.Document {
   level: number // 用户级别
   appLimit: number // 可创建的App的数量上限
+  orgLimit: number // 可创建的组织的数量上限
   adminPermission: boolean // 管理员权限
 }
 
 const levelSchema = new db.Schema({
   level: { type: Number, index: { unique: true }, required: true },
   appLimit: { type: Number, required: true },
+  orgLimit: { type: Number, required: true },
   adminPermission: { type: Boolean, default: false }
 })
 
@@ -50,7 +52,7 @@ export async function addRequest(userId: string, level: number, reason: string):
  *
  * @return {Level[]} 所有等级信息
  */
-export async function getAllLevels(): Promise<Level[]> {
+export async function getLevels(): Promise<Level[]> {
   return await levelDB.find({})
 }
 
@@ -107,9 +109,9 @@ export async function getRequests(
  */
 export async function init(): Promise<void> {
   await levelDB.create(
-    { level: 0, appLimit: 0 },
-    { level: 1, appLimit: 5 },
-    { level: 50, appLimit: 5, adminPermission: true },
-    { level: 99, appLimit: -1, adminPermission: true }
+    { level: 0, appLimit: 0, orgLimit: 0 },
+    { level: 1, appLimit: 5, orgLimit: 5 },
+    { level: 50, appLimit: 5, orgLimit: 5, adminPermission: true },
+    { level: 99, appLimit: -1, orgLimit: -1, adminPermission: true }
   )
 }

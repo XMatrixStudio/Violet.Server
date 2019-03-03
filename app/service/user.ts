@@ -6,6 +6,35 @@ import * as util from '../../lib/util'
 import * as userModel from '../model/user'
 
 /**
+ * 获取用户信息
+ *
+ * @param {RequireOnlyOne<Record<'id' | 'name', string>>} data ObjectId或用户名
+ */
+export async function getInfo(data: RequireOnlyOne<Record<'id' | 'name', string>>): Promise<User.GET.ResponseBody> {
+  if (data.id) {
+    const user = await userModel.getById(data.id)
+    user!.info.avatar = user!.info.avatar || config.avatar.default
+    return {
+      email: user!.email,
+      phone: user!.phone,
+      name: user!.rawName,
+      level: user!.level,
+      createTime: user!.createTime,
+      info: user!.info
+    }
+  } else {
+    const user = await userModel.getByName(data.name!)
+    user!.info.avatar = user!.info.avatar || config.avatar.default
+    return {
+      name: user!.rawName,
+      level: user!.level,
+      createTime: user!.createTime,
+      info: user!.info
+    }
+  }
+}
+
+/**
  * 根据登陆邮箱获取用户名, 如果用户不存在则返回`null`
  *
  * @param {string} email 用户登陆邮箱
@@ -25,24 +54,6 @@ export async function getUserNameByEmail(email: string): Promise<string | null> 
 export async function getUserNameByPhone(phone: string): Promise<string | null> {
   const user = await userModel.getByPhone(phone)
   return user !== null ? user.name : null
-}
-
-/**
- * 获取用户信息
- *
- * @param {string} id ObjectId
- */
-export async function getInfo(id: string): Promise<User.GET.ResponseBody> {
-  const user = await userModel.getById(id)
-  user!.info.avatar = user!.info.avatar || config.avatar.default
-  return {
-    email: user!.email,
-    phone: user!.phone,
-    name: user!.rawName,
-    level: user!.level,
-    createTime: user!.createTime,
-    info: user!.info
-  }
 }
 
 /**

@@ -5,9 +5,10 @@ declare namespace Levels {
     }
 
     interface Data {
-      level: number | string
-      app: number | string
-      admin: boolean | string
+      level: number
+      app: number
+      org: number
+      admin: boolean
     }
   }
 }

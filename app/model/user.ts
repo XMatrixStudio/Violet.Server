@@ -1,4 +1,5 @@
 import * as db from '../../lib/mongo'
+import { Organization } from './org'
 
 export interface User extends db.Document {
   email: string // 用户登陆邮箱，全小写
@@ -14,6 +15,16 @@ export interface User extends db.Document {
   secure: {
     password: string // 经过加盐与多次SHA512的密码
     salt: string // 盐
+  }
+  dev: {
+    app: {
+      own: number
+      member: number
+    }
+    org: {
+      own: number
+      member: number
+    }
   }
 }
 
@@ -59,6 +70,22 @@ const userSchema = new db.Schema({
       salt: { type: String, required: true }
     },
     required: true
+  },
+  dev: {
+    type: {
+      app: {
+        type: {
+          own: { type: Number, default: 0 },
+          member: { type: Number, default: 0 }
+        }
+      },
+      org: {
+        type: {
+          own: { type: Number, default: 0 },
+          member: { type: Number, default: 0 }
+        }
+      }
+    }
   }
 })
 
@@ -123,6 +150,27 @@ export async function getByName(name: string): Promise<User | null> {
  */
 export async function getByPhone(phone: string): Promise<User | null> {
   return await userDB.findOne({ phone: phone.replace('+86', '') })
+}
+
+export async function updateDev(id: string, type: string, operator: number): Promise<void> {
+  switch (type) {
+    case 'app.own': {
+      await userDB.findByIdAndUpdate(id, { $inc: { 'dev.app.own': operator } })
+      break
+    }
+    case 'app.member': {
+      await userDB.findByIdAndUpdate(id, { $inc: { 'dev.app.member': operator } })
+      break
+    }
+    case 'org.own': {
+      await userDB.findByIdAndUpdate(id, { $inc: { 'dev.org.own': operator } })
+      break
+    }
+    case 'org.member': {
+      await userDB.findByIdAndUpdate(id, { $inc: { 'dev.org.member': operator } })
+      break
+    }
+  }
 }
 
 /**

@@ -4,6 +4,7 @@ import * as Router from 'koa-router'
 
 import * as verify from '../../lib/verify'
 import * as level from './level'
+import * as org from './org'
 import * as user from './user'
 import * as util from './util'
 
@@ -16,26 +17,26 @@ type HttpHandler = (path: string | RegExp | (string | RegExp)[], ...middleware: 
 const whiteLoginList: { method: HttpHandler; urls: string[] }[] = [
   {
     method: router.get,
-    urls: ['/i/util/captcha']
+    urls: ['/i/users/:name', '/i/util/captcha']
   },
   {
     method: router.post,
-    urls: ['/i/user', '/i/user/email', '/i/user/phone', '/i/user/session']
+    urls: ['/i/users', '/i/users/email', '/i/users/phone', '/i/users/session']
   },
   {
     method: router.put,
-    urls: ['/i/user/email', '/i/user/phone']
+    urls: ['/i/users/email', '/i/users/phone']
   },
   {
     method: router.delete,
-    urls: ['/i/user/session']
+    urls: ['/i/users/session']
   }
 ]
 
 // 白名单列表
 // 凡是在此白名单, 均不检查是否封禁, 前提已登陆
 const whiteBannedList: { method: HttpHandler; urls: string[] }[] = [
-  { method: router.get, urls: ['/i/levels', '/i/levels/users', '/i/user'] },
+  { method: router.get, urls: ['/i/levels', '/i/levels/users'] },
   { method: router.post, urls: ['/i/levels/users'] }
 ]
 
@@ -89,7 +90,8 @@ router.use('/i/', async (ctx: Context, next: () => Promise<void>) => {
 })
 
 router.use('/i/levels', level.routes())
-router.use('/i/user', user.routes())
+router.use('/i/orgs', org.routes())
+router.use('/i/users', user.routes())
 router.use('/i/util', util.routes())
 
 export = router

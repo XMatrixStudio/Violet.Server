@@ -9,9 +9,7 @@ import * as verify from '../../lib/verify'
 /**
  * 获取用户等级列表
  */
-
 export async function get(ctx: Context): Promise<void> {
-  verify.checkLoginState(ctx)
   ctx.body = await levelService.getLevels()
   ctx.status = 200
 }

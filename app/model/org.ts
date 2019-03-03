@@ -8,15 +8,15 @@ export interface Organization extends db.Document {
   rawName: string // 原始组织名
   createTime: Date // 注册时间
   _owner: User // 组织所有人
-  _members: User[] // 组织成员
+  // _members: User[] // 组织成员
 }
 
 const orgSchema = new db.Schema({
   name: { type: String, index: { unique: true }, required: true },
   rawName: { type: String, required: true },
   createTime: { type: Date, default: new Date() },
-  _owner: { type: ObjectId, ref: 'users', index: true, required: true },
-  _members: [{ type: ObjectId, ref: 'users', index: true }]
+  _owner: { type: ObjectId, ref: 'users', index: true, required: true }
+  // _members: [{ type: ObjectId, ref: 'users' }]
 })
 
 const orgDB = db.model<Organization>('orgs', orgSchema)
@@ -33,4 +33,8 @@ export async function add(userId: string, name: string): Promise<void> {
 
 export async function getByName(name: string): Promise<Organization | null> {
   return await orgDB.findOne({ name: name.toLowerCase() })
+}
+
+export async function getCountByOwner(userId: string): Promise<number> {
+  return await orgDB.find({ _owner: userId }).countDocuments()
 }

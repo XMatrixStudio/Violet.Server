@@ -8,5 +8,6 @@ import * as reservedUsernames from 'github-reserved-names'
  */
 export const isReservedUsername = (username: string): boolean => {
   if (!username) return true
+  if (username === 'me') return true
   return reservedUsernames.check(username.toString())
 }

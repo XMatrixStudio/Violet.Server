@@ -18,7 +18,7 @@ client.on('ready', () => {
   console.log('Redis ready')
 })
 
-export function get(key: string) {
+export function get(key: string): Promise<string> {
   return new Promise((resolve, reject) => {
     client.get(key, (err, result) => {
       if (err) {
@@ -29,7 +29,7 @@ export function get(key: string) {
   })
 }
 
-export function set(key: string, value: string, time?: number) {
+export function set(key: string, value: string, time?: number): Promise<string> {
   if (time === undefined) {
     return new Promise((resolve, reject) => {
       client.set(key, value, (err, result) => {
@@ -51,7 +51,7 @@ export function set(key: string, value: string, time?: number) {
   })
 }
 
-export function del(key: string) {
+export function del(key: string): Promise<number> {
   return new Promise((resolve, reject) => {
     client.del(key, (err, result) => {
       if (err) {

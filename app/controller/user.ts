@@ -14,14 +14,6 @@ const phoneExp = /^(?:\+?86)?1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[01356789]\d{2}|
 const urlExp = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/
 
 /**
- * 获取用户信息
- */
-export async function get(ctx: Context): Promise<void> {
-  ctx.body = await userService.getInfo(ctx.session!.user.id!)
-  ctx.status = 200
-}
-
-/**
  * 注册用户
  */
 export async function post(ctx: Context): Promise<void> {
@@ -75,6 +67,19 @@ export async function patch(ctx: Context): Promise<void> {
 }
 
 /**
+ * 获取用户信息
+ */
+export async function getByName(ctx: Context): Promise<void> {
+  if (ctx.params.name === 'me') {
+    verify.checkLoginState(ctx)
+    ctx.body = await userService.getInfo({ id: ctx.session!.user.id! })
+  } else {
+    ctx.body = await userService.getInfo({ name: ctx.params.name })
+  }
+  ctx.status = 200
+}
+
+/**
  * 发送邮箱验证邮件
  */
 export async function postEmail(ctx: Context): Promise<void> {
@@ -99,7 +104,7 @@ export async function postEmail(ctx: Context): Promise<void> {
     case 'update': {
       verify.checkLoginState(ctx)
       await verify.checkBannedState(ctx)
-      const user = await userService.getInfo(ctx.session!.user.id!)
+      const user = await userService.getInfo({ id: ctx.session!.user.id! })
       assert(user.email !== body.email!.toLowerCase(), 'same_email')
       await verify.sendEmailCode(ctx, body.operator, body.email!, name)
       break
@@ -162,7 +167,7 @@ export async function postPhone(ctx: Context): Promise<void> {
     case 'update': {
       verify.checkLoginState(ctx)
       await verify.checkBannedState(ctx)
-      const user = await userService.getInfo(ctx.session!.user.id!)
+      const user = await userService.getInfo({ id: ctx.session!.user.id! })
       assert(user.phone !== body.phone!.replace('+86', ''), 'same_phone')
       await verify.sendPhoneCode(ctx, body.operator, body.phone!, name)
       break

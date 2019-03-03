@@ -1,8 +1,8 @@
 declare namespace User {
   namespace GET {
     interface ResponseBody {
-      email: string
-      phone: string
+      email?: string
+      phone?: string
       name: string
       level: number
       createTime: Date

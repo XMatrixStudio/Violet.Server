@@ -2,13 +2,19 @@ import * as assert from '../../lib/assert'
 import * as levelModel from '../model/level'
 import * as userModel from '../model/user'
 
+/**
+ * 获取所有用户等级
+ *
+ * @returns {ResponseBody} 用户等级信息的数组
+ */
 export async function getLevels(): Promise<Levels.GET.ResponseBody> {
-  const levels = await levelModel.getAllLevels()
+  const levels = await levelModel.getLevels()
   const data = new Array<Levels.GET.Data>()
   for (const i in levels) {
     data[i] = {
       level: levels[i].level,
       app: levels[i].appLimit,
+      org: levels[i].orgLimit,
       admin: levels[i].adminPermission
     }
   }
@@ -22,6 +28,7 @@ export async function getLevels(): Promise<Levels.GET.ResponseBody> {
  * @param {number | undefined} state 申请状态, 为`undefined`时获取全部状态的申请
  * @param {number} page 页数
  * @param {number} limit 每页数量
+ * @returns {ResponseBody} 用户申请信息和页数信息
  */
 export async function getRequests(
   userId: string | undefined,
