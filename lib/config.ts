@@ -7,6 +7,7 @@ interface Config {
   mongo: Mongo
   server: Server
   sms: Sms
+  redis: Redis
 }
 
 interface Avatar {
@@ -48,6 +49,13 @@ interface Sms {
   }
 }
 
+interface Redis {
+  host: string
+  port: number
+  password: string
+  db: number
+}
+
 const defaultDoc: Config = {
   avatar: {
     default: 'http://violet-1252808268.cosgz.myqcloud.com/0.png',
@@ -60,7 +68,8 @@ const defaultDoc: Config = {
   },
   sms: {
     qcloud: {} as any
-  }
+  },
+  redis: {} as any
 }
 
 let configDoc
