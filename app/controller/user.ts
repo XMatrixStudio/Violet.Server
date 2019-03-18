@@ -106,7 +106,7 @@ export async function postEmail(ctx: Context): Promise<void> {
       await verify.checkBannedState(ctx)
       const user = await userService.getInfo({ id: ctx.session!.user.id! })
       assert(user.email !== body.email!.toLowerCase(), 'same_email')
-      await verify.sendEmailCode(ctx, body.operator, body.email!, name)
+      await verify.sendEmailCode(ctx, body.operator, body.email!, user.info.nickname)
       break
     }
   }
@@ -169,7 +169,7 @@ export async function postPhone(ctx: Context): Promise<void> {
       await verify.checkBannedState(ctx)
       const user = await userService.getInfo({ id: ctx.session!.user.id! })
       assert(user.phone !== body.phone!.replace('+86', ''), 'same_phone')
-      await verify.sendPhoneCode(ctx, body.operator, body.phone!, name)
+      await verify.sendPhoneCode(ctx, body.operator, body.phone!, user.info.nickname)
       break
     }
   }
