@@ -12,9 +12,9 @@ declare namespace User {
         bio?: string
         birthday?: Date
         email?: string
+        phone?: string
         gender?: number
         location?: string
-        phone?: string
         url?: string
       }
     }

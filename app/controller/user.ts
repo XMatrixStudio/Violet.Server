@@ -9,7 +9,7 @@ import * as userService from '../service/user'
 const emailExp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
 const genderExp = /^[012]$/
 const nameExp = /^[a-zA-Z][a-zA-Z0-9_-]{0,31}$/
-const nicknameExp = /^([a-zA-Z0-9_-]|\p{Script=Hani})+$/gu
+// const nicknameExp = /^([a-zA-Z0-9_-]|\p{Script=Hani})+$/gu
 const phoneExp = /^(?:\+?86)?1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[01356789]\d{2}|4(?:0\d|1[0-2]|9\d))|9[189]\d{2}|6[567]\d{2}|4[579]\d{2})\d{6}$/
 const urlExp = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/
 
@@ -19,7 +19,7 @@ const urlExp = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\
 export async function post(ctx: Context): Promise<void> {
   const body = _.pick<User.POST.RequestBody>(ctx.request.body, ['name', 'nickname', 'password'])
   assert.v({ data: body.name, type: 'string', regExp: nameExp, message: 'invalid_name' })
-  assert.v({ data: body.nickname, require: false, type: 'string', regExp: nicknameExp, maxLength: 32, message: 'invalid_nickname' })
+  assert.v({ data: body.nickname, require: false, type: 'string', maxLength: 32, message: 'invalid_nickname' })
   assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
   body.nickname = body.nickname || body.name!
 
@@ -58,8 +58,8 @@ export async function patch(ctx: Context): Promise<void> {
     assert.v({ data: body.info.email, require: false, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' })
     assert.v({ data: body.info.gender, require: false, type: 'number', regExp: genderExp, message: 'invalid_gender' })
     assert.v({ data: body.info.location, require: false, type: 'string', maxLength: 64, message: 'invalid_location' })
-    assert.v({ data: body.info.nickname, require: false, type: 'string', regExp: nicknameExp, maxLength: 32, message: 'invalid_nickname' })
-    assert.v({ data: body.info.phone, require: false, type: 'string', regExp: phoneExp, message: 'invalid_phone' })
+    assert.v({ data: body.info.nickname, require: false, type: 'string', maxLength: 32, message: 'invalid_nickname' })
+    assert.v({ data: body.info.phone, require: false, type: 'string', message: 'invalid_phone' })
     assert.v({ data: body.info.url, require: false, type: 'string', regExp: urlExp, maxLength: 128, message: 'invalid_url' })
     await userService.updateInfo(ctx.session!.user.id!, body.info as any)
   }
