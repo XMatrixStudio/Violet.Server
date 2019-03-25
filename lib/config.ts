@@ -1,18 +1,33 @@
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
 
+/**
+ * Violet配置
+ */
 interface Config {
-  avatar: Avatar
-  email: Email
-  mongo: Mongo
-  server: Server
-  sms: Sms
-  redis: Redis
+  http: HTTPConfig
+  file: FileConfig
+  db: DBConfig
+  cache: CacheConfig
+  email: EmailConfig
 }
 
-interface Avatar {
-  default: string
+/**
+ * 服务器配置
+ */
+interface HTTPConfig {
+  host: string
+  port: string
+  dev: boolean
+}
+
+/**
+ * 静态文件系统配置
+ * 可选方案：cos
+ */
+interface FileConfig {
   cos: {
+    default: string
     secretId: string
     secretKey: string
     bucket: string
@@ -21,7 +36,37 @@ interface Avatar {
   }
 }
 
-interface Email {
+/**
+ * 数据库配置
+ * 可选方案：mongo
+ */
+interface DBConfig {
+  mongo: {
+    user: string
+    password: string
+    host: string
+    port: number
+    dbName: string
+  }
+}
+
+/**
+ * 缓存数据库配置
+ * 可选方案：redis
+ */
+interface CacheConfig {
+  redis: {
+    host: string
+    port: number
+    password: string
+    db: number
+  }
+}
+
+/**
+ * 邮件系统配置
+ */
+interface EmailConfig {
   host: string
   port: number
   user: string
@@ -30,55 +75,17 @@ interface Email {
   from: string
 }
 
-interface Mongo {
-  user: string
-  password: string
-  host: string
-  port: number
-  dbName: string
-}
-
-interface Server {
-  port: number
-}
-
-interface Sms {
-  qcloud: {
-    appId: string
-    appKey: string
+/**
+ * 获取配置信息
+ *
+ * @param {string} path 配置文件路径
+ */
+export function getConfig(path: string): Config | undefined {
+  try {
+    const config: Config = yaml.safeLoad(fs.readFileSync(path, 'utf8'))
+    return config
+  } catch (err) {
+    console.log(err)
+    return undefined
   }
 }
-
-interface Redis {
-  host: string
-  port: number
-  password: string
-  db: number
-}
-
-const defaultDoc: Config = {
-  avatar: {
-    default: 'http://violet-1252808268.cosgz.myqcloud.com/0.png',
-    cos: {} as any
-  },
-  email: {} as any,
-  mongo: {} as any,
-  server: {
-    port: 40002
-  },
-  sms: {
-    qcloud: {} as any
-  },
-  redis: {} as any
-}
-
-let configDoc
-try {
-  configDoc = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'))
-} catch (err) {
-  console.log(err)
-}
-
-const doc: Config = Object.assign(defaultDoc, configDoc)
-
-export = doc

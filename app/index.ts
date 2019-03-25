@@ -5,7 +5,6 @@ import * as helmet from 'koa-helmet'
 import * as morgan from 'koa-morgan'
 import * as session from 'koa-session'
 
-import * as config from '../lib/config'
 import * as router from './router'
 
 const app = new Koa()
@@ -40,5 +39,4 @@ app.use(bodyParser())
 // Routes
 app.use(router.routes())
 
-export = app.listen(config.server.port)
-console.log('Listen at port', config.server.port)
+export = app

@@ -59,6 +59,7 @@
   },
   "exclude": [
     "node_modules",
-    "test"
+    "test",
+    "app/**/*.test.ts"
   ],
 }

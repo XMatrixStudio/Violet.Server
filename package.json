@@ -12,7 +12,7 @@
     "coveralls": "npm run testWithCoverage && cat coverage/lcov.info | coveralls",
     "dev": "nodemon",
     "serve": "node dist/app/index.js",
-    "test": "jest --forceExit",
+    "test": "jest",
     "testWithCoverage": "jest --forceExit --coverage --verbose"
   },
   "repository": {
