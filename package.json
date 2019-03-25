@@ -11,7 +11,7 @@
     "build": "tsc",
     "coveralls": "npm run testWithCoverage && cat coverage/lcov.info | coveralls",
     "dev": "nodemon",
-    "serve": "node dist/app/index.js",
+    "serve": "node dist/index.js",
     "test": "jest",
     "testWithCoverage": "jest --forceExit --coverage --verbose"
   },
@@ -31,10 +31,11 @@
   "dependencies": {
     "@koa/cors": "^2.2.3",
     "captchapng2": "^1.0.3",
+    "commander": "^2.19.0",
     "cos-nodejs-sdk-v5": "^2.5.6",
     "csprng": "^0.1.2",
     "github-reserved-names": "^1.1.5",
-    "js-yaml": "^3.12.1",
+    "js-yaml": "^3.13.0",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
     "koa-helmet": "^4.0.0",

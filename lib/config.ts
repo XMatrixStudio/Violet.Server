@@ -5,7 +5,7 @@ import * as yaml from 'js-yaml'
  * Violet配置
  */
 interface Config {
-  http: HTTPConfig
+  http: HttpConfig
   file: FileConfig
   db: DBConfig
   cache: CacheConfig
@@ -15,7 +15,7 @@ interface Config {
 /**
  * 服务器配置
  */
-interface HTTPConfig {
+interface HttpConfig {
   host: string
   port: string
   dev: boolean
@@ -75,6 +75,10 @@ interface EmailConfig {
   from: string
 }
 
+const defaultConf = getConfig('config.yml')
+
+export default defaultConf
+
 /**
  * 获取配置信息
  *
@@ -88,4 +92,9 @@ export function getConfig(path: string): Config | undefined {
     console.log(err)
     return undefined
   }
+}
+
+export function getHttpUrl(conf?: Config): string {
+  conf = conf || defaultConf
+  return `${conf.http.host}:${conf.http.port}`
 }
