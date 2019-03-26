@@ -121,20 +121,20 @@ export function getCaptcha(ctx: Context): string {
 }
 
 const mailer = Mailer.createTransport({
-  host: config.email.host,
-  port: config.email.port,
-  secure: false,
-  auth: {
-    user: config.email.user,
-    pass: config.email.password
-  },
-  tls: {
-    ciphers: 'SSLv3'
-  }
+  // host: config.email.host,
+  // port: config.email.port,
+  // secure: false,
+  // auth: {
+  //   user: config.email.user,
+  //   pass: config.email.password
+  // },
+  // tls: {
+  //   ciphers: 'SSLv3'
+  // }
 })
 
 const mailOptions: Mailer.SendMailOptions = {
-  from: config.email.from
+  // from: config.email.from
 }
 
 /**

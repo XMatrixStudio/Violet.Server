@@ -78,6 +78,11 @@ interface EmailConfig {
 // 默认导出将使用CommonJS模块标准
 export default undefined as Config | undefined
 
+/**
+ * 初始化默认配置信息
+ * @param {string} path 配置文件路径
+ * @returns {boolean} 如果已经初始化或初始化失败，返回`false`；初始化成功返回`true`
+ */
 export function initDefaultConfig(path: string): boolean {
   if (exports.default !== undefined) return false
   exports.default = getConfig(path)
@@ -87,6 +92,7 @@ export function initDefaultConfig(path: string): boolean {
 /**
  * 获取配置信息
  * @param {string} path 配置文件路径
+ * @returns {Config | undefined} 返回配置信息，当解析失败或文件不存在时返回`undefined`
  */
 export function getConfig(path: string): Config | undefined {
   try {
@@ -98,6 +104,22 @@ export function getConfig(path: string): Config | undefined {
   }
 }
 
+/**
+ * 通过配置信息获取MongoDB的链接
+ * @param {Config} [conf] 配置信息，为空时使用默认配置信息
+ * @returns {string} Url
+ */
+export function getMongoUrl(conf?: Config): string {
+  conf = conf || exports.default
+  const mongo = conf!.db.mongo
+  return `mongodb://${mongo.user}:${mongo.password}@${mongo.host}:${mongo.port}/${mongo.dbName}`
+}
+
+/**
+ * 通过配置信息获取HTTP服务器的链接
+ * @param {Config} [conf] 配置信息，为空时使用默认配置信息
+ * @returns {string} Url
+ */
 export function getHttpUrl(conf?: Config): string {
   conf = conf || exports.default
   return `${conf!.http.host}:${conf!.http.port}`

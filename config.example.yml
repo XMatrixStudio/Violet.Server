@@ -1,0 +1,54 @@
+#================================================================
+# Violet Configuration Settings
+#
+# Version: v3.0.0-alpha
+# Update: 2019/3/25
+#================================================================
+
+# 服务器配置
+http:
+  # Host地址
+  host: 127.0.0.1
+  # 监听端口
+  port: 40002
+  # 是否为开发环境
+  dev: true
+
+# 静态文件系统配置，用于头像等静态文件
+# 可选方案：cos
+file:
+  cos:
+    default:
+    secretId:
+    secretKey:
+    bucket:
+    region:
+    url:
+
+# 数据库配置
+# 可选方案：mongo
+db:
+  mongo:
+    user: violet
+    password: violet_pwd
+    host: 127.0.0.1
+    port: 27017
+    dbName: violet_db
+
+# 缓存数据库配置
+# 可选方案：redis
+cache:
+  redis:
+    host:
+    password:
+    port:
+    db:
+
+# 邮件系统配置
+email:
+  host:
+  port:
+  user:
+  password:
+  cipherKey:
+  from:

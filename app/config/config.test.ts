@@ -1,11 +1,23 @@
-import { Config, getHttpUrl } from './config'
+import { Config, initDefaultConfig, getHttpUrl } from './config'
 
+beforeAll(() => {
+  initDefaultConfig('config.example.yml')
+})
+
+// getMongoUrl
+describe('Test function getMongoUrl', () => {
+  test.todo('by default config')
+
+  test.todo('by specified config')
+})
+
+// getHttpUrl
 describe('Test function getHttpUrl', () => {
-  it('should return 0.0.0.0:40002', () => {
-    expect(getHttpUrl({ http: { host: '0.0.0.0', port: 40002, dev: false } } as Config)).toBe('0.0.0.0:40002')
+  test('by default config', () => {
+    expect(getHttpUrl()).toBe('127.0.0.1:40002')
   })
 
-  it('should return 127.0.0.1:40003', () => {
-    expect(getHttpUrl({ http: { host: '127.0.0.1', port: 80, dev: false } } as Config)).toBe('127.0.0.1:80')
+  test('by specified config', () => {
+    expect(getHttpUrl({ http: { host: '0.0.0.0', port: 80, dev: false } } as Config)).toBe('0.0.0.0:80')
   })
 })
