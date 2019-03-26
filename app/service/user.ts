@@ -1,5 +1,5 @@
 import * as assert from '../../lib/assert'
-import * as config from '../../lib/config'
+import config from '../config/config'
 import * as crypto from '../../lib/crypto'
 import * as file from '../../lib/file'
 import * as util from '../../lib/util'
@@ -13,7 +13,7 @@ import * as userModel from '../model/user'
 export async function getInfo(data: RequireOnlyOne<Record<'id' | 'name', string>>): Promise<User.GET.ResponseBody> {
   if (data.id) {
     const user = await userModel.getById(data.id)
-    user!.info.avatar = user!.info.avatar || config.avatar.default
+    user!.info.avatar = user!.info.avatar || config!.file.cos.default
     return {
       email: user!.email,
       phone: user!.phone,
@@ -24,7 +24,7 @@ export async function getInfo(data: RequireOnlyOne<Record<'id' | 'name', string>
     }
   } else {
     const user = await userModel.getByName(data.name!)
-    user!.info.avatar = user!.info.avatar || config.avatar.default
+    user!.info.avatar = user!.info.avatar || config!.file.cos.default
     return {
       name: user!.rawName,
       level: user!.level,
@@ -134,7 +134,7 @@ export async function updateEmailOrPhone(id: string, user: RequireOnlyOne<Record
 export async function updateInfo(id: string, info: Partial<userModel.UserInfo>): Promise<void> {
   if (info.avatar) {
     await file.upload(id + '.jpg', Buffer.from(info.avatar.replace('data:image/jpeg;base64,', ''), 'base64'))
-    info.avatar = config.avatar.cos.url + id + '.jpg'
+    info.avatar = config!.file.cos.url + id + '.jpg'
   }
   await userModel.updateInfo(id, info)
 }

@@ -4,7 +4,7 @@ import * as yaml from 'js-yaml'
 /**
  * Violet配置
  */
-interface Config {
+export interface Config {
   http: HttpConfig
   file: FileConfig
   db: DBConfig
@@ -17,7 +17,7 @@ interface Config {
  */
 interface HttpConfig {
   host: string
-  port: string
+  port: number
   dev: boolean
 }
 
@@ -75,13 +75,17 @@ interface EmailConfig {
   from: string
 }
 
-const defaultConf = getConfig('config.yml')
+// 默认导出将使用CommonJS模块标准
+export default undefined as Config | undefined
 
-export default defaultConf
+export function initDefaultConfig(path: string): boolean {
+  if (exports.default !== undefined) return false
+  exports.default = getConfig(path)
+  return exports.default !== undefined
+}
 
 /**
  * 获取配置信息
- *
  * @param {string} path 配置文件路径
  */
 export function getConfig(path: string): Config | undefined {
@@ -95,6 +99,6 @@ export function getConfig(path: string): Config | undefined {
 }
 
 export function getHttpUrl(conf?: Config): string {
-  conf = conf || defaultConf
-  return `${conf.http.host}:${conf.http.port}`
+  conf = conf || exports.default
+  return `${conf!.http.host}:${conf!.http.port}`
 }

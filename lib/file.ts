@@ -1,6 +1,6 @@
 import COS = require('cos-nodejs-sdk-v5')
 
-import * as config from '../lib/config'
+import * as config from '../app/config/config'
 
 const cos = new COS({
   SecretId: config.avatar.cos.secretId,

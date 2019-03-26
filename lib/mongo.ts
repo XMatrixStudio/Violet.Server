@@ -1,6 +1,6 @@
 import mongoose = require('mongoose')
 
-import { mongo } from './config'
+import { mongo } from '../app/config/config'
 
 mongoose.connect(`mongodb://${mongo.user}:${mongo.password}@${mongo.host}:${mongo.port}/${mongo.dbName}`, {
   useNewUrlParser: true,

@@ -1,9 +1,9 @@
 import * as redis from 'redis'
-import { redis as redisConfig } from './config'
+import config from '../app/config/config'
 import assert = require('./assert')
 
 const client = redis.createClient({
-  ...redisConfig
+  ...config!.cache.redis
 })
 
 client.on('error', err => {

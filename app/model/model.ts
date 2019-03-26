@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose'
 
-import config from '../../lib/config'
+import config from '../config/config'
 
 mongoose.connect(`mongodb://${mongo.user}:${mongo.password}@${mongo.host}:${mongo.port}/${mongo.dbName}`, {
   useNewUrlParser: true,

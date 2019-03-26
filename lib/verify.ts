@@ -6,7 +6,7 @@ import * as mustache from 'mustache'
 import * as Mailer from 'nodemailer'
 
 import * as assert from './assert'
-import * as config from './config'
+import * as config from '../app/config/config'
 import * as store from './store'
 
 /**
