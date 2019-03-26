@@ -1,6 +1,6 @@
 import { ObjectId } from 'bson'
 
-import * as db from '../../lib/mongo'
+import db from '.'
 import { User } from './user'
 
 interface Level extends db.Document {

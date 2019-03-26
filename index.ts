@@ -1,6 +1,6 @@
 import * as program from 'commander'
 
-import config, { initDefaultConfig, getHttpUrl } from './app/config/config'
+import config, { initDefaultConfig, getMongoUrl, getHttpUrl } from './app/config/config'
 
 program
   .version('3.0.0-alpha', '-v, --version')
@@ -13,6 +13,9 @@ console.log('Use config file', program.config)
 
 // 在加载配置文件之后引入app模块
 import * as app from './app'
+import { connect } from './app/model'
+
+connect(getMongoUrl())
 
 app.listen(config!.http.port, config!.http.host)
 console.log('Listen at host', getHttpUrl())

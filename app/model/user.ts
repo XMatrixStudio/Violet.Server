@@ -1,4 +1,4 @@
-import * as db from '../../lib/mongo'
+import db from '.'
 import { Organization } from './org'
 
 export interface User extends db.Document {

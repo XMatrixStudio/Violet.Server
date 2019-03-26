@@ -6,12 +6,12 @@ import * as morgan from 'koa-morgan'
 import * as session from 'koa-session'
 
 import * as router from './router'
+import config from './config/config'
 
 const app = new Koa()
-const isDev = process.env.NODE_ENV !== 'production'
 
 // HTTP log
-if (isDev) app.use(morgan('dev'))
+if (config!.http.dev) app.use(morgan('dev'))
 
 // HTTPS 安全
 app.use(helmet())
