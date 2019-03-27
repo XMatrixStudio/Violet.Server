@@ -1,8 +1,8 @@
-import { Context } from 'koa'
 import * as _ from 'lodash'
 
 import * as assert from '../../lib/assert'
 import * as store from '../../lib/store'
+import { Context } from '../../types/context'
 
 const nameExp = /^[a-zA-Z][a-zA-Z0-9_-]{0,31}$/
 

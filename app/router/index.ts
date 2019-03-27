@@ -1,16 +1,16 @@
 import { HttpError } from 'http-errors'
-import { Context } from 'koa'
 import * as Router from 'koa-router'
 
 import * as verify from '../../lib/verify'
+import { IState, ICustom, Context } from '../../types/context'
 import * as level from './level'
 import * as org from './org'
 import * as user from './user'
 import * as util from './util'
 
-const router = new Router()
+const router = new Router<IState, ICustom>()
 
-type HttpHandler = (path: string | RegExp | (string | RegExp)[], ...middleware: Array<Router.IMiddleware>) => Router
+type HttpHandler = (path: string | RegExp | (string | RegExp)[], ...middleware: Array<Router.IMiddleware<IState, ICustom>>) => Router
 
 // 白名单列表
 // 凡是在此白名单, 均不检查是否登陆
@@ -41,13 +41,13 @@ const whiteBannedList: { method: HttpHandler; urls: string[] }[] = [
 ]
 
 // 检查是否登录
-const withoutLogin = (ctx: Context, next: () => Promise<void>) => {
+const withoutLogin = (ctx: Context, next: () => Promise<any>) => {
   ctx.state.passLoginStatusCheck = true
   return next()
 }
 
 // 检查是否被封禁
-const withoutBanned = (ctx: Context, next: () => Promise<void>) => {
+const withoutBanned = (ctx: Context, next: () => Promise<any>) => {
   ctx.state.passBannedStatusCheck = true
   return next()
 }
@@ -66,7 +66,7 @@ for (const rule of whiteBannedList) {
 }
 
 // 错误处理
-router.use('/', async (ctx: Context, next: () => Promise<void>) => {
+router.use('/', async (ctx: Context, next: () => Promise<any>) => {
   return next().catch((err: HttpError) => {
     if (err.expose) {
       ctx.status = err.status || 500
@@ -79,7 +79,7 @@ router.use('/', async (ctx: Context, next: () => Promise<void>) => {
 })
 
 // 兜底判断，如果没有被白名单检查，则必须登录
-router.use('/i/', async (ctx: Context, next: () => Promise<void>) => {
+router.use('/i/', async (ctx: Context, next: () => Promise<any>) => {
   if (!ctx.session!.verify) ctx.session!.verify = {}
   if (!ctx.session!.user) ctx.session!.user = {}
   if (!ctx.state.passLoginStatusCheck) {

@@ -1,12 +1,12 @@
 import * as Captchapng from 'captchapng2'
 import * as fs from 'fs'
-import { Context } from 'koa'
 import * as moment from 'moment'
 import * as mustache from 'mustache'
 import * as Mailer from 'nodemailer'
 
-import * as assert from './assert'
 import * as config from '../app/config/config'
+import { Context } from '../types/context'
+import * as assert from './assert'
 import * as store from './store'
 
 /**

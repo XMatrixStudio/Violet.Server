@@ -1,9 +1,9 @@
-import { Context } from 'koa'
 import * as _ from 'lodash'
 
 import * as assert from '../../lib/assert'
 import * as store from '../../lib/store'
 import * as verify from '../../lib/verify'
+import { Context } from '../../types/context'
 import * as userService from '../service/user'
 
 const emailExp = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/

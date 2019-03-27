@@ -1,10 +1,10 @@
-import { Context } from 'koa'
 import * as _ from 'lodash'
 
 import * as assert from '../../lib/assert'
 import * as store from '../../lib/store'
 import * as levelService from '../service/level'
 import * as verify from '../../lib/verify'
+import { Context } from '../../types/context'
 
 /**
  * 获取用户等级列表

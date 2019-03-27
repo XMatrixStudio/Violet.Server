@@ -1,8 +1,9 @@
 import * as Router from 'koa-router'
 
+import { IState, ICustom } from '../../types/context'
 import * as userCtrl from '../controller/user'
 
-const user = new Router()
+const user = new Router<IState, ICustom>()
 
 user.post('/', userCtrl.post) // 注册
 user.patch('/', userCtrl.patch) // 修改用户个人信息
