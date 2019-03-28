@@ -13,9 +13,11 @@ console.log('Use config file', program.config)
 
 // 在加载配置文件之后引入app模块
 import * as app from './app'
-import { connect } from './app/model'
+import { connect as dbConnect } from './app/model'
+import { connect as cacheConnect } from './app/model/redis'
 
-connect(getMongoUrl())
+dbConnect(getMongoUrl())
+cacheConnect(config!.cache.redis)
 
 app.listen(config!.http.port, config!.http.host)
 console.log('Listen at host', getHttpUrl())

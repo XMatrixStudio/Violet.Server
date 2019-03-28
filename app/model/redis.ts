@@ -1,26 +1,26 @@
 import * as redis from 'redis'
-import config from '../app/config/config'
-import assert = require('./assert')
 
-const client = redis.createClient({
-  ...config!.cache.redis
-})
+let client: redis.RedisClient | undefined = undefined
 
-client.on('error', err => {
-  console.log('Redis error ' + err)
-})
+export function connect(options?: redis.ClientOpts) {
+  client = redis.createClient(options)
 
-client.on('connect', () => {
-  console.log('Redis connection success')
-})
+  client.on('error', err => {
+    console.log('Redis error ' + err)
+  })
 
-client.on('ready', () => {
-  console.log('Redis ready')
-})
+  client.on('connect', () => {
+    console.log('Redis connection success')
+  })
+
+  client.on('ready', () => {
+    console.log('Redis ready')
+  })
+}
 
 export function get(key: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    client.get(key, (err, result) => {
+    client!.get(key, (err, result) => {
       if (err) {
         reject(err)
       }
@@ -32,7 +32,7 @@ export function get(key: string): Promise<string> {
 export function set(key: string, value: string, time?: number): Promise<string> {
   if (time === undefined) {
     return new Promise((resolve, reject) => {
-      client.set(key, value, (err, result) => {
+      client!.set(key, value, (err, result) => {
         if (err) {
           return reject(err)
         }
@@ -42,7 +42,7 @@ export function set(key: string, value: string, time?: number): Promise<string> 
   }
 
   return new Promise((resolve, reject) => {
-    client.set(key, value, 'EX', time, (err, result) => {
+    client!.set(key, value, 'EX', time, (err, result) => {
       if (err) {
         return reject(err)
       }
@@ -53,7 +53,7 @@ export function set(key: string, value: string, time?: number): Promise<string> 
 
 export function del(key: string): Promise<number> {
   return new Promise((resolve, reject) => {
-    client.del(key, (err, result) => {
+    client!.del(key, (err, result) => {
       if (err) {
         return reject(err)
       }

@@ -1,5 +1,5 @@
 import * as userModel from '../app/model/user'
-import * as redis from './redis'
+import * as redis from '../app/model/redis'
 
 export async function getUserLevelById(userId: string): Promise<number> {
   const levelStr = await redis.get(`level-${userId}`)
