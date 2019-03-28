@@ -15,6 +15,13 @@ export async function get(ctx: Context): Promise<void> {
 }
 
 /**
+ * 创建用户等级
+ */
+export async function post(ctx: Context): Promise<void> {
+  // TODO
+}
+
+/**
  * 获取申请列表
  */
 export async function getUsers(ctx: Context): Promise<void> {

@@ -3,18 +3,20 @@ import { ObjectId } from 'bson'
 import db from '.'
 import { User } from './user'
 
-interface Level extends db.Document {
+interface ILevel extends db.Document {
   level: number // 用户级别
   appLimit: number // 可创建的App的数量上限
   orgLimit: number // 可创建的组织的数量上限
-  adminPermission: boolean // 管理员权限
+  autoPass: boolean // 是否自动通过申请
+  requestAccess: boolean // 是否允许申请
 }
 
 const levelSchema = new db.Schema({
   level: { type: Number, index: { unique: true }, required: true },
   appLimit: { type: Number, required: true },
   orgLimit: { type: Number, required: true },
-  adminPermission: { type: Boolean, default: false }
+  autoPass: { type: Boolean, default: false },
+  requestAccess: { type: Boolean, default: true }
 })
 
 export interface LevelRequest extends db.Document {
@@ -33,8 +35,12 @@ const levelRequestSchema = new db.Schema({
   state: { type: Number, default: 0 }
 })
 
-const levelDB = db.model<Level>('levels', levelSchema)
+const levelDB = db.model<ILevel>('levels', levelSchema)
 const levelRequestDB = db.model<LevelRequest>('levels.requests', levelRequestSchema)
+
+export async function add(level: ILevel): Promise<void> {
+  await levelDB.create(level)
+}
 
 /**
  * 添加申请
@@ -52,7 +58,7 @@ export async function addRequest(userId: string, level: number, reason: string):
  *
  * @return {Level[]} 所有等级信息
  */
-export async function getLevels(): Promise<Level[]> {
+export async function getLevels(): Promise<ILevel[]> {
   return await levelDB.find({})
 }
 
@@ -62,7 +68,7 @@ export async function getLevels(): Promise<Level[]> {
  * @param {number} level 等级
  * @return {Level | null} 等级信息
  */
-export async function getByLevel(level: number): Promise<Level | null> {
+export async function getByLevel(level: number): Promise<ILevel | null> {
   return await levelDB.findOne({ level: level })
 }
 
