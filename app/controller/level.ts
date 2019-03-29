@@ -18,7 +18,18 @@ export async function get(ctx: Context): Promise<void> {
  * 创建用户等级
  */
 export async function post(ctx: Context): Promise<void> {
-  // TODO
+  const body = _.pick<Levels.POST.RequestBody>(ctx.request.body, ['level', 'app', 'org', 'auto_pass', 'request_access'])
+  assert.v({ data: body.level, type: 'number', min: 1, max: 98, message: 'invalid_level' })
+  assert.v({ data: body.app, type: 'number', min: -1, message: 'invalid_app' })
+  assert.v({ data: body.org, type: 'number', min: -1, message: 'invalid_org' })
+  assert.v({ data: body.auto_pass, type: 'boolean', message: 'invalid_auto_pass' })
+  assert.v({ data: body.request_access, type: 'boolean', message: 'invalid_request_access' })
+
+  verify.checkLoginState(ctx)
+  const level = await store.getUserLevelById(ctx.session!.user.id!)
+  assert(level === 99, 'permission_deny', 403)
+  await levelService.createLevel(body.level!, body.app!, body.org!, body.auto_pass!, body.request_access!)
+  ctx.status = 201
 }
 
 /**

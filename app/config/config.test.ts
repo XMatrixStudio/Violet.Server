@@ -1,4 +1,4 @@
-import { Config, initDefaultConfig, getHttpUrl } from './config'
+import { Config, initDefaultConfig, getHttpUrl, getMongoUrl } from './config'
 
 beforeAll(() => {
   initDefaultConfig('config.example.yml')
@@ -6,9 +6,14 @@ beforeAll(() => {
 
 // getMongoUrl
 describe('Test function getMongoUrl', () => {
-  test.todo('by default config')
+  test('by default config', () => {
+    expect(getMongoUrl()).toBe('mongodb://violet:violet_pwd@127.0.0.1:27017/violet_db')
+  })
 
-  test.todo('by specified config')
+  test('by specified config', () => {
+    const conf: Config = { db: { mongo: { user: 'user', password: 'pwd', host: '0.0.0.0', port: 100, dbName: 'test_db' } } } as Config
+    expect(getMongoUrl(conf)).toBe('mongodb://user:pwd@0.0.0.0:100/test_db')
+  })
 })
 
 // getHttpUrl
