@@ -5,10 +5,11 @@ import * as helmet from 'koa-helmet'
 import * as morgan from 'koa-morgan'
 import * as session from 'koa-session'
 
+import { IState, ICustom } from '../types/context'
 import * as router from './router'
 import config from './config/config'
 
-const app = new Koa()
+const app = new Koa<IState, ICustom>()
 
 // HTTP log
 if (config!.http.dev) app.use(morgan('dev'))
@@ -29,7 +30,7 @@ app.use(
       signed: true,
       rolling: false
     },
-    app
+    app as any
   )
 )
 

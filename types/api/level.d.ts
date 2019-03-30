@@ -8,7 +8,6 @@ declare namespace Levels {
       level: number
       app: number
       org: number
-      admin: boolean
     }
   }
 }

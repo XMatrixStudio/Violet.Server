@@ -14,8 +14,7 @@ export async function getLevels(): Promise<Levels.GET.ResponseBody> {
     data[i] = {
       level: levels[i].level,
       app: levels[i].appLimit,
-      org: levels[i].orgLimit,
-      admin: levels[i].adminPermission
+      org: levels[i].orgLimit
     }
   }
   return data

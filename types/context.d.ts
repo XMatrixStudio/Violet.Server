@@ -10,4 +10,5 @@ declare interface IState {
 
 declare type ICustom = KoaContext
 
+declare type AppContext = KoaContext
 declare type Context = RouterContext<IState, ICustom>
