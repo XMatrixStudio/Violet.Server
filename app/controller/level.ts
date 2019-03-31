@@ -22,6 +22,8 @@ export async function post(ctx: Context): Promise<void> {
   assert.v({ data: body.level, type: 'number', min: 1, max: 98, message: 'invalid_level' })
   assert.v({ data: body.app, type: 'number', min: -1, message: 'invalid_app' })
   assert.v({ data: body.org, type: 'number', min: -1, message: 'invalid_org' })
+  body.auto_pass = body.auto_pass === true
+  body.request_access = body.request_access !== false
 
   verify.checkLoginState(ctx)
   const level = await store.getUserLevelById(ctx.session!.user.id!)

@@ -38,8 +38,8 @@ const levelRequestSchema = new db.Schema({
 const levelDB = db.model<ILevel>('levels', levelSchema)
 const levelRequestDB = db.model<LevelRequest>('levels.requests', levelRequestSchema)
 
-export async function add(level: number, app: number, org: number, auto_pass: boolean, request_access: boolean): Promise<void> {
-  await levelDB.create({ level: level, appLimit: app, orgLimit: org, autoPass: auto_pass, requestAccess: request_access })
+export async function add(level: number, app: number, org: number, autoPass: boolean, requestAccess: boolean): Promise<void> {
+  await levelDB.create({ level: level, appLimit: app, orgLimit: org, autoPass: autoPass, requestAccess: requestAccess })
 }
 
 /**

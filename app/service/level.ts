@@ -8,12 +8,12 @@ import * as userModel from '../model/user'
  * @param {number} level 用户等级
  * @param {number} app 可创建应用的数量上限，-1为无穷
  * @param {number} org 可创建组织的数量上限，-1为无穷
- * @param {boolean} auto_pass 是否免除审核
- * @param {boolean} request_access 是否允许申请
+ * @param {boolean} autoPass 是否免除审核
+ * @param {boolean} requestAccess 是否允许申请
  */
-export async function createLevel(level: number, app: number, org: number, auto_pass: boolean, request_access: boolean): Promise<void> {
+export async function createLevel(level: number, app: number, org: number, autoPass: boolean, requestAccess: boolean): Promise<void> {
   assert(!(await levelModel.getByLevel(level)), 'exist_level')
-  levelModel.add(level, app, org, auto_pass, request_access)
+  await levelModel.add(level, app, org, autoPass, requestAccess)
 }
 
 /**

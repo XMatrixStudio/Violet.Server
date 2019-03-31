@@ -11,8 +11,10 @@ describe('Test function getMongoUrl', () => {
   })
 
   test('by specified config', () => {
-    const conf: Config = { db: { mongo: { user: 'user', password: 'pwd', host: '0.0.0.0', port: 100, dbName: 'test_db' } } } as Config
-    expect(getMongoUrl(conf)).toBe('mongodb://user:pwd@0.0.0.0:100/test_db')
+    const conf: Config = {
+      db: { mongo: { user: 'user', password: 'pwd', host: 'xmatrix.studio', port: 23456, dbName: 'test_db' } }
+    } as Config
+    expect(getMongoUrl(conf)).toBe('mongodb://user:pwd@xmatrix.studio:23456/test_db')
   })
 })
 
