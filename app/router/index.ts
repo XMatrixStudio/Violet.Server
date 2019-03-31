@@ -83,8 +83,8 @@ router.use('/i/', async (ctx: Context, next: () => Promise<any>) => {
   if (!ctx.session!.verify) ctx.session!.verify = {}
   if (!ctx.session!.user) ctx.session!.user = {}
   if (!ctx.state.passLoginStatusCheck) {
-    verify.checkLoginState(ctx)
-    if (!ctx.state.passBannedStatusCheck) await verify.checkBannedState(ctx)
+    await verify.requireLogin(ctx)
+    if (!ctx.state.passBannedStatusCheck) await verify.requireMinUserLevel(ctx)
   }
   return next()
 })

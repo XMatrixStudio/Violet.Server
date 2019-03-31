@@ -3,13 +3,15 @@ import { ObjectId } from 'bson'
 import db from '.'
 import { User } from './user'
 
-interface ILevel extends db.Document {
+export interface ILevel {
   level: number // 用户级别
   appLimit: number // 可创建的App的数量上限
   orgLimit: number // 可创建的组织的数量上限
   autoPass: boolean // 是否自动通过申请
   requestAccess: boolean // 是否允许申请
 }
+
+interface LevelDocument extends db.Document, ILevel {}
 
 const levelSchema = new db.Schema({
   level: { type: Number, index: { unique: true }, required: true },
@@ -35,11 +37,15 @@ const levelRequestSchema = new db.Schema({
   state: { type: Number, default: 0 }
 })
 
-const levelDB = db.model<ILevel>('levels', levelSchema)
+const levelDB = db.model<LevelDocument>('levels', levelSchema)
 const levelRequestDB = db.model<LevelRequest>('levels.requests', levelRequestSchema)
 
-export async function add(level: number, app: number, org: number, autoPass: boolean, requestAccess: boolean): Promise<void> {
-  await levelDB.create({ level: level, appLimit: app, orgLimit: org, autoPass: autoPass, requestAccess: requestAccess })
+/**
+ * 新建用户等级
+ * @param {ILevel} level 用户等级信息
+ */
+export async function add(level: ILevel): Promise<void> {
+  await levelDB.create(level)
 }
 
 /**
@@ -55,10 +61,9 @@ export async function addRequest(userId: string, level: number, reason: string):
 
 /**
  * 获取所有用户等级信息
- *
  * @return {Level[]} 所有等级信息
  */
-export async function getLevels(): Promise<ILevel[]> {
+export async function getLevels(): Promise<LevelDocument[]> {
   return await levelDB.find({})
 }
 
@@ -68,7 +73,7 @@ export async function getLevels(): Promise<ILevel[]> {
  * @param {number} level 等级
  * @return {Level | null} 等级信息
  */
-export async function getByLevel(level: number): Promise<ILevel | null> {
+export async function getByLevel(level: number): Promise<LevelDocument | null> {
   return await levelDB.findOne({ level: level })
 }
 
@@ -120,4 +125,21 @@ export async function init(): Promise<void> {
     { level: 50, appLimit: 5, orgLimit: 5, adminPermission: true },
     { level: 99, appLimit: -1, orgLimit: -1, adminPermission: true }
   )
+}
+
+/**
+ * 删除用户等级
+ * @param {number} level 用户等级
+ */
+export async function removeByLevel(level: number): Promise<void> {
+  await levelDB.remove({ level: level })
+}
+
+/**
+ * 更新用户等级
+ * @param {number} level 用户等级
+ * @param {Partial<Omit<ILevel, 'level'>>} opt 需要更新的信息
+ */
+export async function updateByLevel(level: number, opt: Partial<Omit<ILevel, 'level'>>): Promise<void> {
+  await levelDB.findOneAndUpdate({ level: level }, opt)
 }

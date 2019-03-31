@@ -18,6 +18,8 @@ export async function get(ctx: Context): Promise<void> {
  * 创建用户等级
  */
 export async function post(ctx: Context): Promise<void> {
+  await verify.requireMinUserLevel(ctx, 99)
+
   const body = _.pick<Levels.POST.RequestBody>(ctx.request.body, ['level', 'app', 'org', 'auto_pass', 'request_access'])
   assert.v({ data: body.level, type: 'number', min: 1, max: 98, message: 'invalid_level' })
   assert.v({ data: body.app, type: 'number', min: -1, message: 'invalid_app' })
@@ -25,11 +27,33 @@ export async function post(ctx: Context): Promise<void> {
   body.auto_pass = body.auto_pass === true
   body.request_access = body.request_access !== false
 
-  verify.checkLoginState(ctx)
-  const level = await store.getUserLevelById(ctx.session!.user.id!)
-  assert(level === 99, 'permission_deny', 403)
-  await levelService.createLevel(body.level!, body.app!, body.org!, body.auto_pass!, body.request_access!)
+  await levelService.addLevel(body.level!, body.app!, body.org!, body.auto_pass!, body.request_access!)
   ctx.status = 201
+}
+
+export async function put(ctx: Context): Promise<void> {
+  await verify.requireMinUserLevel(ctx, 99)
+
+  const body = _.pick<Levels.PUT.RequestBody>(ctx.request.body, ['level', 'app', 'org', 'auto_pass', 'request_access'])
+  assert.v({ data: body.level, type: 'number', min: 1, max: 98, message: 'invalid_level' })
+  assert.v({ data: body.app, type: 'number', min: -1, message: 'invalid_app' })
+  assert.v({ data: body.org, type: 'number', min: -1, message: 'invalid_org' })
+  body.auto_pass = body.auto_pass === true
+  body.request_access = body.request_access !== false
+
+  await levelService.updateLevel(body.level!, body.app!, body.org!, body.auto_pass!, body.request_access!)
+  ctx.status = 200
+}
+
+export async function del(ctx: Context): Promise<void> {
+  await verify.requireMinUserLevel(ctx, 99)
+
+  const body = _.pick<Levels.DELETE.Query>(ctx.request.query, ['level'])
+  body.level = typeof body.level === 'string' ? parseInt(body.level) : undefined
+  assert.v({ data: body.level, type: 'number', min: 1, max: 98, message: 'invalid_level' })
+
+  await levelService.removeLevel(body.level!)
+  ctx.status = 204
 }
 
 /**

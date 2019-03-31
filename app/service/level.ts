@@ -4,31 +4,31 @@ import * as userModel from '../model/user'
 
 /**
  * 创建用户等级
- *
  * @param {number} level 用户等级
  * @param {number} app 可创建应用的数量上限，-1为无穷
  * @param {number} org 可创建组织的数量上限，-1为无穷
  * @param {boolean} autoPass 是否免除审核
  * @param {boolean} requestAccess 是否允许申请
  */
-export async function createLevel(level: number, app: number, org: number, autoPass: boolean, requestAccess: boolean): Promise<void> {
+export async function addLevel(level: number, app: number, org: number, autoPass: boolean, requestAccess: boolean): Promise<void> {
   assert(!(await levelModel.getByLevel(level)), 'exist_level')
-  await levelModel.add(level, app, org, autoPass, requestAccess)
+  await levelModel.add({ level: level, appLimit: app, orgLimit: org, autoPass: autoPass, requestAccess: requestAccess })
 }
 
 /**
  * 获取所有用户等级
- *
- * @returns {ResponseBody} 用户等级信息的数组
+ * @returns {ResponseBody} 用户等级信息列表
  */
 export async function getLevels(): Promise<Levels.GET.ResponseBody> {
   const levels = await levelModel.getLevels()
-  const data = new Array<Levels.GET.Data>()
+  const data: Levels.GET.ResponseBody = []
   for (const i in levels) {
     data[i] = {
       level: levels[i].level,
       app: levels[i].appLimit,
-      org: levels[i].orgLimit
+      org: levels[i].orgLimit,
+      auto_pass: levels[i].autoPass,
+      request_access: levels[i].requestAccess
     }
   }
   return data
@@ -76,6 +76,15 @@ export async function getRequests(
 }
 
 /**
+ * 删除用户等级
+ * @param {number} level 用户等级
+ */
+export async function removeLevel(level: number): Promise<void> {
+  // TODO: 判断是否存在该用户等级的用户
+  await levelModel.removeByLevel(level)
+}
+
+/**
  * 申请修改用户等级
  *
  * @param {string} userId 用户ObjectId
@@ -94,4 +103,17 @@ export async function requestUpdateUserLevel(userId: string, level: number, reas
     assert(!request, 'exist_open_request')
     await levelModel.addRequest(userId, level, reason)
   }
+}
+
+/**
+ * 更新用户等级
+ * @param {number} level 用户等级
+ * @param {number} app 可创建应用的数量上限，-1为无穷
+ * @param {number} org 可创建组织的数量上限，-1为无穷
+ * @param {boolean} autoPass 是否免除审核
+ * @param {boolean} requestAccess 是否允许申请
+ */
+export async function updateLevel(level: number, app: number, org: number, autoPass: boolean, requestAccess: boolean): Promise<void> {
+  assert(await levelModel.getByLevel(level), 'not_exist_level')
+  await levelModel.updateByLevel(level, { appLimit: app, orgLimit: org, autoPass: autoPass, requestAccess: requestAccess })
 }

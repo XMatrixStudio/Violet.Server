@@ -10,10 +10,8 @@ import * as assert from './assert'
 import * as store from './store'
 
 /**
- * 检查封禁状态
- *
+ * 检查用户等级
  * 当用户已被封禁时, 抛出`ban_user`错误.
- *
  * @param {Context} ctx Koa上下文
  */
 export async function checkBannedState(ctx: Context): Promise<void> {
@@ -118,6 +116,28 @@ export function getCaptcha(ctx: Context): string {
   ctx.session!.verify.captcha = rand.toString()
   ctx.session!.verify.captchaTime = Date.now()
   return 'data:image/png;base64,'.concat(png.getBase64())
+}
+
+/**
+ * 登陆状态检验
+ * 当不存在登陆记录时，抛出`invalid_token`错误
+ * 当登陆记录过期时，抛出`timeout_token`错误
+ * @param {Context} ctx Koa上下文
+ */
+export async function requireLogin(ctx: Context): Promise<void> {
+  assert(ctx.session!.user.id, 'invalid_token', 401)
+  assert(ctx.session!.user.remember || Date.now() - ctx.session!.user.time! <= 86400 * 1000, 'timeout_token', 401)
+  if (!ctx.session!.user.remember) ctx.session!.user.time = Date.now()
+}
+
+/**
+ * 用户等级检验
+ * 当权限不足时，抛出`permission_deny`错误
+ * @param {Context} ctx Koa上下文
+ * @param {number} [minLevel] 用户最小所需的等级，默认为0
+ */
+export async function requireMinUserLevel(ctx: Context, minLevel: number = 0): Promise<void> {
+  assert((await store.getUserLevelById(ctx.session!.user.id!)) >= minLevel, 'permission_deny', 403)
 }
 
 const mailer = Mailer.createTransport({

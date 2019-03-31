@@ -1,22 +1,28 @@
 declare namespace Levels {
-  namespace GET {
-    interface ResponseBody {
-      [key: number]: Data
-    }
-
-    interface Data {
-      level: number
-      app: number
-      org: number
-    }
+  // 用户等级
+  interface ILevel {
+    level: number
+    app: number
+    org: number
+    auto_pass: boolean
+    request_access: boolean
   }
+
+  namespace GET {
+    type ResponseBody = ILevel[]
+  }
+
   namespace POST {
-    interface RequestBody {
-      level: number
-      app: number
-      org: number
-      auto_pass: boolean
-      request_access: boolean
+    type RequestBody = ILevel
+  }
+
+  namespace PUT {
+    type RequestBody = ILevel
+  }
+
+  namespace DELETE {
+    interface Query {
+      level: number | string
     }
   }
 }
