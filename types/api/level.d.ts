@@ -10,6 +10,15 @@ declare namespace Levels {
       org: number
     }
   }
+  namespace POST {
+    interface RequestBody {
+      level: number
+      app: number
+      org: number
+      auto_pass: boolean
+      request_access: boolean
+    }
+  }
 }
 
 declare namespace Levels.Users {
