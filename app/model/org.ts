@@ -1,13 +1,13 @@
 import { ObjectId } from 'bson'
 
 import db from '.'
-import { User } from './user'
+import { IUser } from './user'
 
 export interface Organization extends db.Document {
   name: string // 组织名，全小写，用于索引
   rawName: string // 原始组织名
   createTime: Date // 注册时间
-  _owner: User // 组织所有人
+  _owner: IUser // 组织所有人
   // _members: User[] // 组织成员
 }
 

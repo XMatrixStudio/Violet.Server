@@ -63,8 +63,8 @@ export async function getUserNameByPhone(phone: string): Promise<string | null> 
  * @param {string} password 密码的SHA512散列值
  * @returns {User} 用户信息
  */
-export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'name', string>>, password: string): Promise<userModel.User> {
-  let user: userModel.User | null
+export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'name', string>>, password: string): Promise<userModel.IUser> {
+  let user: userModel.IUser | null
   if (data.email) {
     user = await userModel.getByEmail(data.email)
   } else if (data.phone) {
@@ -131,7 +131,7 @@ export async function updateEmailOrPhone(id: string, user: RequireOnlyOne<Record
  * @param {string} id ObjectId
  * @param {UserInfo} info 用户个人信息
  */
-export async function updateInfo(id: string, info: Partial<userModel.UserInfo>): Promise<void> {
+export async function updateInfo(id: string, info: Partial<userModel.IUserInfo>): Promise<void> {
   if (info.avatar) {
     await file.upload(id + '.jpg', Buffer.from(info.avatar.replace('data:image/jpeg;base64,', ''), 'base64'))
     info.avatar = config!.file.cos.url + id + '.jpg'

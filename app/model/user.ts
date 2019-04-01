@@ -1,34 +1,22 @@
 import db from '.'
-import { Organization } from './org'
 
-export interface User extends db.Document {
+export interface IUser {
+  _id: any // ObjectId
   email: string // 用户登陆邮箱，全小写
   phone: string // 用户登陆手机，11位
   name: string // 用户名，全小写，用于索引
   rawName: string // 原始用户名
-  level: number // 用户等级
+  level: number // 用户等级，0 => 普通用户，1 => 开发者，50 => 管理员，99 => 超级管理员
   createTime: Date // 注册时间
-  auth: {
-    appId: string // 应用的ObjectId
-  }[]
-  info: UserInfo
   secure: {
-    password: string // 经过加盐与多次SHA512的密码
-    salt: string // 盐
+    password: string
+    salt: string
   }
-  dev: {
-    app: {
-      own: number
-      member: number
-    }
-    org: {
-      own: number
-      member: number
-    }
-  }
+  info: IUserInfo // 个人信息
+  dev: IUserDev // 开发者信息
 }
 
-export interface UserInfo {
+export interface IUserInfo {
   avatar: string // 头像URL
   bio: string // 个人简介
   birthday: Date // 生日
@@ -40,6 +28,24 @@ export interface UserInfo {
   url: string // 个人URL
 }
 
+export interface IUserDev {
+  name: string // 联系名称
+  email: string // 联系邮箱
+  phone: string // 联系电话
+  app: {
+    limit: number // 应用上限
+    own: number // 所属应用数量
+    join: number // 协作应用数量
+  }
+  org: {
+    limit: number // 组织上限
+    own: number // 所属组织数量
+    join: number // 协作组织数量
+  }
+}
+
+interface UserDocument extends db.Document, IUser {}
+
 const userSchema = new db.Schema({
   email: { type: String, index: { unique: true } },
   phone: { type: String, index: { unique: true } },
@@ -49,9 +55,6 @@ const userSchema = new db.Schema({
   createTime: {
     type: Date,
     default: new Date()
-  },
-  auth: {
-    appId: String
   },
   info: {
     avatar: String,
@@ -73,27 +76,31 @@ const userSchema = new db.Schema({
   },
   dev: {
     type: {
+      name: String,
+      email: String,
+      phone: String,
       app: {
         type: {
+          limit: { type: Number, default: 5 },
           own: { type: Number, default: 0 },
-          member: { type: Number, default: 0 }
+          join: { type: Number, default: 0 }
         }
       },
       org: {
         type: {
+          limit: { type: Number, default: 5 },
           own: { type: Number, default: 0 },
-          member: { type: Number, default: 0 }
+          join: { type: Number, default: 0 }
         }
       }
     }
   }
 })
 
-const userDB = db.model<User>('users', userSchema)
+const userDB = db.model<UserDocument>('users', userSchema)
 
 /**
  * 添加用户
- *
  * @param {Record<'email' | 'phone' | 'name' | 'nickname' | 'password' | 'salt', string>} data 用户数据
  */
 export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' | 'password' | 'salt', string>): Promise<void> {
@@ -118,7 +125,7 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
  * @param {string} email 登陆邮箱
  * @returns {User | null} 用户信息
  */
-export async function getByEmail(email: string): Promise<User | null> {
+export async function getByEmail(email: string): Promise<UserDocument | null> {
   return await userDB.findOne({ email: email.toLowerCase() })
 }
 
@@ -128,7 +135,7 @@ export async function getByEmail(email: string): Promise<User | null> {
  * @param {string} id ObjectId
  * @returns {User | null} 用户信息
  */
-export async function getById(id: string): Promise<User | null> {
+export async function getById(id: string): Promise<UserDocument | null> {
   return await userDB.findById(id)
 }
 
@@ -138,7 +145,7 @@ export async function getById(id: string): Promise<User | null> {
  * @param {string} name 用户名
  * @returns {User | null} 用户信息
  */
-export async function getByName(name: string): Promise<User | null> {
+export async function getByName(name: string): Promise<UserDocument | null> {
   return await userDB.findOne({ name: name.toLowerCase() })
 }
 
@@ -148,7 +155,7 @@ export async function getByName(name: string): Promise<User | null> {
  * @param {string} phone 登陆手机
  * @returns {User | null} 用户信息
  */
-export async function getByPhone(phone: string): Promise<User | null> {
+export async function getByPhone(phone: string): Promise<UserDocument | null> {
   return await userDB.findOne({ phone: phone.replace('+86', '') })
 }
 
@@ -203,7 +210,7 @@ export async function updatePhone(id: string, phone: string): Promise<void> {
  * @param {string} id ObjectId
  * @param {UserInfo} info 用户个人信息
  */
-export async function updateInfo(id: string, info: Partial<UserInfo>): Promise<void> {
+export async function updateInfo(id: string, info: Partial<IUserInfo>): Promise<void> {
   await userDB.findByIdAndUpdate(id, { info: info })
 }
 

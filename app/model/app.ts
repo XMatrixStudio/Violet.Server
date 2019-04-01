@@ -1,7 +1,6 @@
 import { ObjectId } from 'bson'
 
 import db from '.'
-import { User } from './user'
 
 export interface Application extends db.Document {
   name: string // 项目名

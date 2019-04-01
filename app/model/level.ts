@@ -1,7 +1,7 @@
 import { ObjectId } from 'bson'
 
 import db from '.'
-import { User } from './user'
+import { IUser } from './user'
 
 export interface ILevel {
   level: number // 用户级别
@@ -22,7 +22,7 @@ const levelSchema = new db.Schema({
 })
 
 export interface LevelRequest extends db.Document {
-  _user: User // 用户信息
+  _user: IUser // 用户信息
   level: number // 申请的用户等级
   reason: string // 申请理由
   time: Date // 申请时间
