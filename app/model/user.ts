@@ -119,6 +119,11 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
   })
 }
 
+export async function addDeveloper(id: string, devData: Record<'name' | 'email' | 'phone', string>): Promise<void> {
+  const data = Object.assign(devData, { app: { limit: 5, own: 0, join: 0 }, org: { limit: 5, own: 0, join: 0 } })
+  await userDB.findByIdAndUpdate(id, { level: 1, dev: data })
+}
+
 /**
  * 获取用户信息
  *

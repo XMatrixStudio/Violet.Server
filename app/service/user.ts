@@ -12,24 +12,34 @@ import * as userModel from '../model/user'
  */
 export async function getInfo(data: RequireOnlyOne<Record<'id' | 'name', string>>): Promise<User.GET.ResponseBody> {
   if (data.id) {
-    const user = await userModel.getById(data.id)
-    user!.info.avatar = user!.info.avatar || config!.file.cos.default
+    const user = (await userModel.getById(data.id))!
+    user.info.avatar = user.info.avatar || config!.file.cos.default
     return {
-      email: user!.email,
-      phone: user!.phone,
-      name: user!.rawName,
-      level: user!.level,
-      createTime: user!.createTime,
-      info: user!.info
+      email: user.email,
+      phone: user.phone,
+      name: user.rawName,
+      level: user.level,
+      createTime: user.createTime,
+      info: user.info,
+      dev: user.dev
     }
   } else {
     const user = await userModel.getByName(data.name!)
-    user!.info.avatar = user!.info.avatar || config!.file.cos.default
+    assert(user, 'not_found')
+    user!.info.avatar = user!.info.avatar || config!.file.cos.url + config!.file.cos.default
+    if (user!.dev) {
+      delete user!.dev.name
+      delete user!.dev.email
+      delete user!.dev.phone
+      delete user!.dev.app.limit
+      delete user!.dev.org.limit
+    }
     return {
       name: user!.rawName,
       level: user!.level,
       createTime: user!.createTime,
-      info: user!.info
+      info: user!.info,
+      dev: user!.dev
     }
   }
 }
@@ -137,6 +147,18 @@ export async function updateInfo(id: string, info: Partial<userModel.IUserInfo>)
     info.avatar = config!.file.cos.url + id + '.jpg'
   }
   await userModel.updateInfo(id, info)
+}
+
+export async function updateLevel(id: string, level: 1 | 50 | 99, name: string, email: string, phone: string, remark?: string) {
+  const user = (await userModel.getById(id))!
+  if (level === 1) {
+    assert(user.level === 0, 'not_normal_user')
+    await userModel.addDeveloper(id, { name: name, email: email, phone: phone })
+  } else if (level === 50) {
+    assert(false, 'not_implement')
+  } else {
+    assert(false, 'not_implement')
+  }
 }
 
 /**

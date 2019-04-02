@@ -71,7 +71,7 @@ export async function patch(ctx: Context): Promise<void> {
  */
 export async function getByName(ctx: Context): Promise<void> {
   if (ctx.params.name === 'me') {
-    verify.checkLoginState(ctx)
+    await verify.requireLogin(ctx)
     ctx.body = await userService.getInfo({ id: ctx.session!.user.id! })
   } else {
     ctx.body = await userService.getInfo({ name: ctx.params.name })
@@ -139,6 +139,21 @@ export async function putEmail(ctx: Context): Promise<void> {
       break
     }
   }
+  ctx.status = 200
+}
+
+/**
+ * 申请更改用户等级
+ */
+export async function putLevel(ctx: Context): Promise<void> {
+  const body = _.pick<User.Level.PUT.RequestBody>(ctx.request.body, ['level', 'name', 'email', 'phone', 'remark'])
+  assert.v({ data: body.level, type: 'number', enums: [1, 50, 99], message: 'invalid_level' })
+  assert.v({ data: body.name, type: 'string', maxLength: 32, message: 'invalid_name' })
+  assert.v({ data: body.email, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' })
+  assert.v({ data: body.phone, type: 'string', regExp: phoneExp, message: 'invalid_phone' })
+  assert.v({ data: body.remark, require: false, type: 'string', maxLength: 256, message: 'invalid_remark' })
+
+  await userService.updateLevel(ctx.session!.user.id!, body.level!, body.name!, body.email!, body.phone!)
   ctx.status = 200
 }
 

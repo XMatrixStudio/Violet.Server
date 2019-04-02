@@ -17,6 +17,21 @@ declare namespace User {
         location?: string
         url?: string
       }
+      dev: {
+        name?: string
+        email?: string
+        phone?: string
+        app: {
+          limit?: number
+          own: number
+          join: number
+        }
+        org: {
+          limit?: number
+          own: number
+          join: number
+        }
+      }
     }
   }
 
@@ -63,6 +78,18 @@ declare namespace User.Email {
       operator: 'register' | 'reset' | 'update'
       code: string
       password?: string
+    }
+  }
+}
+
+declare namespace User.Level {
+  namespace PUT {
+    interface RequestBody {
+      level: 1 | 50 | 99
+      name: string
+      email: string
+      phone: string
+      remark: string
     }
   }
 }

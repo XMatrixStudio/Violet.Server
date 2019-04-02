@@ -10,6 +10,7 @@ user.patch('/', userCtrl.patch) // 修改用户个人信息
 user.get('/:name', userCtrl.getByName) // 获取用户基本信息
 user.post('/email', userCtrl.postEmail) // 发送邮箱验证邮件
 user.put('/email', userCtrl.putEmail) // 验证邮箱
+user.put('/level', userCtrl.putLevel) // 申请更改用户等级
 user.post('/phone', userCtrl.postPhone) // 发送手机验证短信
 user.put('/phone', userCtrl.putPhone) // 验证手机
 user.post('/session', userCtrl.postSession) // 用户登陆
