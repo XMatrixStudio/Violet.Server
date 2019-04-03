@@ -18,6 +18,17 @@ export function connect(options?: redis.ClientOpts) {
   })
 }
 
+export function flushDB(): Promise<'OK'> {
+  return new Promise((resolve, reject) => {
+    client!.flushdb((err, result) => {
+      if (err) {
+        reject(err)
+      }
+      resolve(result)
+    })
+  })
+}
+
 export function get(key: string): Promise<string> {
   return new Promise((resolve, reject) => {
     client!.get(key, (err, result) => {
@@ -29,7 +40,7 @@ export function get(key: string): Promise<string> {
   })
 }
 
-export function set(key: string, value: string, time?: number): Promise<string> {
+export function set(key: string, value: string, time?: number): Promise<'OK'> {
   if (time === undefined) {
     return new Promise((resolve, reject) => {
       client!.set(key, value, (err, result) => {
@@ -40,7 +51,6 @@ export function set(key: string, value: string, time?: number): Promise<string> 
       })
     })
   }
-
   return new Promise((resolve, reject) => {
     client!.set(key, value, 'EX', time, (err, result) => {
       if (err) {

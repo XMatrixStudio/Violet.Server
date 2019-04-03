@@ -24,6 +24,6 @@ export function connect(url: string) {
   })
 }
 
-export function disconnect() {
-  mongoose.disconnect()
+export async function disconnect() {
+  await mongoose.disconnect()
 }

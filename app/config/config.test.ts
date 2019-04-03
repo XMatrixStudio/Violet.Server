@@ -5,7 +5,7 @@ beforeAll(() => {
 })
 
 // getMongoUrl
-describe('Test function getMongoUrl', () => {
+describe('Function getMongoUrl', () => {
   test('by default config', () => {
     expect(getMongoUrl()).toBe('mongodb://violet:violet_pwd@127.0.0.1:27017/violet_db')
   })
@@ -19,7 +19,7 @@ describe('Test function getMongoUrl', () => {
 })
 
 // getHttpUrl
-describe('Test function getHttpUrl', () => {
+describe('Function getHttpUrl', () => {
   test('by default config', () => {
     expect(getHttpUrl()).toBe('127.0.0.1:40002')
   })

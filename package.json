@@ -13,7 +13,7 @@
     "dev": "nodemon",
     "serve": "node dist/index.js",
     "test": "jest",
-    "testWithCoverage": "jest --forceExit --coverage --verbose"
+    "testWithCoverage": "jest --coverage --verbose"
   },
   "repository": {
     "type": "git",
