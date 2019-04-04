@@ -3,7 +3,7 @@ import { ObjectId } from 'bson'
 import db from '.'
 import { IUser } from './user'
 
-export interface Organization extends db.Document {
+export interface IOrganization extends db.Document {
   name: string // 组织名，全小写，用于索引
   rawName: string // 原始组织名
   createTime: Date // 注册时间
@@ -19,7 +19,7 @@ const orgSchema = new db.Schema({
   // _members: [{ type: ObjectId, ref: 'users' }]
 })
 
-const orgDB = db.model<Organization>('orgs', orgSchema)
+const orgDB = db.model<IOrganization>('orgs', orgSchema)
 
 /**
  * 创建组织
@@ -31,7 +31,7 @@ export async function add(userId: string, name: string): Promise<void> {
   await orgDB.create({ name: name.toLowerCase(), rawName: name, _owner: userId })
 }
 
-export async function getByName(name: string): Promise<Organization | null> {
+export async function getByName(name: string): Promise<IOrganization | null> {
   return await orgDB.findOne({ name: name.toLowerCase() })
 }
 
