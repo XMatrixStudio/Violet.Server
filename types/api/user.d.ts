@@ -82,12 +82,28 @@ declare namespace User.Email {
 }
 
 declare namespace User.Level {
-  namespace PUT {
+  namespace POST {
     interface RequestBody {
       level: 1 | 50 | 99
       name: string
       email: string
       phone: string
+      remark: string
+    }
+  }
+}
+
+declare namespace User.Level.App {
+  namespace POST {
+    interface RequestBody {
+      remark: string
+    }
+  }
+}
+
+declare namespace User.Level.Org {
+  namespace POST {
+    interface RequestBody {
       remark: string
     }
   }

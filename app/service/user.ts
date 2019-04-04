@@ -3,6 +3,7 @@ import config from '../config/config'
 import * as crypto from '../../lib/crypto'
 import * as file from '../../lib/file'
 import * as util from '../../lib/util'
+import * as requestModel from '../model/request'
 import * as userModel from '../model/user'
 
 /**
@@ -151,12 +152,26 @@ export async function updateLevel(id: string, level: 1 | 50 | 99, name: string, 
   const user = (await userModel.getById(id))!
   if (level === 1) {
     assert(user.level === 0, 'not_normal_user')
-    await userModel.addDeveloper(id, { name: name, email: email, phone: phone })
+    await userModel.addDeveloper(id, name, email, phone)
+    await requestModel.add(id, 0, remark, 1)
   } else if (level === 50) {
-    assert(false, 'not_implement')
+    assert(user.level === 1, 'not_developer')
+    assert(!(await requestModel.checkIfExistByTargetAndType(id, 1)), 'repeat_request')
+    await userModel.updateDevInfo(id, name, email, phone)
+    await requestModel.add(id, 1, remark)
   } else {
     assert(!(await userModel.checkIfExistByLevel(99)), 'limit_level')
     await userModel.updateLevel(id, 99)
+  }
+}
+
+export async function updateDevLimit(id: string, type: 'app' | 'org', remark: string) {
+  if (type === 'app') {
+    assert(!(await requestModel.checkIfExistByTargetAndType(id, 10)), 'repeat_request')
+    await requestModel.add(id, 10, remark)
+  } else {
+    assert(!(await requestModel.checkIfExistByTargetAndType(id, 11)), 'repeat_request')
+    await requestModel.add(id, 11, remark)
   }
 }
 

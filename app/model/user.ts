@@ -118,9 +118,17 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
   })
 }
 
-export async function addDeveloper(id: string, devData: Record<'name' | 'email' | 'phone', string>): Promise<void> {
-  const data = Object.assign(devData, { app: { limit: 5, own: 0, join: 0 }, org: { limit: 5, own: 0, join: 0 } })
-  await userDB.findByIdAndUpdate(id, { level: 1, dev: data })
+export async function addDeveloper(id: string, name: string, email: string, phone: string): Promise<void> {
+  await userDB.findByIdAndUpdate(id, {
+    level: 1,
+    dev: {
+      name: name,
+      email: email,
+      phone: phone,
+      app: { limit: 5, own: 0, join: 0 },
+      org: { limit: 5, own: 0, join: 0 }
+    }
+  })
 }
 
 export async function checkIfExistByLevel(level: number): Promise<boolean> {
@@ -165,6 +173,10 @@ export async function getByName(name: string): Promise<UserDocument | null> {
  */
 export async function getByPhone(phone: string): Promise<UserDocument | null> {
   return await userDB.findOne({ phone: phone.replace('+86', '') })
+}
+
+export async function updateDevInfo(id: string, name: string, email: string, phone: string) {
+  await userDB.findByIdAndUpdate(id, { $set: { 'dev.name': name, 'dev.email': email, 'dev.phone': phone } })
 }
 
 export async function updateDev(id: string, type: string, operator: number): Promise<void> {

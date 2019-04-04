@@ -145,8 +145,8 @@ export async function putEmail(ctx: Context): Promise<void> {
 /**
  * 申请更改用户等级
  */
-export async function putLevel(ctx: Context): Promise<void> {
-  const body = _.pick<User.Level.PUT.RequestBody>(ctx.request.body, ['level', 'name', 'email', 'phone', 'remark'])
+export async function postLevel(ctx: Context): Promise<void> {
+  const body = _.pick<User.Level.POST.RequestBody>(ctx.request.body, ['level', 'name', 'email', 'phone', 'remark'])
   assert.v({ data: body.level, type: 'number', enums: [1, 50, 99], message: 'invalid_level' })
   assert.v({ data: body.name, type: 'string', maxLength: 32, message: 'invalid_name' })
   assert.v({ data: body.email, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' })
@@ -154,7 +154,23 @@ export async function putLevel(ctx: Context): Promise<void> {
   assert.v({ data: body.remark, require: false, type: 'string', maxLength: 256, message: 'invalid_remark' })
 
   await userService.updateLevel(ctx.session!.user.id!, body.level!, body.name!, body.email!, body.phone!)
-  ctx.status = 200
+  ctx.status = 201
+}
+
+export async function postLevelApp(ctx: Context): Promise<void> {
+  const body = _.pick<User.Level.App.POST.RequestBody>(ctx.request.body, ['remark'])
+  assert.v({ data: body.remark, type: 'string', maxLength: 256, message: 'invalid_remark' })
+
+  await userService.updateDevLimit(ctx.session!.user.id!, 'app', body.remark!)
+  ctx.status = 201
+}
+
+export async function postLevelOrg(ctx: Context): Promise<void> {
+  const body = _.pick<User.Level.Org.POST.RequestBody>(ctx.request.body, ['remark'])
+  assert.v({ data: body.remark, type: 'string', maxLength: 256, message: 'invalid_remark' })
+
+  await userService.updateDevLimit(ctx.session!.user.id!, 'org', body.remark!)
+  ctx.status = 201
 }
 
 /**
