@@ -7,13 +7,14 @@ import * as userModel from '../model/user'
 
 /**
  * 获取用户信息
- *
+ * 使用ObjecId获取时返回所有信息，使用用户名获取时返回公开信息
  * @param {RequireOnlyOne<Record<'id' | 'name', string>>} data ObjectId或用户名
+ * @returns {User.GET.ResponseBody} 用户信息
  */
 export async function getInfo(data: RequireOnlyOne<Record<'id' | 'name', string>>): Promise<User.GET.ResponseBody> {
   if (data.id) {
     const user = (await userModel.getById(data.id))!
-    user.info.avatar = user.info.avatar || config!.file.cos.default
+    user.info.avatar = user.info.avatar || config!.file.cos.url + config!.file.cos.default
     return {
       email: user.email,
       phone: user.phone,
@@ -27,26 +28,29 @@ export async function getInfo(data: RequireOnlyOne<Record<'id' | 'name', string>
     const user = await userModel.getByName(data.name!)
     assert(user, 'not_found')
     user!.info.avatar = user!.info.avatar || config!.file.cos.url + config!.file.cos.default
-    if (user!.dev) {
-      delete user!.dev.name
-      delete user!.dev.email
-      delete user!.dev.phone
-      delete user!.dev.app.limit
-      delete user!.dev.org.limit
+    const devInfo = user!.dev && {
+      app: {
+        limit: user!.dev!.app.limit,
+        own: user!.dev!.app.own
+      },
+      org: {
+        limit: user!.dev!.org.limit,
+        own: user!.dev!.org.own,
+        join: user!.dev!.org.join
+      }
     }
     return {
       name: user!.rawName,
       level: user!.level,
       createTime: user!.createTime,
       info: user!.info,
-      dev: user!.dev
+      dev: devInfo
     }
   }
 }
 
 /**
  * 根据登陆邮箱获取用户名, 如果用户不存在则返回`null`
- *
  * @param {string} email 用户登陆邮箱
  * @returns {string | null} 用户名或
  */
@@ -57,7 +61,6 @@ export async function getUserNameByEmail(email: string): Promise<string | null> 
 
 /**
  * 根据登陆手机获取用户名, 如果用户不存在则返回`null`
- *
  * @param {string} phone 用户登陆手机
  * @returns {string | null} 用户名或
  */
@@ -68,7 +71,6 @@ export async function getUserNameByPhone(phone: string): Promise<string | null> 
 
 /**
  * 用户登陆
- *
  * @param {RequireOnlyOne<Record<'email' | 'phone' | 'name', string>>} data 用户唯一标识
  * @param {string} password 密码的SHA512散列值
  * @returns {User} 用户信息
@@ -90,7 +92,6 @@ export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'nam
 
 /**
  * 用户注册
- *
  * @param {string} email 用户登陆邮箱
  * @param {string} phone 用户登陆手机
  * @param {string} name 用户名
@@ -106,7 +107,6 @@ export async function register(email: string, phone: string, name: string, nickn
 
 /**
  * 重置用户密码
- *
  * @param {RequireOnlyOne<Record<'email' | 'phone', string>>} user 用户登陆邮箱或手机
  * @param {string} password 新密码的SHA512散列值
  */
@@ -123,7 +123,6 @@ export async function resetPassword(user: RequireOnlyOne<Record<'email' | 'phone
 
 /**
  * 更新用户登陆信息
- *
  * @param {string} id ObjectId
  * @param {RequireOnlyOne<Record<'email' | 'phone', string>>} user 用户登陆邮箱或手机
  */
@@ -137,7 +136,6 @@ export async function updateEmailOrPhone(id: string, user: RequireOnlyOne<Record
 
 /**
  * 更新用户个人信息
- *
  * @param {string} id ObjectId
  * @param {UserInfo} info 用户个人信息
  */
@@ -157,13 +155,13 @@ export async function updateLevel(id: string, level: 1 | 50 | 99, name: string, 
   } else if (level === 50) {
     assert(false, 'not_implement')
   } else {
-    assert(false, 'not_implement')
+    assert(!(await userModel.checkIfExistByLevel(99)), 'limit_level')
+    await userModel.updateLevel(id, 99)
   }
 }
 
 /**
  * 更新用户密码
- *
  * @param {string} id ObjectId
  * @param {string} oldPassword 旧密码的SHA512散列值
  * @param {string} newPassword 新密码的SHA512散列值

@@ -1,9 +1,10 @@
-import { initTestCacheDB } from '../../test'
+import * as init from '../../test'
 import * as redis from './redis'
 
-beforeAll(async () => {
-  initTestCacheDB()
-  await redis.flushDB()
+init.initTestCacheDB()
+
+afterAll(async () => {
+  await init.finishTestCacheDB()
 })
 
 // get, set, del

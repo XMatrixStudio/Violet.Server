@@ -18,6 +18,17 @@ export function connect(options?: redis.ClientOpts) {
   })
 }
 
+export function disconnect(): Promise<'OK'> {
+  return new Promise((resolve, reject) => {
+    client!.quit((err, result) => {
+      if (err) {
+        reject(err)
+      }
+      resolve(result)
+    })
+  })
+}
+
 export function flushDB(): Promise<'OK'> {
   return new Promise((resolve, reject) => {
     client!.flushdb((err, result) => {

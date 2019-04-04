@@ -17,14 +17,13 @@ declare namespace User {
         location?: string
         url?: string
       }
-      dev: {
+      dev?: {
         name?: string
         email?: string
         phone?: string
         app: {
           limit?: number
           own: number
-          join: number
         }
         org: {
           limit?: number

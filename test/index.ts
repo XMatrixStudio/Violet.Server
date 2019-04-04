@@ -1,6 +1,6 @@
 import { Config, initDefaultConfig, getMongoUrl } from '../app/config/config'
-import { connect as dbConnect } from '../app/model'
-import { connect as cacheConnect } from '../app/model/redis'
+import * as mongo from '../app/model'
+import * as redis from '../app/model/redis'
 
 export function initTestConfig() {
   initDefaultConfig('config.example.yml')
@@ -29,7 +29,7 @@ export function initTestDB() {
     exitFlag = true
   }
   if (exitFlag) process.exit(1)
-  dbConnect(
+  mongo.connect(
     getMongoUrl({
       db: {
         mongo: {
@@ -59,10 +59,19 @@ export function initTestCacheDB() {
     exitFlag = true
   }
   if (exitFlag) process.exit(1)
-  cacheConnect({
+  redis.connect({
     host: process.env.REDIS_TEST_HOST,
     port: parseInt(process.env.REDIS_TEST_PORT!),
     password: process.env.REDIS_TEST_PASSWORD,
     db: 2
   })
+  redis.flushDB()
+}
+
+export async function finishTestDB() {
+  await mongo.disconnect()
+}
+
+export async function finishTestCacheDB() {
+  await redis.disconnect()
 }

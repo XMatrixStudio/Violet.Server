@@ -1,11 +1,19 @@
 import * as request from 'supertest'
 
-import { initTestConfig } from '../../test'
+import * as init from '../../test'
 import { AppContext } from '../../types/context'
-initTestConfig()
+
+init.initTestConfig()
+init.initTestCacheDB()
+init.initTestDB()
 
 import * as app from '../'
 const agent = request.agent(app.callback())
+
+beforeAll(async () => {
+  await init.finishTestCacheDB()
+  await init.finishTestDB()
+})
 
 describe('POST /i/users/email', () => {
   const url = '/i/users/email'

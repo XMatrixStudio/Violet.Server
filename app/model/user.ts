@@ -13,7 +13,7 @@ export interface IUser {
     salt: string
   }
   info: IUserInfo // 个人信息
-  dev: IUserDev // 开发者信息
+  dev?: IUserDev // 开发者信息
 }
 
 export interface IUserInfo {
@@ -35,7 +35,6 @@ export interface IUserDev {
   app: {
     limit: number // 应用上限
     own: number // 所属应用数量
-    join: number // 协作应用数量
   }
   org: {
     limit: number // 组织上限
@@ -124,6 +123,10 @@ export async function addDeveloper(id: string, devData: Record<'name' | 'email' 
   await userDB.findByIdAndUpdate(id, { level: 1, dev: data })
 }
 
+export async function checkIfExistByLevel(level: number): Promise<boolean> {
+  return (await userDB.findOne({ level: level }).countDocuments()) !== 0
+}
+
 /**
  * 获取用户信息
  *
@@ -140,7 +143,7 @@ export async function getByEmail(email: string): Promise<UserDocument | null> {
  * @param {string} id ObjectId
  * @returns {User | null} 用户信息
  */
-export async function getById(id: string): Promise<UserDocument | null> {
+export async function getById(id: string): Promise<IUser | null> {
   return await userDB.findById(id)
 }
 
