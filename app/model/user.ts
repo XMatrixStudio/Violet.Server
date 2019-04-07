@@ -179,24 +179,20 @@ export async function updateDevInfo(id: string, name: string, email: string, pho
   await userDB.findByIdAndUpdate(id, { $set: { 'dev.name': name, 'dev.email': email, 'dev.phone': phone } })
 }
 
-export async function updateDev(id: string, type: string, operator: number): Promise<void> {
+export async function updateDevState(id: string, type: string, operator: number): Promise<void> {
   switch (type) {
-    case 'app.own': {
-      await userDB.findByIdAndUpdate(id, { $inc: { 'dev.app.own': operator } })
+    case 'app.own':
+      await userDB.updateOne({ _id: id }, { $inc: { 'dev.app.own': operator } })
       break
-    }
-    case 'app.member': {
-      await userDB.findByIdAndUpdate(id, { $inc: { 'dev.app.member': operator } })
+    case 'app.join':
+      await userDB.updateOne({ _id: id }, { $inc: { 'dev.app.join': operator } })
       break
-    }
-    case 'org.own': {
-      await userDB.findByIdAndUpdate(id, { $inc: { 'dev.org.own': operator } })
+    case 'org.own':
+      await userDB.updateOne({ _id: id }, { $inc: { 'dev.org.own': operator } })
       break
-    }
-    case 'org.member': {
-      await userDB.findByIdAndUpdate(id, { $inc: { 'dev.org.member': operator } })
+    case 'org.join':
+      await userDB.updateOne({ _id: id }, { $inc: { 'dev.org.join': operator } })
       break
-    }
   }
 }
 

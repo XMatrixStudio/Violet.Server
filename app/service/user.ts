@@ -4,6 +4,7 @@ import * as crypto from '../../lib/crypto'
 import * as file from '../../lib/file'
 import * as util from '../../lib/util'
 import * as requestModel from '../model/request'
+import * as orgModel from '../model/org'
 import * as userModel from '../model/user'
 
 /**
@@ -101,7 +102,7 @@ export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'nam
  */
 export async function register(email: string, phone: string, name: string, nickname: string, password: string): Promise<void> {
   assert(!util.isReservedUsername(name), 'reserved_name')
-  assert((await userModel.getByName(name)) === null, 'exist_name')
+  assert(!(await orgModel.getByName(name)) && !(await userModel.getByName(name)), 'exist_name')
   const hash = crypto.hashPassword(password)
   await userModel.add({ email: email, phone: phone, name: name, nickname: nickname, password: hash.password, salt: hash.salt })
 }

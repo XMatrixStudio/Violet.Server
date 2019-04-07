@@ -3,32 +3,59 @@ import { ObjectId } from 'bson'
 import db from '.'
 import { IUser } from './user'
 
-export interface IOrganization extends db.Document {
+export interface IOrganization {
+  _id: any // ObjectId
   name: string // 组织名，全小写，用于索引
   rawName: string // 原始组织名
   createTime: Date // 注册时间
   _owner: IUser // 组织所有人
-  // _members: User[] // 组织成员
+  contact: {
+    name: string
+    email: string
+    phone: string
+  }
+  info: {
+    description: string
+  }
 }
 
+interface OrganizationDocument extends db.Document, IOrganization {}
+
 const orgSchema = new db.Schema({
+  _owner: { type: ObjectId, ref: 'users', index: true, required: true },
   name: { type: String, index: { unique: true }, required: true },
   rawName: { type: String, required: true },
   createTime: { type: Date, default: new Date() },
-  _owner: { type: ObjectId, ref: 'users', index: true, required: true }
-  // _members: [{ type: ObjectId, ref: 'users' }]
+  contact: {
+    type: {
+      name: { type: String, required: true },
+      email: { type: String, required: true },
+      phone: { type: String, required: true }
+    },
+    required: true
+  },
+  info: {
+    type: {
+      description: String
+    }
+  }
 })
 
-const orgDB = db.model<IOrganization>('orgs', orgSchema)
+const orgDB = db.model<OrganizationDocument>('orgs', orgSchema)
 
-/**
- * 创建组织
- *
- * @param {string} userId 用户ObjectId
- * @param {string} name 组织名
- */
-export async function add(userId: string, name: string): Promise<void> {
-  await orgDB.create({ name: name.toLowerCase(), rawName: name, _owner: userId })
+export async function add(userId: string, name: string, description: string, contact: string, email: string, phone: string) {
+  await orgDB.create({
+    name: name.toLowerCase(),
+    rawName: name,
+    contact: {
+      name: contact,
+      email: email,
+      phone: phone
+    },
+    info: {
+      description: description
+    }
+  })
 }
 
 export async function getByName(name: string): Promise<IOrganization | null> {
