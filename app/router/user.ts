@@ -8,11 +8,12 @@ const user = new Router<IState, ICustom>()
 user.post('/', userCtrl.post) // 注册
 user.patch('/', userCtrl.patch) // 修改用户个人信息
 user.get('/:name', userCtrl.getByName) // 获取用户基本信息
+user.get('/:name/orgs', userCtrl.getOrgsByName) // 获取用户的组织列表
 user.post('/email', userCtrl.postEmail) // 发送邮箱验证邮件
 user.put('/email', userCtrl.putEmail) // 验证邮箱
-user.post('/levels', userCtrl.postLevel) // 申请更改用户等级
-user.post('/levels/apps', userCtrl.postLevelApp) // 申请提高用户应用上限
-user.post('/levels/orgs', userCtrl.postLevelOrg) // 申请提高用户组织上限
+user.post('/levels', userCtrl.postLevels) // 申请更改用户等级
+user.post('/levels/apps', userCtrl.postLevelsApps) // 申请提高用户应用上限
+user.post('/levels/orgs', userCtrl.postLevelsOrgs) // 申请提高用户组织上限
 user.post('/phone', userCtrl.postPhone) // 发送手机验证短信
 user.put('/phone', userCtrl.putPhone) // 验证手机
 user.post('/session', userCtrl.postSession) // 用户登陆

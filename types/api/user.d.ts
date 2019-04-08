@@ -109,6 +109,26 @@ declare namespace User.Level.Org {
   }
 }
 
+declare namespace User.Orgs {
+  interface IOrg {
+    name: string
+    avatar: string
+    create_time: Date
+    description: string
+  }
+
+  namespace GET {
+    interface ResponseBody {
+      pagination: {
+        page: number
+        limit: number
+        total: number
+      }
+      data: IOrg[]
+    }
+  }
+}
+
 declare namespace User.Phone {
   namespace POST {
     interface RequestBody {

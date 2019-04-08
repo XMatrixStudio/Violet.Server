@@ -79,6 +79,22 @@ export async function getByName(ctx: Context): Promise<void> {
   ctx.status = 200
 }
 
+export async function getOrgsByName(ctx: Context): Promise<void> {
+  if (ctx.params.name === 'me') {
+    await verify.requireLogin(ctx)
+
+    const body = _.pick(ctx.request.query, ['page', 'limit'])
+    body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+    body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+    ctx.body = await userService.getOrgsBaseInfo({ id: ctx.session!.user.id! }, body.page, body.limit)
+  } else {
+    const body = _.pick(ctx.request.query, ['page', 'limit'])
+    body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+    body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+    ctx.body = await userService.getOrgsBaseInfo({ name: ctx.params.name }, body.page, body.limit)
+  }
+}
+
 /**
  * 发送邮箱验证邮件
  */
@@ -145,7 +161,7 @@ export async function putEmail(ctx: Context): Promise<void> {
 /**
  * 申请更改用户等级
  */
-export async function postLevel(ctx: Context): Promise<void> {
+export async function postLevels(ctx: Context): Promise<void> {
   const body = _.pick<User.Level.POST.RequestBody>(ctx.request.body, ['level', 'name', 'email', 'phone', 'remark'])
   assert.v({ data: body.level, type: 'number', enums: [1, 50, 99], message: 'invalid_level' })
   assert.v({ data: body.name, type: 'string', maxLength: 32, message: 'invalid_name' })
@@ -157,7 +173,7 @@ export async function postLevel(ctx: Context): Promise<void> {
   ctx.status = 201
 }
 
-export async function postLevelApp(ctx: Context): Promise<void> {
+export async function postLevelsApps(ctx: Context): Promise<void> {
   const body = _.pick<User.Level.App.POST.RequestBody>(ctx.request.body, ['remark'])
   assert.v({ data: body.remark, type: 'string', maxLength: 256, message: 'invalid_remark' })
 
@@ -165,7 +181,7 @@ export async function postLevelApp(ctx: Context): Promise<void> {
   ctx.status = 201
 }
 
-export async function postLevelOrg(ctx: Context): Promise<void> {
+export async function postLevelsOrgs(ctx: Context): Promise<void> {
   const body = _.pick<User.Level.Org.POST.RequestBody>(ctx.request.body, ['remark'])
   assert.v({ data: body.remark, type: 'string', maxLength: 256, message: 'invalid_remark' })
 

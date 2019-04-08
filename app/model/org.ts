@@ -15,6 +15,7 @@ export interface IOrganization {
     phone: string
   }
   info: {
+    avatar: string
     description: string
   }
 }
@@ -36,6 +37,7 @@ const orgSchema = new db.Schema({
   },
   info: {
     type: {
+      avatar: String,
       description: String
     }
   }
@@ -62,6 +64,13 @@ export async function getByName(name: string): Promise<IOrganization | null> {
   return await orgDB.findOne({ name: name.toLowerCase() })
 }
 
-export async function getCountByOwner(userId: string): Promise<number> {
+export async function getCountByUserId(userId: string): Promise<number> {
   return await orgDB.find({ _owner: userId }).countDocuments()
+}
+
+export async function getListByUserId(userId: string, page: number, limit: number): Promise<IOrganization[]> {
+  return await orgDB
+    .find({ _owner: userId })
+    .skip(limit * (page - 1))
+    .limit(limit)
 }

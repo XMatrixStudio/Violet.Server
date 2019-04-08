@@ -6,6 +6,7 @@ import * as util from '../../lib/util'
 import * as requestModel from '../model/request'
 import * as orgModel from '../model/org'
 import * as userModel from '../model/user'
+import { totalmem } from 'os';
 
 /**
  * 获取用户信息
@@ -48,6 +49,39 @@ export async function getInfo(data: RequireOnlyOne<Record<'id' | 'name', string>
       info: user!.info,
       dev: devInfo
     }
+  }
+}
+
+export async function getOrgsBaseInfo(
+  uid: RequireOnlyOne<Record<'id' | 'name', string>>,
+  page: number,
+  limit: number
+): Promise<User.Orgs.GET.ResponseBody> {
+  let id: string
+  if (uid.id !== undefined) id = uid.id
+  else {
+    const user = await userModel.getByName(uid.name)
+    assert(user, 'not_exist_user')
+    id = user!._id
+  }
+  const orgs = await orgModel.getListByUserId(id, page, limit)
+  const total = await orgModel.getCountByUserId(id)
+  const data: User.Orgs.IOrg[] = []
+  for (const i in orgs) {
+    data[i] = {
+      name: orgs[i].rawName,
+      avatar: orgs[i].info.avatar || config!.file.cos.url + config!.file.cos.default,
+      create_time: orgs[i].createTime,
+      description: orgs[i].info.description
+    }
+  }
+  return {
+    pagination: {
+      page: page,
+      limit: limit,
+      total: total
+    },
+    data: data
   }
 }
 
