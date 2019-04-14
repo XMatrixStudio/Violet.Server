@@ -81,8 +81,7 @@ const userSchema = new db.Schema({
       app: {
         type: {
           limit: { type: Number, default: 5 },
-          own: { type: Number, default: 0 },
-          join: { type: Number, default: 0 }
+          own: { type: Number, default: 0 }
         }
       },
       org: {

@@ -18,6 +18,10 @@ export interface IOrganization {
     avatar: string
     description: string
   }
+  app: {
+    limit: number // 应用上限
+    own: number // 所属应用数量
+  }
 }
 
 interface OrganizationDocument extends db.Document, IOrganization {}
@@ -39,6 +43,12 @@ const orgSchema = new db.Schema({
     type: {
       avatar: String,
       description: String
+    }
+  },
+  app: {
+    type: {
+      limit: { type: Number, default: 5 },
+      own: { type: Number, default: 0 }
     }
   }
 })
