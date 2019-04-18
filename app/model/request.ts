@@ -26,8 +26,12 @@ const requestSchema = new db.Schema({
 
 const requestDB = db.model<RequestDocument>('requests', requestSchema)
 
-export async function add(targetId: string, type: number, remark?: string, state: number = 0) {
-  await requestDB.create({ targetId: targetId, type: type, remark: remark, state: state })
+export async function addUser(userId: string, type: number, remark?: string, state: number = 0) {
+  await requestDB.create({ _target: userId, __target: 'users', type: type, remark: remark, state: state })
+}
+
+export async function addOrganization(orgId: string, type: number, remark?: string, state: number = 0) {
+  await requestDB.create({ _target: orgId, __target: 'orgs', type: type, remark: remark, state: state })
 }
 
 export async function checkIfExistByTargetAndType(targetId: string, type: number): Promise<boolean> {
