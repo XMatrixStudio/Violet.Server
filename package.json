@@ -35,7 +35,7 @@
     "cos-nodejs-sdk-v5": "^2.5.7",
     "csprng": "^0.1.2",
     "github-reserved-names": "^1.1.5",
-    "js-yaml": "^3.13.0",
+    "js-yaml": "^3.13.1",
     "koa": "^2.7.0",
     "koa-bodyparser": "^4.2.1",
     "koa-helmet": "^4.1.0",

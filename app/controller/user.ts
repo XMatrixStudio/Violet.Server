@@ -99,6 +99,37 @@ export async function getOrgsByName(ctx: Context): Promise<void> {
   }
 }
 
+export async function getAuths(ctx: Context) {
+  const body = _.pick(ctx.request.query, ['page', 'limit'])
+  body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+  body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+  ctx.body = await userService.getAuths(ctx.session!.user.id!, body.page, body.limit)
+  ctx.status = 200
+}
+
+export async function postAuths(ctx: Context) {
+  const body = _.pick(ctx.request.body, ['app', 'duration'])
+  assert.v(
+    { data: body.app, type: 'string', regExp: regexp.Name, message: 'invalid_app' },
+    { data: body.duration, type: 'number', enums: [0, 1, 7, 30, 90], message: 'invalid_duration' }
+  )
+  await userService.auth(ctx.session!.user.id!, body.app, body.duration)
+  ctx.status = 201
+}
+
+export async function deleteAuths(ctx: Context) {
+  const body = _.pick(ctx.request.body, ['app'])
+  assert.v({ data: body.app, type: 'string', regExp: regexp.Name, message: 'invalid_app' })
+  await userService.removeAuth(ctx.session!.user.id!, body.app)
+  ctx.status = 204
+}
+
+export async function getAuthsByApp(ctx: Context) {
+  assert.v({ data: ctx.params.app, type: 'string', regExp: regexp.Name, message: 'invalid_app' })
+  ctx.body = await userService.getAuth(ctx.session!.user.id!, ctx.params.app)
+  ctx.status = 200
+}
+
 /**
  * 发送邮箱验证邮件
  */

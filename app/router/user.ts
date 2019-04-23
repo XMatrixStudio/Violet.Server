@@ -9,6 +9,10 @@ user.post('/', userCtrl.post) // 注册
 user.patch('/', userCtrl.patch) // 修改用户个人信息
 user.get('/:name', userCtrl.getByName) // 获取用户基本信息
 user.get('/:name/orgs', userCtrl.getOrgsByName) // 获取用户的组织列表
+user.get('/auths', userCtrl.getAuths) // 获取授权列表
+user.post('/auths', userCtrl.postAuths) // 添加授权
+user.delete('/auths', userCtrl.deleteAuths) // 删除授权
+user.get('/auths/:app', userCtrl.getAuthsByApp) // 获取授权信息
 user.post('/email', userCtrl.postEmail) // 发送邮箱验证邮件
 user.put('/email', userCtrl.putEmail) // 验证邮箱
 user.post('/levels', userCtrl.postLevels) // 申请更改用户等级

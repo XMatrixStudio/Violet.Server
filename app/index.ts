@@ -6,6 +6,7 @@ import * as morgan from 'koa-morgan'
 import * as session from 'koa-session'
 
 import { IState, ICustom } from '../types/context'
+import * as redis from './model/redis'
 import * as router from './router'
 import config from './config/config'
 
@@ -23,12 +24,13 @@ app.keys = ['cookieKey']
 app.use(
   session(
     {
-      key: 'key',
+      key: 'koa:sess',
       maxAge: 1296000000,
       overwrite: true,
       httpOnly: true,
       signed: true,
-      rolling: false
+      rolling: false,
+      store: redis.getSessionStore()
     },
     app as any
   )

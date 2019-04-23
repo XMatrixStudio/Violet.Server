@@ -1,3 +1,4 @@
+import { stores } from 'koa-session'
 import * as redis from 'redis'
 
 let client: redis.RedisClient | undefined = undefined
@@ -38,6 +39,26 @@ export function flushDB(): Promise<'OK'> {
       resolve(result)
     })
   })
+}
+
+export function getSessionStore(): stores {
+  return {
+    async get(key: string): Promise<any> {
+      const res = await get(key)
+      if (!res) return null
+      return JSON.parse(res)
+    },
+
+    async set(key: string, value: any, maxAge: number) {
+      maxAge = typeof maxAge === 'number' ? maxAge / 1000 : 86400
+      value = JSON.stringify(value)
+      await set(key, value, maxAge)
+    },
+
+    async destroy(key: string) {
+      await del(key)
+    }
+  }
 }
 
 export function get(key: string): Promise<string> {
@@ -82,16 +103,3 @@ export function del(key: string): Promise<number> {
     })
   })
 }
-
-/*
-  // test
-  import * as redisClient from '../lib/redis'
-  async function test() {
-    console.log('get', await redisClient.get('test12')) // get null
-    console.log('set', await redisClient.set('test12', '10086')) // set OK
-    console.log('get', await redisClient.get('test12')) // get 10086
-    console.log('del', await redisClient.del('test12')) // del 1
-    console.log('get', await redisClient.get('test12')) // get null
-  }
-  test()
-*/

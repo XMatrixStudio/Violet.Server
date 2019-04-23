@@ -3,10 +3,17 @@ import config from '../config/config'
 import * as crypto from '../../lib/crypto'
 import * as file from '../../lib/file'
 import * as util from '../../lib/util'
+import * as appModel from '../model/app'
 import * as logModel from '../model/log'
 import * as orgModel from '../model/org'
 import * as requestModel from '../model/request'
 import * as userModel from '../model/user'
+
+export async function auth(id: string, appName: string, duration: number) {
+  const app = await appModel.getByName(appName)
+  assert(app, 'not_exist_app')
+  await userModel.addAuth(id, app!._id, duration)
+}
 
 /**
  * 获取用户的所有信息
@@ -30,6 +37,25 @@ export async function getAllInfo(id: string): Promise<User.GET.ResponseBody> {
       password: log.password[0] && log.password[0].time
     }
   }
+}
+
+export async function getAuth(id: string, appName: string): Promise<any> {
+  const app = await appModel.getByName(appName)
+  assert(app, 'not_exist_app')
+  const auth = await userModel.getAuthById(id, app!._id)
+  if (!auth) {
+    return { auth: false }
+  }
+  return {
+    auth: true,
+    time: auth.time,
+    duration: auth.duration
+  }
+}
+
+export async function getAuths(id: string, page: number, limit: number): Promise<any> {
+  const auths = await userModel.getAuths(id, page, limit)
+  return { data: auths }
 }
 
 /**
@@ -166,6 +192,12 @@ export async function register(email: string, phone: string, name: string, nickn
   const hash = crypto.hashPassword(password)
   const id = await userModel.add({ email: email, phone: phone, name: name, nickname: nickname, password: hash.password, salt: hash.salt })
   await logModel.addUser(id)
+}
+
+export async function removeAuth(id: string, appName: string) {
+  const app = await appModel.getByName(appName)
+  assert(app, 'not_exist_app')
+  await userModel.removeAuth(id, app!._id)
 }
 
 /**

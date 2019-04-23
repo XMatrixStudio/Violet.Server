@@ -17,10 +17,7 @@ export interface IUser {
     salt: string
   }
   info: IUserInfo // 个人信息
-  auth: {
-    app: IApplication
-    time: Date
-  }[]
+  auth: IUserAuth[]
   dev?: IUserDev // 开发者信息
 }
 
@@ -34,6 +31,12 @@ export interface IUserInfo {
   nickname: string // 昵称
   phone: string // 联系电话
   url: string // 个人URL
+}
+
+export interface IUserAuth {
+  app: IApplication
+  time: Date
+  duration: number
 }
 
 export interface IUserDev {
@@ -61,7 +64,7 @@ const userSchema = new db.Schema({
   level: { type: Number, default: 0 },
   createTime: {
     type: Date,
-    default: new Date()
+    default: Date.now
   },
   info: {
     avatar: String,
@@ -84,7 +87,8 @@ const userSchema = new db.Schema({
   auth: [
     {
       app: { type: ObjectId, ref: 'apps', required: true },
-      time: { type: Date, default: new Date() }
+      time: { type: Date, default: Date.now },
+      duration: Number
     }
   ],
   dev: {
@@ -133,8 +137,17 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
   return user._id
 }
 
-export async function addAuth(id: string, appId: string): Promise<void> {
-  await userDB.updateOne({ _id: id, 'auth.app': { $ne: appId } }, { $push: { auth: { app: appId } } })
+export async function addAuth(id: string, appId: string, duration: number): Promise<void> {
+  const result = await userDB.updateOne(
+    { _id: id, 'auth.app': { $ne: appId } },
+    { $push: { auth: { $each: [{ app: appId, duration: duration }], $sort: { time: -1 } } } }
+  )
+  if (result.n === 0) {
+    await userDB.updateOne(
+      { _id: id, 'auth.app': appId },
+      { 'auth.$.time': Date.now(), $push: { auth: { $each: [], $sort: { time: -1 } } } }
+    )
+  }
 }
 
 export async function addDeveloper(id: string, name: string, email: string, phone: string): Promise<void> {
@@ -152,6 +165,18 @@ export async function addDeveloper(id: string, name: string, email: string, phon
 
 export async function checkIfExistByLevel(level: number): Promise<boolean> {
   return (await userDB.findOne({ level: level }).countDocuments()) !== 0
+}
+
+export async function getAuthById(id: string, appId: string): Promise<IUserAuth | null> {
+  const user = await userDB.findOne({ _id: id, 'auth.app': appId }, { 'auth.$': 1, 'auth.$._id': 0 })
+  if (!user) return null
+  return user.auth[0]
+}
+
+export async function getAuths(id: string, page: number, limit: number): Promise<IUserAuth[]> {
+  const user = await userDB.findById(id, { auth: { $skip: (page - 1) * limit, $limit: limit }, 'auth.$': 1, 'auth.$._id': 0 })
+  if (!user) return []
+  return user.auth
 }
 
 /**
@@ -206,6 +231,10 @@ export async function getLevelById(id: string): Promise<number> {
     return level
   }
   return parseInt(levelStr)
+}
+
+export async function removeAuth(id: string, appId: string) {
+  await userDB.updateOne({ _id: id, 'auth.app': appId }, { $pull: { auth: { app: appId } } })
 }
 
 export async function updateDevInfo(id: string, name: string, email: string, phone: string) {
