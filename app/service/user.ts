@@ -3,17 +3,42 @@ import config from '../config/config'
 import * as crypto from '../../lib/crypto'
 import * as file from '../../lib/file'
 import * as util from '../../lib/util'
-import * as requestModel from '../model/request'
+import * as logModel from '../model/log'
 import * as orgModel from '../model/org'
+import * as requestModel from '../model/request'
 import * as userModel from '../model/user'
+
+/**
+ * 获取用户的所有信息
+ * @param {string} id 用户ObjectId
+ * @returns {User.GET.ResponseBody} 用户信息
+ */
+export async function getAllInfo(id: string): Promise<User.GET.ResponseBody> {
+  const user = (await userModel.getById(id))!
+  user.info.avatar = user.info.avatar || config!.file.cos.url + config!.file.cos.default
+  const log = (await logModel.getUserLog(id))!
+  return {
+    email: user.email,
+    phone: user.phone,
+    name: user.rawName,
+    level: user.level,
+    createTime: user.createTime,
+    info: user.info,
+    dev: user.dev,
+    log: {
+      login: log.login,
+      password: log.password[0] && log.password[0].time
+    }
+  }
+}
 
 /**
  * 获取用户信息
  * 使用ObjecId获取时返回所有信息，使用用户名获取时返回公开信息
- * @param {RequireOnlyOne<Record<'id' | 'name', string>>} data ObjectId或用户名
+ * @param {OnlyOne<Record<'id' | 'name', string>>} data ObjectId或用户名
  * @returns {User.GET.ResponseBody} 用户信息
  */
-export async function getInfo(data: RequireOnlyOne<Record<'id' | 'name', string>>): Promise<User.GET.ResponseBody> {
+export async function getInfo(data: OnlyOne<Record<'id' | 'name', string>>): Promise<User.GET.ResponseBody> {
   if (data.id) {
     const user = (await userModel.getById(data.id))!
     user.info.avatar = user.info.avatar || config!.file.cos.url + config!.file.cos.default
@@ -106,11 +131,12 @@ export async function getUserNameByPhone(phone: string): Promise<string | null> 
 
 /**
  * 用户登陆
- * @param {RequireOnlyOne<Record<'email' | 'phone' | 'name', string>>} data 用户唯一标识
+ * @param {OnlyOne<Record<'email' | 'phone' | 'name', string>>} data 用户唯一标识
  * @param {string} password 密码的SHA512散列值
+ * @param {string} ip 用户登陆IP
  * @returns {User} 用户信息
  */
-export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'name', string>>, password: string): Promise<userModel.IUser> {
+export async function login(data: OnlyOne<Record<'email' | 'phone' | 'name', string>>, password: string, ip: string): Promise<string> {
   let user: userModel.IUser | null
   if (data.email) {
     user = await userModel.getByEmail(data.email)
@@ -122,7 +148,8 @@ export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'nam
   assert(user, 'error_user_or_password') // 用户不存在
   const hash = crypto.hashPassword(password, user!.secure.salt)
   assert(hash.password === user!.secure.password, 'error_user_or_password') // 密码错误
-  return user!
+  await logModel.addLogin(user!._id, ip)
+  return user!._id
 }
 
 /**
@@ -133,11 +160,12 @@ export async function login(data: RequireOnlyOne<Record<'email' | 'phone' | 'nam
  * @param {string} nickname 昵称
  * @param {string} password 密码的SHA512散列值
  */
-export async function register(email: string, phone: string, name: string, nickname: string, password: string): Promise<void> {
+export async function register(email: string, phone: string, name: string, nickname: string, password: string) {
   assert(!util.isReservedUsername(name), 'reserved_name')
   assert(!(await orgModel.getByName(name)) && !(await userModel.getByName(name)), 'exist_name')
   const hash = crypto.hashPassword(password)
-  await userModel.add({ email: email, phone: phone, name: name, nickname: nickname, password: hash.password, salt: hash.salt })
+  const id = await userModel.add({ email: email, phone: phone, name: name, nickname: nickname, password: hash.password, salt: hash.salt })
+  await logModel.addUser(id)
 }
 
 /**

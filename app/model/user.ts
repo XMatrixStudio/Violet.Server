@@ -1,4 +1,8 @@
+import { ObjectId } from 'bson'
+
 import db from '.'
+import { IApplication } from './app'
+import * as redis from './redis'
 
 export interface IUser {
   _id: any // ObjectId
@@ -13,6 +17,10 @@ export interface IUser {
     salt: string
   }
   info: IUserInfo // 个人信息
+  auth: {
+    app: IApplication
+    time: Date
+  }[]
   dev?: IUserDev // 开发者信息
 }
 
@@ -73,6 +81,12 @@ const userSchema = new db.Schema({
     },
     required: true
   },
+  auth: [
+    {
+      app: { type: ObjectId, ref: 'apps', required: true },
+      time: { type: Date, default: new Date() }
+    }
+  ],
   dev: {
     type: {
       name: String,
@@ -100,9 +114,10 @@ const userDB = db.model<UserDocument>('users', userSchema)
 /**
  * 添加用户
  * @param {Record<'email' | 'phone' | 'name' | 'nickname' | 'password' | 'salt', string>} data 用户数据
+ * @returns {string} 新用户的ObjectId
  */
-export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' | 'password' | 'salt', string>): Promise<void> {
-  await userDB.create({
+export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' | 'password' | 'salt', string>): Promise<string> {
+  const user = await userDB.create({
     email: data.email,
     phone: data.phone,
     name: data.name.toLowerCase(),
@@ -115,6 +130,11 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
       salt: data.salt
     }
   })
+  return user._id
+}
+
+export async function addAuth(id: string, appId: string): Promise<void> {
+  await userDB.updateOne({ _id: id, 'auth.app': { $ne: appId } }, { $push: { auth: { app: appId } } })
 }
 
 export async function addDeveloper(id: string, name: string, email: string, phone: string): Promise<void> {
@@ -156,11 +176,10 @@ export async function getById(id: string): Promise<IUser | null> {
 
 /**
  * 获取用户信息
- *
  * @param {string} name 用户名
  * @returns {User | null} 用户信息
  */
-export async function getByName(name: string): Promise<UserDocument | null> {
+export async function getByName(name: string): Promise<IUser | null> {
   return await userDB.findOne({ name: name.toLowerCase() })
 }
 
@@ -172,6 +191,21 @@ export async function getByName(name: string): Promise<UserDocument | null> {
  */
 export async function getByPhone(phone: string): Promise<UserDocument | null> {
   return await userDB.findOne({ phone: phone.replace('+86', '') })
+}
+
+/**
+ * 获取用户等级
+ * @param {string} id 用户ObjectId
+ * @returns {number} 用户等级
+ */
+export async function getLevelById(id: string): Promise<number> {
+  const levelStr = await redis.get(`level-${id}`)
+  if (levelStr === null) {
+    const level = (await getById(id))!.level
+    await redis.set(`level-${id}`, level.toString(), 1296000)
+    return level
+  }
+  return parseInt(levelStr)
 }
 
 export async function updateDevInfo(id: string, name: string, email: string, phone: string) {

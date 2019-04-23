@@ -1,6 +1,7 @@
 import * as _ from 'lodash'
 
 import * as assert from '../../lib/assert'
+import * as regexp from '../../lib/regexp'
 import * as store from '../../lib/store'
 import * as verify from '../../lib/verify'
 import { Context } from '../../types/context'
@@ -16,11 +17,13 @@ const urlExp = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\
 /**
  * 注册用户
  */
-export async function post(ctx: Context): Promise<void> {
+export async function post(ctx: Context) {
   const body = _.pick<User.POST.RequestBody>(ctx.request.body, ['name', 'nickname', 'password'])
-  assert.v({ data: body.name, type: 'string', regExp: nameExp, message: 'invalid_name' })
-  assert.v({ data: body.nickname, require: false, type: 'string', maxLength: 32, message: 'invalid_nickname' })
-  assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+  assert.v(
+    { data: body.name, type: 'string', regExp: regexp.Name, message: 'invalid_name' },
+    { data: body.nickname, require: false, type: 'string', maxLength: 32, message: 'invalid_nickname' },
+    { data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' }
+  )
   body.nickname = body.nickname || body.name!
 
   assert(ctx.session!.user.register, 'not_exist_register_record')
@@ -69,12 +72,13 @@ export async function patch(ctx: Context): Promise<void> {
 /**
  * 获取用户信息
  */
-export async function getByName(ctx: Context): Promise<void> {
+export async function getByName(ctx: Context) {
   if (ctx.params.name === 'me') {
     await verify.requireLogin(ctx)
-    ctx.body = await userService.getInfo({ id: ctx.session!.user.id! })
+    ctx.body = await userService.getAllInfo(ctx.session!.user.id!)
   } else {
-    ctx.body = await userService.getInfo({ name: ctx.params.name })
+    throw 'not_implementation'
+    // ctx.body = await userService.getInfo({ name: ctx.params.name })
   }
   ctx.status = 200
 }
@@ -255,35 +259,36 @@ export async function putPhone(ctx: Context): Promise<void> {
 /**
  * 用户登陆
  */
-export async function postSession(ctx: Context): Promise<void> {
+export async function postSession(ctx: Context) {
   const body = _.pick<User.Session.POST.RequestBody>(ctx.request.body, ['user', 'password', 'remember'])
-  assert.v({ data: body.user, type: 'string', message: 'invalid_user' })
-  assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+  assert.v(
+    { data: body.user, type: 'string', message: 'invalid_user' },
+    { data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' }
+  )
   body.remember = body.remember === true
 
-  let user
+  let userId
   if (body.user!.indexOf('@') !== -1) {
-    assert.v({ data: body.user, type: 'string', maxLength: 64, regExp: emailExp, message: 'invalid_email' })
-    user = await userService.login({ email: body.user! }, body.password!)
+    assert.v({ data: body.user, type: 'string', maxLength: 64, regExp: regexp.Email, message: 'invalid_email' })
+    userId = await userService.login({ email: body.user! }, body.password!, ctx.request.ip)
   } else if (body.user![0] >= '0' && body.user![0] <= '9') {
-    assert.v({ data: body.user, type: 'string', minLength: 11, maxLength: 11, message: 'invalid_phone' })
-    user = await userService.login({ phone: body.user! }, body.password!)
+    assert.v({ data: body.user, type: 'string', regExp: regexp.Phone, message: 'invalid_phone' })
+    userId = await userService.login({ phone: body.user! }, body.password!, ctx.request.ip)
   } else {
     assert.v({ data: body.user, type: 'string', regExp: nameExp, message: 'invalid_name' })
-    user = await userService.login({ name: body.user! }, body.password!)
+    userId = await userService.login({ name: body.user! }, body.password!, ctx.request.ip)
   }
 
-  ctx.session!.user.id = user._id
+  ctx.session!.user.id = userId
   ctx.session!.user.time = Date.now()
   ctx.session!.user.remember = body.remember
-  await store.setUserLevelById(user._id, user.level)
   ctx.status = 201
 }
 
 /**
  * 用户登出
  */
-export async function deleteSession(ctx: Context): Promise<void> {
+export async function deleteSession(ctx: Context) {
   ctx.session = null
   ctx.status = 204
 }

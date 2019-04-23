@@ -31,6 +31,13 @@ declare namespace User {
           join: number
         }
       }
+      log?: {
+        login: {
+          time: Date
+          ip: string
+        }[]
+        password: Date | undefined
+      }
     }
   }
 
