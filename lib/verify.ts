@@ -4,19 +4,9 @@ import * as moment from 'moment'
 import * as mustache from 'mustache'
 import * as Mailer from 'nodemailer'
 
-import * as config from '../app/config/config'
+import * as userModel from '../app/model/user'
 import { Context } from '../types/context'
 import * as assert from './assert'
-import * as store from './store'
-
-/**
- * 检查用户等级
- * 当用户已被封禁时, 抛出`ban_user`错误.
- * @param {Context} ctx Koa上下文
- */
-export async function checkBannedState(ctx: Context): Promise<void> {
-  assert((await store.getUserLevelById(ctx.session!.user.id!)) >= 0, 'ban_user', 403)
-}
 
 /**
  * 检查图形验证码, 并且清除Session中的验证码记录
@@ -137,7 +127,7 @@ export async function requireLogin(ctx: Context): Promise<void> {
  * @param {number} [minLevel] 用户最小所需的等级，默认为0
  */
 export async function requireMinUserLevel(ctx: Context, minLevel: number = 0): Promise<void> {
-  assert((await store.getUserLevelById(ctx.session!.user.id!)) >= minLevel, 'permission_deny', 403)
+  assert((await userModel.getLevelById(ctx.session!.user.id!)) >= minLevel, 'permission_deny', 403)
 }
 
 const mailer = Mailer.createTransport({

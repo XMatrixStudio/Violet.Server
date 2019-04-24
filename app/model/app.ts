@@ -11,7 +11,8 @@ export interface IApplication {
   name: string // 项目名，全小写
   rawName: string // 原始项目名
   createTime: Date // 创建时间
-  type: number
+  type: number // 类型
+  state: number // 状态，0 - 运行中，1 - 已暂停
   key: string // 密钥
   callback: string // 回调地址
   info: {
@@ -30,6 +31,7 @@ const appSchema = new db.Schema({
   rawName: { type: String, required: true },
   createTime: { type: Date, default: new Date() },
   type: { type: Number },
+  state: { type: Number, default: 0 },
   key: { type: String, required: true },
   callback: String,
   info: {
@@ -43,7 +45,7 @@ const appSchema = new db.Schema({
 
 const appDB = db.model<ApplicationDocument>('apps', appSchema)
 
-export async function add(
+export async function addUser(
   name: string,
   owner: string,
   description: string,
@@ -53,6 +55,7 @@ export async function add(
 ): Promise<string> {
   const app = await appDB.create({
     _owner: owner,
+    __owner: 'users',
     name: name.toLowerCase(),
     rawName: name,
     type: type,
@@ -68,6 +71,17 @@ export async function add(
 
 export async function getByName(name: string): Promise<IApplication | null> {
   return await appDB.findOne({ name: name.toLowerCase() })
+}
+
+export async function getCountByOwner(ownerId: string): Promise<number> {
+  return await appDB.countDocuments({ _owner: ownerId })
+}
+
+export async function getListByOwner(ownerId: string, page: number, limit: number): Promise<IApplication[]> {
+  return await appDB
+    .find({ _owner: ownerId })
+    .skip((page - 1) * limit)
+    .limit(limit)
 }
 
 export async function setAvatar(id: string, avatar: string) {

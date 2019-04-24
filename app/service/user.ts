@@ -39,6 +39,39 @@ export async function getAllInfo(id: string): Promise<User.GET.ResponseBody> {
   }
 }
 
+export async function getAppsBaseInfo(
+  u: OnlyOne<{ id: string; name: string }>,
+  page: number,
+  limit: number
+): Promise<User.Apps.GET.ResponseBody> {
+  let id: string
+  if (u.id !== undefined) id = u.id
+  else {
+    const user = await userModel.getByName(u.name)
+    assert(user, 'not_exist_user')
+    id = user!._id
+  }
+  const apps = await appModel.getListByOwner(id, page, limit)
+  const total = await appModel.getCountByOwner(id)
+  const data: User.Apps.IApp[] = []
+  for (const i in apps) {
+    data[i] = {
+      name: apps[i].rawName,
+      avatar: apps[i].info.avatar || config!.file.cos.url + config!.file.cos.default,
+      description: apps[i].info.description,
+      state: apps[i].state
+    }
+  }
+  return {
+    pagination: {
+      page: page,
+      limit: limit,
+      total: total
+    },
+    data: data
+  }
+}
+
 export async function getAuth(id: string, appName: string): Promise<any> {
   const app = await appModel.getByName(appName)
   assert(app, 'not_exist_app')
@@ -103,7 +136,7 @@ export async function getInfo(data: OnlyOne<Record<'id' | 'name', string>>): Pro
 }
 
 export async function getOrgsBaseInfo(
-  uid: RequireOnlyOne<Record<'id' | 'name', string>>,
+  uid: OnlyOne<Record<'id' | 'name', string>>,
   page: number,
   limit: number
 ): Promise<User.Orgs.GET.ResponseBody> {

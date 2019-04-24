@@ -116,6 +116,26 @@ declare namespace User.Level.Org {
   }
 }
 
+declare namespace User.Apps {
+  interface IApp {
+    name: string
+    avatar: string
+    description: string
+    state: number
+  }
+
+  namespace GET {
+    interface ResponseBody {
+      pagination: {
+        page: number
+        limit: number
+        total: number
+      }
+      data: IApp[]
+    }
+  }
+}
+
 declare namespace User.Orgs {
   interface IOrg {
     name: string

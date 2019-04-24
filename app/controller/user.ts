@@ -83,6 +83,23 @@ export async function getByName(ctx: Context) {
   ctx.status = 200
 }
 
+export async function getAppsByName(ctx: Context) {
+  if (ctx.params.name === 'me') {
+    await verify.requireLogin(ctx)
+
+    const body = _.pick(ctx.request.query, ['page', 'limit'])
+    body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+    body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+    ctx.body = await userService.getAppsBaseInfo({ id: ctx.session!.user.id! }, body.page, body.limit)
+  } else {
+    const body = _.pick(ctx.request.query, ['page', 'limit'])
+    body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+    body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+    ctx.body = await userService.getAppsBaseInfo({ name: ctx.params.name }, body.page, body.limit)
+  }
+  ctx.status = 200
+}
+
 export async function getOrgsByName(ctx: Context): Promise<void> {
   if (ctx.params.name === 'me') {
     await verify.requireLogin(ctx)
@@ -97,6 +114,7 @@ export async function getOrgsByName(ctx: Context): Promise<void> {
     body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
     ctx.body = await userService.getOrgsBaseInfo({ name: ctx.params.name }, body.page, body.limit)
   }
+  ctx.status = 200
 }
 
 export async function getAuths(ctx: Context) {
@@ -154,7 +172,6 @@ export async function postEmail(ctx: Context): Promise<void> {
     }
     case 'update': {
       verify.checkLoginState(ctx)
-      await verify.checkBannedState(ctx)
       const user = await userService.getInfo({ id: ctx.session!.user.id! })
       assert(user.email !== body.email!.toLowerCase(), 'same_email')
       await verify.sendEmailCode(ctx, body.operator, body.email!, user.info.nickname)
@@ -185,7 +202,6 @@ export async function putEmail(ctx: Context): Promise<void> {
     }
     case 'update': {
       verify.checkLoginState(ctx)
-      await verify.checkBannedState(ctx)
       await userService.updateEmailOrPhone(ctx.session!.user.id!, { email: ctx.session!.verify.email! })
       break
     }
@@ -248,7 +264,6 @@ export async function postPhone(ctx: Context): Promise<void> {
     }
     case 'update': {
       verify.checkLoginState(ctx)
-      await verify.checkBannedState(ctx)
       const user = await userService.getInfo({ id: ctx.session!.user.id! })
       assert(user.phone !== body.phone!.replace('+86', ''), 'same_phone')
       await verify.sendPhoneCode(ctx, body.operator, body.phone!, user.info.nickname)
@@ -279,7 +294,6 @@ export async function putPhone(ctx: Context): Promise<void> {
     }
     case 'update': {
       verify.checkLoginState(ctx)
-      await verify.checkBannedState(ctx)
       await userService.updateEmailOrPhone(ctx.session!.user.id!, { phone: ctx.session!.verify.phone! })
       break
     }

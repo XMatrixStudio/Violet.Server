@@ -8,6 +8,7 @@ const user = new Router<IState, ICustom>()
 user.post('/', userCtrl.post) // 注册
 user.patch('/', userCtrl.patch) // 修改用户个人信息
 user.get('/:name', userCtrl.getByName) // 获取用户基本信息
+user.get('/:name/apps', userCtrl.getAppsByName) // 获取用户的应用列表
 user.get('/:name/orgs', userCtrl.getOrgsByName) // 获取用户的组织列表
 user.get('/auths', userCtrl.getAuths) // 获取授权列表
 user.post('/auths', userCtrl.postAuths) // 添加授权
