@@ -65,6 +65,7 @@ export async function getAppBaseInfoList(
     data.push({
       id: app._id,
       name: app.rawName,
+      displayName: app.info.displayName,
       state: app.state,
       avatar: app.info.avatar || config!.file.cos.url + config!.file.cos.default,
       description: app.info.description
@@ -267,7 +268,7 @@ export async function updateEmailOrPhone(id: string, user: RequireOnlyOne<Record
 /**
  * 更新用户个人信息
  * @param {string} id ObjectId
- * @param {UserInfo} info 用户个人信息
+ * @param {Partial<userModel.IUserInfo>} info 用户个人信息
  */
 export async function updateInfo(id: string, info: Partial<userModel.IUserInfo>) {
   if (info.avatar) {

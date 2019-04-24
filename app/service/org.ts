@@ -40,6 +40,7 @@ export async function getAppBaseInfoList(orgName: string, page: number, limit: n
     data.push({
       id: app._id,
       name: app.rawName,
+      displayName: app.info.displayName,
       state: app.state,
       avatar: app.info.avatar || config!.file.cos.url + config!.file.cos.default,
       description: app.info.description

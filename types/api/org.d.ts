@@ -20,6 +20,7 @@ declare namespace GetOrgsByNameApps {
   interface IApp {
     id: string
     name: string
+    displayName: string
     state: number
     avatar: string
     description: string

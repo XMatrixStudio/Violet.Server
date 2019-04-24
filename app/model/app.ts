@@ -15,10 +15,11 @@ export interface IApp {
   type: number // 类型
   state: number // 状态，0 - 运行中，1 - 已暂停
   key: string // 密钥
-  callback: string // 回调地址
+  callbackHosts: string[] // 回调域
   info: {
     avatar: string
     description: string
+    displayName: string
     url: string
   }
 }
@@ -34,7 +35,7 @@ const appSchema = new db.Schema({
   type: { type: Number },
   state: { type: Number, default: 0 },
   key: { type: String, required: true },
-  callback: String,
+  callbackHosts: [String],
   info: {
     type: {
       avatar: String,
@@ -50,19 +51,21 @@ const appDB = db.model<AppDocument>('apps', appSchema)
  * 添加组织应用
  * @param {string} orgId 组织ObjectId
  * @param {string} name 应用名
+ * @param {string} displayName 显示名
  * @param {string} description 简介
  * @param {number} type 类型
- * @param {string} homeUrl 主页
- * @param {string} callbackUrl 回调域
+ * @param {string} url 主页
+ * @param {string[]} callbackHosts 回调域
  * @returns {string} 应用ObjectId
  */
 export async function addOrg(
   orgId: string,
   name: string,
+  displayName: string,
   description: string,
   type: number,
-  homeUrl: string,
-  callbackUrl: string
+  url: string,
+  callbackHosts: string[]
 ): Promise<string> {
   const app = await appDB.create({
     _owner: orgId,
@@ -71,10 +74,11 @@ export async function addOrg(
     rawName: name,
     type: type,
     key: rand(200).substr(0, 24),
-    callback: callbackUrl,
+    callbackHost: callbackHosts,
     info: {
       description: description,
-      url: homeUrl
+      displayName: displayName,
+      url: url
     }
   })
   return app._id
@@ -84,19 +88,21 @@ export async function addOrg(
  * 添加用户应用
  * @param {string} userId 用户ObjectId
  * @param {string} name 应用名
+ * @param {string} displayName 显示名
  * @param {string} description 简介
  * @param {number} type 类型
- * @param {string} homeUrl 主页
- * @param {string} callbackUrl 回调域
+ * @param {string} url 主页
+ * @param {string[]} callbackHosts 回调域
  * @returns {string} 应用ObjectId
  */
 export async function addUser(
   userId: string,
   name: string,
+  displayName: string,
   description: string,
   type: number,
-  homeUrl: string,
-  callbackUrl: string
+  url: string,
+  callbackHosts: string[]
 ): Promise<string> {
   const app = await appDB.create({
     _owner: userId,
@@ -105,10 +111,11 @@ export async function addUser(
     rawName: name,
     type: type,
     key: rand(200).substr(0, 24),
-    callback: callbackUrl,
+    callbackHosts: callbackHosts,
     info: {
       description: description,
-      url: homeUrl
+      displayName: displayName,
+      url: url
     }
   })
   return app._id
