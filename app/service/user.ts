@@ -315,4 +315,5 @@ export async function updatePassword(id: string, oldPassword: string, newPasswor
   assert(oldPassword !== newPassword, 'same_password')
   hash = crypto.hashPassword(newPassword)
   await userModel.updatePassword(id, hash.password, hash.salt)
+  await logModel.addPasswordChange(id)
 }

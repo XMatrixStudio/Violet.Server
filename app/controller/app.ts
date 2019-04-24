@@ -12,7 +12,7 @@ import * as appService from '../service/app'
 export async function post(ctx: Context) {
   await verify.requireMinUserLevel(ctx, 1)
 
-  const body = _.pick(ctx.request.body, ['avatar', 'callbackUrl', 'description', 'homeUrl', 'name', 'owner', 'type'])
+  const body = _.pick<PostApps.ReqBody>(ctx.request.body, ['avatar', 'callbackUrl', 'description', 'homeUrl', 'name', 'owner', 'type'])
   assert.v(
     { data: body.avatar, require: false, type: 'string', maxLength: 102400, message: 'invalid_avatar' },
     { data: body.callbackUrl, type: 'string', regExp: regexp.Url, maxLength: 128, message: 'invalid_callback_url' },
@@ -24,12 +24,12 @@ export async function post(ctx: Context) {
   )
   await appService.createApp(
     ctx.session!.user.id!,
-    body.name,
-    body.owner,
-    body.description,
-    body.type,
-    body.homeUrl,
-    body.callbackUrl,
+    body.name!,
+    body.owner!,
+    body.description!,
+    body.type!,
+    body.homeUrl!,
+    body.callbackUrl!,
     body.avatar
   )
   ctx.status = 201

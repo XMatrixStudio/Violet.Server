@@ -1,3 +1,27 @@
+/**
+ * @method PATCH
+ * @resource `/i/users`
+ */
+declare namespace PatchUsers {
+  interface ReqBody {
+    info?: {
+      avatar?: string
+      bio?: string
+      birthday?: Date | string
+      email?: string
+      gender?: 0 | 1 | 2
+      location?: string
+      nickname?: string
+      phone?: string
+      url?: string
+    }
+    secure?: {
+      newPassword: string
+      oldPassword: string
+    }
+  }
+}
+
 declare namespace User {
   namespace GET {
     interface ResponseBody {
@@ -46,26 +70,6 @@ declare namespace User {
       name: string
       password: string
       nickname?: string
-    }
-  }
-
-  namespace PATCH {
-    interface RequestBody {
-      info?: {
-        avatar?: string
-        bio?: string
-        birthday?: Date | string
-        email?: string
-        gender?: 0 | 1 | 2
-        location?: string
-        nickname?: string
-        phone?: string
-        url?: string
-      }
-      secure?: {
-        old_password: string
-        new_password: string
-      }
     }
   }
 }
