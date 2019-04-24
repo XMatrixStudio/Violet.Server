@@ -3,6 +3,7 @@ import * as Router from 'koa-router'
 
 import * as verify from '../../lib/verify'
 import { IState, ICustom, Context } from '../../types/context'
+import * as app from './app'
 import * as admin from './admin'
 import * as org from './org'
 import * as user from './user'
@@ -90,6 +91,7 @@ router.use('/i/', async (ctx: Context, next: () => Promise<any>) => {
 })
 
 router.use('/i/admin', admin.routes())
+router.use('/i/apps', app.routes())
 router.use('/i/orgs', org.routes())
 router.use('/i/users', user.routes())
 router.use('/i/util', util.routes())

@@ -25,7 +25,7 @@ export async function createApp(
   type: number,
   homeUrl: string,
   callbackUrl: string,
-  avatar: string
+  avatar?: string
 ) {
   assert(!util.isReservedUsername(name), 'reserved_name')
   assert(!(await appModel.getByName(name)), 'exist_name')
@@ -34,17 +34,18 @@ export async function createApp(
   if (user) {
     assert(user._id === userId, 'not_exist_owner')
     assert(user.dev!.app.limit > user.dev!.app.own, 'limit_apps')
-    id = await appModel.addUser(name, userId, description, type, homeUrl, callbackUrl)
+    id = await appModel.addUser(userId, name, description, type, homeUrl, callbackUrl)
   } else {
-    throw 'not_implement'
-    // const org = await orgModel.getByName(name)
-    // assert(org, 'not_exist_owner')
-    // assert(org!._owner._id, )
-    // assert(org!.app.limit > org!.app.own, 'limit_apps')
-    // owner = org!._id
+    const org = await orgModel.getByName(owner)
+    assert(org && (await orgModel.isHasMember(org._id, userId)), 'not_exist_owner')
+    assert(org!.app.limit > org!.app.own, 'limit_apps')
+    id = await appModel.addOrg(org!._id, name, description, type, homeUrl, callbackUrl)
   }
-  await file.upload(id + '.jpg', Buffer.from(avatar.replace('data:image/jpeg;base64,', ''), 'base64'))
-  await appModel.setAvatar(id, config!.file.cos.url + id + '.jpg')
+  if (avatar) {
+    console.log('error')
+    await file.upload(id + '.jpg', Buffer.from(avatar.replace('data:image/jpeg;base64,', ''), 'base64'))
+    await appModel.setAvatar(id, config!.file.cos.url + id + '.jpg')
+  }
 }
 
 export async function getApp(userId: string | undefined, appName: string) {

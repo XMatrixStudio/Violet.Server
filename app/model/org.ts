@@ -56,10 +56,8 @@ const orgSchema = new db.Schema({
     }
   },
   app: {
-    type: {
-      limit: { type: Number, default: 5 },
-      own: { type: Number, default: 0 }
-    }
+    type: { limit: Number, own: Number },
+    default: { limit: 5, own: 0 }
   }
 })
 
@@ -91,7 +89,7 @@ export async function add(userId: string, name: string, description: string, con
 }
 
 export async function getByName(name: string): Promise<IOrg | null> {
-  return await orgDB.findOne({ name: name.toLowerCase() }).populate('_owner')
+  return await orgDB.findOne({ name: name.toLowerCase() })
 }
 
 export async function getCountByUserId(userId: string): Promise<number> {
@@ -103,4 +101,8 @@ export async function getListByUserId(userId: string, page: number, limit: numbe
     .find({ _owner: userId })
     .skip(limit * (page - 1))
     .limit(limit)
+}
+
+export async function isHasMember(id: string, userId: string): Promise<boolean> {
+  return (await orgDB.countDocuments({ _id: id, 'members._user': userId })) !== 0
 }
