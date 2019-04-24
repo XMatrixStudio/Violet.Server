@@ -4,6 +4,7 @@ import * as moment from 'moment'
 import * as mustache from 'mustache'
 import * as Mailer from 'nodemailer'
 
+import config from '../app/config/config'
 import * as userModel from '../app/model/user'
 import { Context } from '../types/context'
 import * as assert from './assert'
@@ -131,20 +132,20 @@ export async function requireMinUserLevel(ctx: Context, minLevel: number = 0): P
 }
 
 const mailer = Mailer.createTransport({
-  // host: config.email.host,
-  // port: config.email.port,
-  // secure: false,
-  // auth: {
-  //   user: config.email.user,
-  //   pass: config.email.password
-  // },
-  // tls: {
-  //   ciphers: 'SSLv3'
-  // }
+  host: config!.email.host,
+  port: config!.email.port,
+  secure: false,
+  auth: {
+    user: config!.email.user,
+    pass: config!.email.password
+  },
+  tls: {
+    ciphers: 'SSLv3'
+  }
 })
 
 const mailOptions: Mailer.SendMailOptions = {
-  // from: config.email.from
+  from: config!.email.from
 }
 
 /**

@@ -237,6 +237,17 @@ export async function removeAuth(id: string, appId: string) {
   await userDB.updateOne({ _id: id, 'auth.app': appId }, { $pull: { auth: { app: appId } } })
 }
 
+/**
+ * 更新用户个人信息
+ * @param {string} id ObjectId
+ * @param {Partial<IUserInfo>} info 用户个人信息
+ */
+export async function setInfo(id: string, info: Partial<IUserInfo>) {
+  const user = (await userDB.findById(id))!
+  user.info = Object.assign(user.info, info)
+  await user.save()
+}
+
 export async function updateDevInfo(id: string, name: string, email: string, phone: string) {
   await userDB.findByIdAndUpdate(id, { $set: { 'dev.name': name, 'dev.email': email, 'dev.phone': phone } })
 }
@@ -283,16 +294,6 @@ export async function updateLevel(id: string, level: number): Promise<void> {
  */
 export async function updatePhone(id: string, phone: string): Promise<void> {
   await userDB.findByIdAndUpdate(id, { phone: phone.replace('+86', '') })
-}
-
-/**
- * 更新用户个人信息
- *
- * @param {string} id ObjectId
- * @param {UserInfo} info 用户个人信息
- */
-export async function updateInfo(id: string, info: Partial<IUserInfo>): Promise<void> {
-  await userDB.findByIdAndUpdate(id, { info: info })
 }
 
 /**

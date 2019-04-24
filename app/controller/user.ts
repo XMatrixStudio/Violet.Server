@@ -18,7 +18,7 @@ const urlExp = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\
  * 注册用户
  */
 export async function post(ctx: Context) {
-  const body = _.pick<User.POST.RequestBody>(ctx.request.body, ['name', 'nickname', 'password'])
+  const body = _.pick<PostUsers.ReqBody>(ctx.request.body, ['name', 'nickname', 'password'])
   assert.v(
     { data: body.name, type: 'string', regExp: regexp.Name, message: 'invalid_name' },
     { data: body.nickname, require: false, type: 'string', maxLength: 32, message: 'invalid_nickname' },
@@ -28,14 +28,12 @@ export async function post(ctx: Context) {
 
   assert(ctx.session!.user.register, 'not_exist_register_record')
   switch (ctx.session!.user.register) {
-    case 'email': {
+    case 'email':
       await userService.register(ctx.session!.verify.email!, '', body.name!, body.nickname, body.password!)
       break
-    }
-    case 'phone': {
+    case 'phone':
       await userService.register('', ctx.session!.verify.phone!, body.name!, body.nickname, body.password!)
       break
-    }
   }
   ctx.session!.user.register = undefined
   ctx.status = 201
@@ -81,8 +79,7 @@ export async function getByName(ctx: Context) {
     await verify.requireLogin(ctx)
     ctx.body = await userService.getAllInfo(ctx.session!.user.id!)
   } else {
-    throw 'not_implementation'
-    // ctx.body = await userService.getInfo({ name: ctx.params.name })
+    ctx.body = await userService.getBaseInfo(ctx.params.name)
   }
   ctx.status = 200
 }
@@ -155,32 +152,31 @@ export async function getAuthsByApp(ctx: Context) {
 /**
  * 发送邮箱验证邮件
  */
-export async function postEmail(ctx: Context): Promise<void> {
-  const body = _.pick<User.Email.POST.RequestBody>(ctx.request.body, ['operator', 'captcha', 'email'])
-  assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
-  assert.v({ data: body.captcha, type: 'string', minLength: 4, maxLength: 4, message: 'invalid_captcha' })
-  assert.v({ data: body.email, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' })
+export async function postEmail(ctx: Context) {
+  const body = _.pick<PostUsersEmail.ReqBody>(ctx.request.body, ['operator', 'captcha', 'email'])
+  assert.v(
+    { data: body.captcha, type: 'string', minLength: 4, maxLength: 4, message: 'invalid_captcha' },
+    { data: body.email, type: 'string', regExp: emailExp, maxLength: 64, message: 'invalid_email' },
+    { data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' }
+  )
 
   verify.checkCaptcha(ctx, body.captcha!)
   switch (body.operator) {
-    case 'register': {
+    case 'register':
       assert((await userService.getUserNameByEmail(body.email!)) === null, 'exist_user')
       await verify.sendEmailCode(ctx, body.operator, body.email!)
       break
-    }
-    case 'reset': {
+    case 'reset':
       const name = await userService.getUserNameByEmail(body.email!)
       assert(name, 'not_exist_user')
       await verify.sendEmailCode(ctx, body.operator, body.email!, name!)
       break
-    }
-    case 'update': {
+    case 'update':
       verify.checkLoginState(ctx)
-      const user = await userService.getInfo({ id: ctx.session!.user.id! })
+      const user = await userService.getAllInfo(ctx.session!.user.id!)
       assert(user.email !== body.email!.toLowerCase(), 'same_email')
       await verify.sendEmailCode(ctx, body.operator, body.email!, user.info.nickname)
       break
-    }
   }
   ctx.status = 201
 }
@@ -189,7 +185,7 @@ export async function postEmail(ctx: Context): Promise<void> {
  * 验证邮箱
  */
 export async function putEmail(ctx: Context): Promise<void> {
-  const body = _.pick<User.Email.PUT.RequestBody>(ctx.request.body, ['operator', 'code', 'password'])
+  const body = _.pick<PutUsersEmail.ReqBody>(ctx.request.body, ['operator', 'code', 'password'])
   assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
   assert.v({ data: body.code, type: 'string', minLength: 6, maxLength: 6, message: 'invalid_code' })
   assert.v({ data: body.password, require: false, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
@@ -268,7 +264,7 @@ export async function postPhone(ctx: Context): Promise<void> {
     }
     case 'update': {
       verify.checkLoginState(ctx)
-      const user = await userService.getInfo({ id: ctx.session!.user.id! })
+      const user = await userService.getAllInfo(ctx.session!.user.id!)
       assert(user.phone !== body.phone!.replace('+86', ''), 'same_phone')
       await verify.sendPhoneCode(ctx, body.operator, body.phone!, user.info.nickname)
       break

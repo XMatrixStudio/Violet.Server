@@ -1,4 +1,16 @@
 /**
+ * @method POST
+ * @resource `/i/users`
+ */
+declare namespace PostUsers {
+  interface ReqBody {
+    name: string
+    nickname: string
+    password: string
+  }
+}
+
+/**
  * @method PATCH
  * @resource `/i/users`
  */
@@ -18,6 +30,52 @@ declare namespace PatchUsers {
     secure?: {
       newPassword: string
       oldPassword: string
+    }
+  }
+}
+
+/**
+ * @method GET
+ * @resource `/i/users/:name`
+ */
+declare namespace GetUsersByName {
+  interface ResBody {
+    email?: string
+    phone?: string
+    name: string
+    level: number
+    createTime: Date
+    info: {
+      avatar: string
+      nickname: string
+      bio?: string
+      birthday?: Date
+      email?: string
+      phone?: string
+      gender?: number
+      location?: string
+      url?: string
+    }
+    dev?: {
+      name?: string
+      email?: string
+      phone?: string
+      app: {
+        limit?: number
+        own: number
+      }
+      org: {
+        limit?: number
+        own: number
+        join: number
+      }
+    }
+    log?: {
+      login: {
+        time: Date
+        ip: string
+      }[]
+      password?: Date
     }
   }
 }
@@ -61,73 +119,27 @@ declare namespace GetUsersByNameOrgs {
   }
 }
 
-declare namespace User {
-  namespace GET {
-    interface ResponseBody {
-      email?: string
-      phone?: string
-      name: string
-      level: number
-      createTime: Date
-      info: {
-        avatar: string
-        nickname: string
-        bio?: string
-        birthday?: Date
-        email?: string
-        phone?: string
-        gender?: number
-        location?: string
-        url?: string
-      }
-      dev?: {
-        name?: string
-        email?: string
-        phone?: string
-        app: {
-          limit?: number
-          own: number
-        }
-        org: {
-          limit?: number
-          own: number
-          join: number
-        }
-      }
-      log?: {
-        login: {
-          time: Date
-          ip: string
-        }[]
-        password: Date | undefined
-      }
-    }
-  }
-
-  namespace POST {
-    interface RequestBody {
-      name: string
-      password: string
-      nickname?: string
-    }
+/**
+ * @method POST
+ * @resource `/i/users/email`
+ */
+declare namespace PostUsersEmail {
+  interface ReqBody {
+    captcha: string
+    email: string
+    operator: 'register' | 'reset' | 'update'
   }
 }
 
-declare namespace User.Email {
-  namespace POST {
-    interface RequestBody {
-      operator: 'register' | 'reset' | 'update'
-      captcha: string
-      email: string
-    }
-  }
-
-  namespace PUT {
-    interface RequestBody {
-      operator: 'register' | 'reset' | 'update'
-      code: string
-      password?: string
-    }
+/**
+ * @method PUT
+ * @resource `/i/users/email`
+ */
+declare namespace PutUsersEmail {
+  interface ReqBody {
+    code: string
+    password?: string
+    operator: 'register' | 'reset' | 'update'
   }
 }
 
@@ -155,46 +167,6 @@ declare namespace User.Level.Org {
   namespace POST {
     interface RequestBody {
       remark: string
-    }
-  }
-}
-
-declare namespace User.Apps {
-  interface IApp {
-    name: string
-    avatar: string
-    description: string
-    state: number
-  }
-
-  namespace GET {
-    interface ResponseBody {
-      pagination: {
-        page: number
-        limit: number
-        total: number
-      }
-      data: IApp[]
-    }
-  }
-}
-
-declare namespace User.Orgs {
-  interface IOrg {
-    name: string
-    avatar: string
-    create_time: Date
-    description: string
-  }
-
-  namespace GET {
-    interface ResponseBody {
-      pagination: {
-        page: number
-        limit: number
-        total: number
-      }
-      data: IOrg[]
     }
   }
 }

@@ -18,9 +18,9 @@ export async function auth(id: string, appName: string, duration: number) {
 /**
  * 获取用户的所有信息
  * @param {string} id 用户ObjectId
- * @returns {User.GET.ResponseBody} 用户信息
+ * @returns {GetUsersByName.ResBody} 用户信息
  */
-export async function getAllInfo(id: string): Promise<User.GET.ResponseBody> {
+export async function getAllInfo(id: string): Promise<GetUsersByName.ResBody> {
   const user = (await userModel.getById(id))!
   user.info.avatar = user.info.avatar || config!.file.cos.url + config!.file.cos.default
   const log = (await logModel.getUserLog(id))!
@@ -100,46 +100,31 @@ export async function getAuths(id: string, page: number, limit: number): Promise
 }
 
 /**
- * 获取用户信息
- * 使用ObjecId获取时返回所有信息，使用用户名获取时返回公开信息
- * @param {OnlyOne<Record<'id' | 'name', string>>} data ObjectId或用户名
- * @returns {User.GET.ResponseBody} 用户信息
+ * 获取用户的基本信息
+ * @param {string} name 用户名
+ * @returns {GetUsersByName.ResBody} 用户信息
  */
-export async function getInfo(data: OnlyOne<Record<'id' | 'name', string>>): Promise<User.GET.ResponseBody> {
-  if (data.id) {
-    const user = (await userModel.getById(data.id))!
-    user.info.avatar = user.info.avatar || config!.file.cos.url + config!.file.cos.default
-    return {
-      email: user.email,
-      phone: user.phone,
-      name: user.rawName,
-      level: user.level,
-      createTime: user.createTime,
-      info: user.info,
-      dev: user.dev
+export async function getBaseInfo(name: string): Promise<GetUsersByName.ResBody> {
+  const user = await userModel.getByName(name)
+  assert(user, 'not_exist_user')
+  user!.info.avatar = user!.info.avatar || config!.file.cos.url + config!.file.cos.default
+  const devInfo = user!.dev && {
+    app: {
+      limit: user!.dev!.app.limit,
+      own: user!.dev!.app.own
+    },
+    org: {
+      limit: user!.dev!.org.limit,
+      own: user!.dev!.org.own,
+      join: user!.dev!.org.join
     }
-  } else {
-    const user = await userModel.getByName(data.name!)
-    assert(user, 'not_found')
-    user!.info.avatar = user!.info.avatar || config!.file.cos.url + config!.file.cos.default
-    const devInfo = user!.dev && {
-      app: {
-        limit: user!.dev!.app.limit,
-        own: user!.dev!.app.own
-      },
-      org: {
-        limit: user!.dev!.org.limit,
-        own: user!.dev!.org.own,
-        join: user!.dev!.org.join
-      }
-    }
-    return {
-      name: user!.rawName,
-      level: user!.level,
-      createTime: user!.createTime,
-      info: user!.info,
-      dev: devInfo
-    }
+  }
+  return {
+    name: user!.rawName,
+    level: user!.level,
+    createTime: user!.createTime,
+    info: user!.info,
+    dev: devInfo
   }
 }
 
@@ -284,12 +269,12 @@ export async function updateEmailOrPhone(id: string, user: RequireOnlyOne<Record
  * @param {string} id ObjectId
  * @param {UserInfo} info 用户个人信息
  */
-export async function updateInfo(id: string, info: Partial<userModel.IUserInfo>): Promise<void> {
+export async function updateInfo(id: string, info: Partial<userModel.IUserInfo>) {
   if (info.avatar) {
     await file.upload(id + '.jpg', Buffer.from(info.avatar.replace('data:image/jpeg;base64,', ''), 'base64'))
     info.avatar = config!.file.cos.url + id + '.jpg'
   }
-  await userModel.updateInfo(id, info)
+  await userModel.setInfo(id, info)
 }
 
 export async function updateLevel(id: string, level: 1 | 50 | 99, name: string, email: string, phone: string, remark?: string) {
