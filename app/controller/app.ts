@@ -35,10 +35,19 @@ export async function post(ctx: Context) {
   ctx.status = 201
 }
 
-export async function getById(ctx: Context) {
-  const body = _.pick(ctx.request.query, ['all'])
-  assert.v({ data: ctx.params.id, type: 'string', regExp: regexp.Name, message: 'invalid_name' })
+/**
+ * 获取指定`name`或`id`的应用信息
+ */
+export async function getByNameOrId(ctx: Context) {
+  const body = _.pick<GetAppsByNameOrId.Query>(ctx.request.query, ['all'])
   body.all = body.all === true
-  ctx.body = await appService.getApp(ctx.session!.user.id, ctx.params.id)
-  ctx.status
+  assert(ctx.params.nameOrId && ctx.params.nameOrId.length !== 0, 'invalid_name')
+  if (ctx.params.nameOrId[0] !== '+') {
+    assert.v({ data: ctx.params.nameOrId, type: 'string', regExp: regexp.Name, message: 'invalid_name' })
+    ctx.body = await appService.getAppBaseInfo({ name: ctx.params.nameOrId })
+  } else {
+    assert.v({ data: ctx.params.nameOrId, type: 'string', regExp: regexp.ExtId, message: 'invalid_id' })
+    ctx.body = await appService.getAppBaseInfo({ id: ctx.params.nameOrId.substr(1) })
+  }
+  ctx.status = 200
 }

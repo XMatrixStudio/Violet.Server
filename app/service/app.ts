@@ -48,28 +48,22 @@ export async function createApp(
   }
 }
 
-export async function getApp(userId: string | undefined, appName: string) {
-  let user: userModel.IUser | undefined = undefined
-  if (userId !== undefined) user = (await userModel.getById(userId))!
-  const app = await appModel.getByName(appName)
+export async function getAppBaseInfo(a: OnlyOne<Record<'id' | 'name', string>>) {
+  let app: appModel.IApp | null
+  if (a.id !== undefined) app = await appModel.getByIdWithOwner(a.id)
+  else app = await appModel.getByNameWithOwner(a.name)
   assert(app, 'not_exist_app')
-  if (user === undefined || userId != app!._owner._id) {
-    return {
-      name: app!.rawName,
-      createTime: app!.createTime,
-      type: app!.type,
-      state: app!.state,
-      info: app!.info
-    }
-  } else {
-    return {
-      name: app!.rawName,
-      createTime: app!.createTime,
-      type: app!.type,
-      state: app!.state,
-      key: app!.key,
-      callback: app!.callback,
-      info: app!.info
-    }
+  app!.info.avatar = app!.info.avatar || config!.file.cos.url + config!.file.cos.default
+  return {
+    id: app!._id,
+    name: app!.rawName,
+    owner: {
+      name: app!._owner.rawName,
+      type: app!.__owner === 'users' ? 'user' : 'org'
+    },
+    createTime: app!.createTime,
+    type: app!.type,
+    state: app!.state,
+    info: app!.info
   }
 }

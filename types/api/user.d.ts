@@ -31,10 +31,8 @@ declare namespace GetUsersByNameApps {
     id: string
     name: string
     state: number
-    info: {
-      avatar: string
-      description: string
-    }
+    avatar: string
+    description: string
   }
   interface Query extends PageQuery {}
   interface ResBody {
@@ -52,11 +50,9 @@ declare namespace GetUsersByNameOrgs {
     name: string
     members: number
     apps: number
-    info: {
-      avatar: string
-      description: string
-      location: string
-    }
+    avatar: string
+    description: string
+    location: string
   }
   interface Query extends PageQuery {}
   interface ResBody {

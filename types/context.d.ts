@@ -5,7 +5,6 @@ import { RouterContext } from 'koa-router'
 
 declare interface IState {
   passLoginStatusCheck: boolean
-  passBannedStatusCheck: boolean
 }
 
 declare type ICustom = KoaContext

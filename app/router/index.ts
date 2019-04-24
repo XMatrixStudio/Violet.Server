@@ -18,7 +18,7 @@ type HttpHandler = (path: string | RegExp | (string | RegExp)[], ...middleware: 
 const whiteLoginList: { method: HttpHandler; urls: string[] }[] = [
   {
     method: router.get,
-    urls: ['/i/users/:name', '/i/users/:name/orgs', '/i/util/captcha']
+    urls: ['/i/apps/:nameOrId', '/i/orgs/:name/apps', '/i/users/:name', '/i/users/:name/apps', '/i/users/:name/orgs', '/i/util/captcha']
   },
   {
     method: router.post,
@@ -34,22 +34,9 @@ const whiteLoginList: { method: HttpHandler; urls: string[] }[] = [
   }
 ]
 
-// 白名单列表
-// 凡是在此白名单, 均不检查是否封禁, 前提已登陆
-const whiteBannedList: { method: HttpHandler; urls: string[] }[] = [
-  { method: router.get, urls: ['/i/levels', '/i/levels/users'] },
-  { method: router.post, urls: ['/i/levels/users'] }
-]
-
 // 检查是否登录
 const withoutLogin = (ctx: Context, next: () => Promise<any>) => {
   ctx.state.passLoginStatusCheck = true
-  return next()
-}
-
-// 检查是否被封禁
-const withoutBanned = (ctx: Context, next: () => Promise<any>) => {
-  ctx.state.passBannedStatusCheck = true
   return next()
 }
 
@@ -58,11 +45,6 @@ const withoutBanned = (ctx: Context, next: () => Promise<any>) => {
 for (const rule of whiteLoginList) {
   for (const url of rule.urls) {
     rule.method.call(router, url, withoutLogin)
-  }
-}
-for (const rule of whiteBannedList) {
-  for (const url of rule.urls) {
-    rule.method.call(router, url, withoutBanned)
   }
 }
 
@@ -83,10 +65,7 @@ router.use('/', async (ctx: Context, next: () => Promise<any>) => {
 router.use('/i/', async (ctx: Context, next: () => Promise<any>) => {
   if (!ctx.session!.verify) ctx.session!.verify = {}
   if (!ctx.session!.user) ctx.session!.user = {}
-  if (!ctx.state.passLoginStatusCheck) {
-    await verify.requireLogin(ctx)
-    if (!ctx.state.passBannedStatusCheck) await verify.requireMinUserLevel(ctx)
-  }
+  if (!ctx.state.passLoginStatusCheck) await verify.requireLogin(ctx)
   return next()
 })
 

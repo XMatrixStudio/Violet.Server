@@ -22,3 +22,15 @@ export async function post(ctx: Context) {
   await orgService.createOrg(ctx.session!.user.id!, body.name!, body.description!, body.contact!, body.email!, body.phone!)
   ctx.status = 201
 }
+
+/**
+ * 获取指定组织名`name`的应用列表
+ */
+export async function getByNameApps(ctx: Context) {
+  const body = _.pick<GetOrgsByNameApps.Query>(ctx.request.query, ['page', 'limit'])
+  body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+  body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+
+  ctx.body = await orgService.getAppBaseInfoList(ctx.params.name, body.page, body.limit)
+  ctx.status = 200
+}

@@ -62,12 +62,12 @@ export async function getAppBaseInfoList(
   const total = await appModel.getCountByOwner(id)
   const data: GetUsersByNameApps.IApp[] = []
   for (const app of apps) {
-    app.info.avatar = app.info.avatar || config!.file.cos.url + config!.file.cos.default
     data.push({
       id: app._id,
       name: app.rawName,
       state: app.state,
-      info: app.info
+      avatar: app.info.avatar || config!.file.cos.url + config!.file.cos.default,
+      description: app.info.description
     })
   }
   return {
@@ -166,12 +166,13 @@ export async function getOrgBaseInfoList(
   const total = await orgModel.getCountByUserId(id)
   const data: GetUsersByNameOrgs.IOrg[] = []
   for (const org of orgs) {
-    org.info.avatar = org.info.avatar || config!.file.cos.url + config!.file.cos.default
     data.push({
       name: org.rawName,
-      info: org.info,
       members: org.members.length,
-      apps: org.app.own
+      apps: org.app.own,
+      avatar: org.info.avatar || config!.file.cos.url + config!.file.cos.default,
+      description: org.info.description,
+      location: org.info.location
     })
   }
   return {

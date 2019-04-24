@@ -8,6 +8,7 @@ import db from '.'
 export interface IApp {
   _id: any
   _owner: IUser | IOrg
+  __owner: string
   name: string // 项目名，全小写
   rawName: string // 原始项目名
   createTime: Date // 创建时间
@@ -113,8 +114,31 @@ export async function addUser(
   return app._id
 }
 
+/**
+ * 获取指定Id的应用，同时连接Owner
+ * @param {string} id 应用ObjectId
+ * @returns {IApp | null} 应用信息
+ */
+export async function getByIdWithOwner(id: string): Promise<IApp | null> {
+  return await appDB.findById(id).populate('_owner')
+}
+
+/**
+ * 获取指定应用名的应用
+ * @param {string} name 应用名
+ * @returns {IApp | null} 应用信息
+ */
 export async function getByName(name: string): Promise<IApp | null> {
-  return await appDB.findOne({ name: name.toLowerCase() }).populate('_owner', '_id')
+  return await appDB.findOne({ name: name.toLowerCase() }).populate('_owner')
+}
+
+/**
+ * 获取指定应用名的应用，同时连接Owner
+ * @param {string} name 应用名
+ * @returns {IApp | null} 应用信息
+ */
+export async function getByNameWithOwner(name: string): Promise<IApp | null> {
+  return await appDB.findOne({ name: name.toLowerCase() }).populate('_owner')
 }
 
 /**
