@@ -87,36 +87,36 @@ export async function getByName(ctx: Context) {
   ctx.status = 200
 }
 
-export async function getAppsByName(ctx: Context) {
+/**
+ * 获取指定用户名`name`的应用列表，当`name`为`me`时指定当前用户
+ */
+export async function getByNameApps(ctx: Context) {
+  const body = _.pick<GetUsersByNameApps.Query>(ctx.request.query, ['page', 'limit'])
+  body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+  body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+
   if (ctx.params.name === 'me') {
     await verify.requireLogin(ctx)
-
-    const body = _.pick(ctx.request.query, ['page', 'limit'])
-    body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
-    body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-    ctx.body = await userService.getAppsBaseInfo({ id: ctx.session!.user.id! }, body.page, body.limit)
+    ctx.body = await userService.getAppBaseInfoList({ id: ctx.session!.user.id! }, body.page, body.limit)
   } else {
-    const body = _.pick(ctx.request.query, ['page', 'limit'])
-    body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
-    body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-    ctx.body = await userService.getAppsBaseInfo({ name: ctx.params.name }, body.page, body.limit)
+    ctx.body = await userService.getAppBaseInfoList({ name: ctx.params.name }, body.page, body.limit)
   }
   ctx.status = 200
 }
 
-export async function getOrgsByName(ctx: Context): Promise<void> {
+/**
+ * 获取指定用户名`name`的组织列表，当`name`为`me`时指定当前用户
+ */
+export async function getByNameOrgs(ctx: Context) {
+  const body = _.pick<GetUsersByNameOrgs.Query>(ctx.request.query, ['page', 'limit'])
+  body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+  body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+
   if (ctx.params.name === 'me') {
     await verify.requireLogin(ctx)
-
-    const body = _.pick(ctx.request.query, ['page', 'limit'])
-    body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
-    body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-    ctx.body = await userService.getOrgsBaseInfo({ id: ctx.session!.user.id! }, body.page, body.limit)
+    ctx.body = await userService.getOrgBaseInfoList({ id: ctx.session!.user.id! }, body.page, body.limit)
   } else {
-    const body = _.pick(ctx.request.query, ['page', 'limit'])
-    body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
-    body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-    ctx.body = await userService.getOrgsBaseInfo({ name: ctx.params.name }, body.page, body.limit)
+    ctx.body = await userService.getOrgBaseInfoList({ name: ctx.params.name }, body.page, body.limit)
   }
   ctx.status = 200
 }

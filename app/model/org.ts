@@ -17,6 +17,7 @@ export interface IOrg {
   info: {
     avatar: string
     description: string
+    location: string
   }
   app: {
     limit: number // 应用上限
@@ -52,7 +53,8 @@ const orgSchema = new db.Schema({
   info: {
     type: {
       avatar: String,
-      description: String
+      description: String,
+      location: String
     }
   },
   app: {
@@ -88,21 +90,40 @@ export async function add(userId: string, name: string, description: string, con
   })
 }
 
+/**
+ * 获取指定名字的组织
+ * @param {string} name 组织名
+ */
 export async function getByName(name: string): Promise<IOrg | null> {
   return await orgDB.findOne({ name: name.toLowerCase() })
 }
 
+/**
+ * 获取指定用户的组织数量
+ * @param {string} userId 用户ObjectId
+ */
 export async function getCountByUserId(userId: string): Promise<number> {
-  return await orgDB.find({ _owner: userId }).countDocuments()
+  return await orgDB.countDocuments({ 'members._user': userId })
 }
 
+/**
+ * 获取指定用户的组织列表
+ * @param {string} userId 用户ObjectId
+ * @param {string} page 资源页码
+ * @param {string} limit 资源每页数量
+ */
 export async function getListByUserId(userId: string, page: number, limit: number): Promise<IOrg[]> {
   return await orgDB
-    .find({ _owner: userId })
+    .find({ 'members._user': userId })
     .skip(limit * (page - 1))
     .limit(limit)
 }
 
+/**
+ * 判断组织是否包含该成员
+ * @param {string} id 组织ObjectId
+ * @param {string} userId 用户ObjectId
+ */
 export async function isHasMember(id: string, userId: string): Promise<boolean> {
   return (await orgDB.countDocuments({ _id: id, 'members._user': userId })) !== 0
 }

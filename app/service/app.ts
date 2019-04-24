@@ -32,7 +32,7 @@ export async function createApp(
   const user = await userModel.getByName(owner)
   let id: string
   if (user) {
-    assert(user._id === userId, 'not_exist_owner')
+    assert(user._id.toString() === userId, 'not_exist_owner')
     assert(user.dev!.app.limit > user.dev!.app.own, 'limit_apps')
     id = await appModel.addUser(userId, name, description, type, homeUrl, callbackUrl)
   } else {

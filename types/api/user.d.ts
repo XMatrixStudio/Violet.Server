@@ -22,6 +22,49 @@ declare namespace PatchUsers {
   }
 }
 
+/**
+ * @method GET
+ * @resource `/i/users/:name/apps`
+ */
+declare namespace GetUsersByNameApps {
+  interface IApp {
+    id: string
+    name: string
+    state: number
+    info: {
+      avatar: string
+      description: string
+    }
+  }
+  interface Query extends PageQuery {}
+  interface ResBody {
+    pagination: PageRes
+    data: IApp[]
+  }
+}
+
+/**
+ * @method GET
+ * @resource `/i/users/:name/orgs`
+ */
+declare namespace GetUsersByNameOrgs {
+  interface IOrg {
+    name: string
+    members: number
+    apps: number
+    info: {
+      avatar: string
+      description: string
+      location: string
+    }
+  }
+  interface Query extends PageQuery {}
+  interface ResBody {
+    pagination: PageRes
+    data: IOrg[]
+  }
+}
+
 declare namespace User {
   namespace GET {
     interface ResponseBody {

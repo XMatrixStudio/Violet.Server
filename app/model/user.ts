@@ -1,7 +1,7 @@
 import { ObjectId } from 'bson'
 
 import db from '.'
-import { IApplication } from './app'
+import { IApp } from './app'
 import * as redis from './redis'
 
 export interface IUser {
@@ -34,7 +34,7 @@ export interface IUserInfo {
 }
 
 export interface IUserAuth {
-  app: IApplication
+  app: IApp
   time: Date
   duration: number
 }

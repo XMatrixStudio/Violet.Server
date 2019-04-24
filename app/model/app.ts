@@ -5,7 +5,7 @@ import { IOrg } from './org'
 import { IUser } from './user'
 import db from '.'
 
-export interface IApplication {
+export interface IApp {
   _id: any
   _owner: IUser | IOrg
   name: string // 项目名，全小写
@@ -22,7 +22,7 @@ export interface IApplication {
   }
 }
 
-export interface ApplicationDocument extends db.Document, IApplication {}
+export interface AppDocument extends db.Document, IApp {}
 
 const appSchema = new db.Schema({
   _owner: { type: ObjectId, refPath: '__owner', required: true },
@@ -43,7 +43,7 @@ const appSchema = new db.Schema({
   }
 })
 
-const appDB = db.model<ApplicationDocument>('apps', appSchema)
+const appDB = db.model<AppDocument>('apps', appSchema)
 
 /**
  * 添加组织应用
@@ -113,15 +113,26 @@ export async function addUser(
   return app._id
 }
 
-export async function getByName(name: string): Promise<IApplication | null> {
+export async function getByName(name: string): Promise<IApp | null> {
   return await appDB.findOne({ name: name.toLowerCase() }).populate('_owner', '_id')
 }
 
+/**
+ * 获取指定所有人的应用数量
+ * @param {string} ownerId 用户ObjectId或组织ObjectId
+ */
 export async function getCountByOwner(ownerId: string): Promise<number> {
   return await appDB.countDocuments({ _owner: ownerId })
 }
 
-export async function getListByOwner(ownerId: string, page: number, limit: number): Promise<IApplication[]> {
+/**
+ * 获取指定所有人的应用列表
+ * @param {string} ownerId 用户ObjectId或组织ObjectId
+ * @param {number} page 资源页码
+ * @param {number} limit 资源每页数量
+ * @returns {IApp[]} 应用列表
+ */
+export async function getListByOwner(ownerId: string, page: number, limit: number): Promise<IApp[]> {
   return await appDB
     .find({ _owner: ownerId })
     .skip((page - 1) * limit)

@@ -18,7 +18,7 @@ type HttpHandler = (path: string | RegExp | (string | RegExp)[], ...middleware: 
 const whiteLoginList: { method: HttpHandler; urls: string[] }[] = [
   {
     method: router.get,
-    urls: ['/i/users/:name', '/i/util/captcha']
+    urls: ['/i/users/:name', '/i/users/:name/orgs', '/i/util/captcha']
   },
   {
     method: router.post,

@@ -39,11 +39,18 @@ export async function getAllInfo(id: string): Promise<User.GET.ResponseBody> {
   }
 }
 
-export async function getAppsBaseInfo(
+/**
+ * 获取应用基本信息的列表
+ * @param {OnlyOne<Record<'id' | 'name', string>>} u 用户ObjectId或用户名
+ * @param {number} page 资源页码
+ * @param {number} limit 资源每页数量
+ * @returns {GetUsersByNameApps.ResBody} 分页信息与应用列表
+ */
+export async function getAppBaseInfoList(
   u: OnlyOne<{ id: string; name: string }>,
   page: number,
   limit: number
-): Promise<User.Apps.GET.ResponseBody> {
+): Promise<GetUsersByNameApps.ResBody> {
   let id: string
   if (u.id !== undefined) id = u.id
   else {
@@ -53,14 +60,15 @@ export async function getAppsBaseInfo(
   }
   const apps = await appModel.getListByOwner(id, page, limit)
   const total = await appModel.getCountByOwner(id)
-  const data: User.Apps.IApp[] = []
-  for (const i in apps) {
-    data[i] = {
-      name: apps[i].rawName,
-      avatar: apps[i].info.avatar || config!.file.cos.url + config!.file.cos.default,
-      description: apps[i].info.description,
-      state: apps[i].state
-    }
+  const data: GetUsersByNameApps.IApp[] = []
+  for (const app of apps) {
+    app.info.avatar = app.info.avatar || config!.file.cos.url + config!.file.cos.default
+    data.push({
+      id: app._id,
+      name: app.rawName,
+      state: app.state,
+      info: app.info
+    })
   }
   return {
     pagination: {
@@ -135,28 +143,36 @@ export async function getInfo(data: OnlyOne<Record<'id' | 'name', string>>): Pro
   }
 }
 
-export async function getOrgsBaseInfo(
-  uid: OnlyOne<Record<'id' | 'name', string>>,
+/**
+ * 获取组织基本信息的列表
+ * @param {OnlyOne<Record<'id' | 'name', string>>} u 用户ObjectId或用户名
+ * @param {number} page 资源页码
+ * @param {number} limit 资源每页数量
+ * @returns {GetUsersByNameOrgs.ResBody} 分页信息与组织列表
+ */
+export async function getOrgBaseInfoList(
+  u: OnlyOne<Record<'id' | 'name', string>>,
   page: number,
   limit: number
-): Promise<User.Orgs.GET.ResponseBody> {
+): Promise<GetUsersByNameOrgs.ResBody> {
   let id: string
-  if (uid.id !== undefined) id = uid.id
+  if (u.id !== undefined) id = u.id
   else {
-    const user = await userModel.getByName(uid.name)
+    const user = await userModel.getByName(u.name)
     assert(user, 'not_exist_user')
     id = user!._id
   }
   const orgs = await orgModel.getListByUserId(id, page, limit)
   const total = await orgModel.getCountByUserId(id)
-  const data: User.Orgs.IOrg[] = []
-  for (const i in orgs) {
-    data[i] = {
-      name: orgs[i].rawName,
-      avatar: orgs[i].info.avatar || config!.file.cos.url + config!.file.cos.default,
-      create_time: orgs[i].createTime,
-      description: orgs[i].info.description
-    }
+  const data: GetUsersByNameOrgs.IOrg[] = []
+  for (const org of orgs) {
+    org.info.avatar = org.info.avatar || config!.file.cos.url + config!.file.cos.default
+    data.push({
+      name: org.rawName,
+      info: org.info,
+      members: org.members.length,
+      apps: org.app.own
+    })
   }
   return {
     pagination: {
