@@ -1,12 +1,12 @@
 import { ObjectId } from 'bson'
 
 import db from '.'
-import { IOrganization } from './org'
+import { IOrg } from './org'
 import { IUser } from './user'
 
 export interface IRequest {
   _id: any // ObjectId
-  _target: IUser | IOrganization // 目标
+  _target: IUser | IOrg // 目标
   type: number // 申请类型: 0 - 成为开发者, 1 - 成为管理员, 10 - 提高用户应用上限, 11 - 提高用户组织上限, 20 - 提高组织应用上限
   state: number // 申请状态: 0 - 待审核, 1 - 已通过, 2 - 已拒绝
   remark: string // 备注

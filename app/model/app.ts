@@ -1,13 +1,13 @@
 import { ObjectId } from 'bson'
 
 import { rand } from '../../lib/crypto'
-import { IOrganization } from './org'
+import { IOrg } from './org'
 import { IUser } from './user'
 import db from '.'
 
 export interface IApplication {
   _id: any
-  _owner: IUser | IOrganization
+  _owner: IUser | IOrg
   name: string // 项目名，全小写
   rawName: string // 原始项目名
   createTime: Date // 创建时间
@@ -45,16 +45,60 @@ const appSchema = new db.Schema({
 
 const appDB = db.model<ApplicationDocument>('apps', appSchema)
 
-export async function addUser(
+/**
+ * 添加组织应用
+ * @param {string} orgId 组织ObjectId
+ * @param {string} name 应用名
+ * @param {string} description 简介
+ * @param {number} type 类型
+ * @param {string} homeUrl 主页
+ * @param {string} callbackUrl 回调域
+ * @returns {string} 应用ObjectId
+ */
+export async function addOrg(
+  orgId: string,
   name: string,
-  owner: string,
   description: string,
   type: number,
   homeUrl: string,
   callbackUrl: string
 ): Promise<string> {
   const app = await appDB.create({
-    _owner: owner,
+    _owner: orgId,
+    __owner: 'orgs',
+    name: name.toLowerCase(),
+    rawName: name,
+    type: type,
+    key: rand(200).substr(0, 24),
+    callback: callbackUrl,
+    info: {
+      description: description,
+      url: homeUrl
+    }
+  })
+  return app._id
+}
+
+/**
+ * 添加用户应用
+ * @param {string} userId 用户ObjectId
+ * @param {string} name 应用名
+ * @param {string} description 简介
+ * @param {number} type 类型
+ * @param {string} homeUrl 主页
+ * @param {string} callbackUrl 回调域
+ * @returns {string} 应用ObjectId
+ */
+export async function addUser(
+  userId: string,
+  name: string,
+  description: string,
+  type: number,
+  homeUrl: string,
+  callbackUrl: string
+): Promise<string> {
+  const app = await appDB.create({
+    _owner: userId,
     __owner: 'users',
     name: name.toLowerCase(),
     rawName: name,
@@ -70,7 +114,7 @@ export async function addUser(
 }
 
 export async function getByName(name: string): Promise<IApplication | null> {
-  return await appDB.findOne({ name: name.toLowerCase() })
+  return await appDB.findOne({ name: name.toLowerCase() }).populate('_owner', '_id')
 }
 
 export async function getCountByOwner(ownerId: string): Promise<number> {
@@ -84,6 +128,11 @@ export async function getListByOwner(ownerId: string, page: number, limit: numbe
     .limit(limit)
 }
 
+/**
+ * 更新应用头像
+ * @param {string} id 应用ObjectId
+ * @param {string} avatar 应用头像Url
+ */
 export async function setAvatar(id: string, avatar: string) {
-  await appDB.update({ _id: id }, { $set: { 'info.avatar': avatar } })
+  await appDB.updateOne({ _id: id }, { 'info.avatar': avatar })
 }

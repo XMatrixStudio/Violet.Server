@@ -1,12 +1,12 @@
 import { ObjectId } from 'bson'
 
 import db from '.'
-import { IOrganization } from './org'
+import { IOrg } from './org'
 import { IUser } from './user'
 
 interface ILog {
   _id: any
-  _target: IUser | IOrganization
+  _target: IUser | IOrg
   login: {
     ip: string
     time: Date

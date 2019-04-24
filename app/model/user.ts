@@ -241,19 +241,22 @@ export async function updateDevInfo(id: string, name: string, email: string, pho
   await userDB.findByIdAndUpdate(id, { $set: { 'dev.name': name, 'dev.email': email, 'dev.phone': phone } })
 }
 
-export async function updateDevState(id: string, type: string, operator: number): Promise<void> {
+/**
+ * 更新用户开发状态
+ * @param {string} id 用户ObjectId
+ * @param {string} type 更新状态类型，可为`app.own`、`org.own`、`org.join`
+ * @param {number} offset 修改的偏移量
+ */
+export async function updateDevState(id: string, type: 'app.own' | 'org.own' | 'org.join', offset: number) {
   switch (type) {
     case 'app.own':
-      await userDB.updateOne({ _id: id }, { $inc: { 'dev.app.own': operator } })
-      break
-    case 'app.join':
-      await userDB.updateOne({ _id: id }, { $inc: { 'dev.app.join': operator } })
+      await userDB.updateOne({ _id: id }, { $inc: { 'dev.app.own': offset } })
       break
     case 'org.own':
-      await userDB.updateOne({ _id: id }, { $inc: { 'dev.org.own': operator } })
+      await userDB.updateOne({ _id: id }, { $inc: { 'dev.org.own': offset } })
       break
     case 'org.join':
-      await userDB.updateOne({ _id: id }, { $inc: { 'dev.org.join': operator } })
+      await userDB.updateOne({ _id: id }, { $inc: { 'dev.org.join': offset } })
       break
   }
 }
