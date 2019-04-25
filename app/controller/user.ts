@@ -153,23 +153,9 @@ export async function postEmail(ctx: Context) {
   )
 
   verify.checkCaptcha(ctx, body.captcha!)
-  switch (body.operator) {
-    case 'register':
-      assert((await userService.getUserNameByEmail(body.email!)) === null, 'exist_user')
-      await verify.sendEmailCode(ctx, body.operator, body.email!)
-      break
-    case 'reset':
-      const name = await userService.getUserNameByEmail(body.email!)
-      assert(name, 'not_exist_user')
-      await verify.sendEmailCode(ctx, body.operator, body.email!, name!)
-      break
-    case 'update':
-      verify.checkLoginState(ctx)
-      const user = await userService.getAllInfo(ctx.session!.user.id!)
-      assert(user.email !== body.email!.toLowerCase(), 'same_email')
-      await verify.sendEmailCode(ctx, body.operator, body.email!, user.info.nickname)
-      break
-  }
+  if (body.operator === 'update') await verify.requireLogin(ctx)
+  const code = verify.getEmailCode(ctx, body.email!, body.operator!)
+  await userService.sendEmailCode(ctx.session!.user.id!, body.email!, body.operator!, code)
   ctx.status = 201
 }
 
@@ -178,20 +164,26 @@ export async function postEmail(ctx: Context) {
  */
 export async function putEmail(ctx: Context) {
   const body = _.pick<PutUsersEmail.ReqBody>(ctx.request.body, ['operator', 'code', 'password'])
-  assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
-  assert.v({ data: body.code, type: 'string', minLength: 6, maxLength: 6, message: 'invalid_code' })
-  assert.v({ data: body.password, require: false, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+  assert.v(
+    { data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' },
+    { data: body.code, type: 'string', minLength: 6, maxLength: 6, message: 'invalid_code' }
+  )
 
-  verify.checkEmailCode(ctx, body.code!, body.operator!)
   switch (body.operator) {
     case 'register':
+      verify.checkEmailCode(ctx, body.code!, body.operator!)
       ctx.session!.user.register = 'email'
       break
     case 'reset':
+      assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+      verify.checkEmailCode(ctx, body.code!, body.operator!)
       await userService.resetPassword({ email: ctx.session!.verify.email! }, body.password!)
       break
     case 'update':
       verify.checkLoginState(ctx)
+      assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+      await userService.checkPassword(ctx.session!.user.id!, body.password!)
+      verify.checkEmailCode(ctx, body.code!, body.operator!)
       await userService.updateEmailOrPhone(ctx.session!.user.id!, { email: ctx.session!.verify.email! })
       break
   }

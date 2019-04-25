@@ -1,13 +1,12 @@
 import * as Captchapng from 'captchapng2'
 import * as fs from 'fs'
-import * as moment from 'moment'
-import * as mustache from 'mustache'
-import * as Mailer from 'nodemailer'
 
 import config from '../app/config/config'
 import * as userModel from '../app/model/user'
 import { Context } from '../types/context'
 import * as assert from './assert'
+import * as mailer from './email'
+import moment = require('moment')
 
 /**
  * 检查图形验证码, 并且清除Session中的验证码记录
@@ -34,24 +33,22 @@ export function checkCaptcha(ctx: Context, vcode: string): void {
 /**
  * 检查邮箱验证码, 并且清除Session中的验证码记录
  *
- * 当记录不存在时, 抛出`not_exist_code`错误;
- * 当记录超过5分钟后, 抛出`timeout_code`错误;
+ * 当记录不存在或记录超过10分钟时, 抛出`timeout_code`错误;
  * 当记录与操作不符时, 抛出`error_operator`错误;
  * 当记录错误时, 抛出`error_code`错误.
- *
  * @param {Context} ctx Koa上下文
  * @param {string} code 邮箱验证码
+ * @param {string} operator 操作
  */
-export function checkEmailCode(ctx: Context, code: string, operator: string): void {
-  assert(ctx.session!.verify.emailType, 'not_exist_code')
-  assert(Date.now() - ctx.session!.verify.emailTime! < 300 * 1000, 'timeout_code')
+export function checkEmailCode(ctx: Context, code: string, operator: string) {
+  assert(Date.now() - ctx.session!.verify.emailTime! < 600 * 1000, 'timeout_code')
   if (ctx.session!.verify.emailType !== operator) {
-    ctx.session!.verify.emailType = undefined
+    ctx.session!.verify.emailTime = undefined
     assert(false, 'error_operator')
   } else if (ctx.session!.verify.emailCode === code) {
-    ctx.session!.verify.emailType = undefined
+    ctx.session!.verify.emailTime = undefined
   } else {
-    ctx.session!.verify.emailCode = undefined
+    ctx.session!.verify.emailTime = undefined
     assert(false, 'error_code')
   }
 }
@@ -110,12 +107,29 @@ export function getCaptcha(ctx: Context): string {
 }
 
 /**
+ * 生成邮箱验证码，并将验证码记录存储到Session中
+ * @param {Context} ctx Koa上下文
+ * @param {string} email 邮箱地址
+ * @param {string} type 操作类型
+ * @returns {string} 验证码
+ */
+export function getEmailCode(ctx: Context, email: string, type: string): string {
+  assert(!ctx.session!.verify.emailTime || Date.now() - ctx.session!.verify.emailTime! > 60 * 1000, 'limit_time')
+  const rand = Math.trunc(Math.random() * 900000 + 100000)
+  ctx.session!.verify.email = email
+  ctx.session!.verify.emailType = type
+  ctx.session!.verify.emailCode = rand.toString()
+  ctx.session!.verify.emailTime = Date.now()
+  return rand.toString()
+}
+
+/**
  * 登陆状态检验
  * 当不存在登陆记录时，抛出`invalid_token`错误
  * 当登陆记录过期时，抛出`timeout_token`错误
  * @param {Context} ctx Koa上下文
  */
-export async function requireLogin(ctx: Context): Promise<void> {
+export async function requireLogin(ctx: Context) {
   assert(ctx.session!.user.id, 'invalid_token', 401)
   assert(ctx.session!.user.remember || Date.now() - ctx.session!.user.time! <= 86400 * 1000, 'timeout_token', 401)
   if (!ctx.session!.user.remember) ctx.session!.user.time = Date.now()
@@ -131,30 +145,12 @@ export async function requireMinUserLevel(ctx: Context, minLevel: number = 0): P
   assert((await userModel.getLevelById(ctx.session!.user.id!)) >= minLevel, 'permission_deny', 403)
 }
 
-const mailer = Mailer.createTransport({
-  host: config!.email.host,
-  port: config!.email.port,
-  secure: false,
-  auth: {
-    user: config!.email.user,
-    pass: config!.email.password
-  },
-  tls: {
-    ciphers: 'SSLv3'
-  }
-})
-
-const mailOptions: Mailer.SendMailOptions = {
-  from: config!.email.from
-}
-
 /**
  * 发送验证码邮件
  * @param {Context} ctx Koa上下文
  * @param {string} type 操作类型
  * @param {string} email 邮箱地址
  * @param {string | undefined} name 名字
- * @returns {boolean} 是否发送成功
  */
 export async function sendEmailCode(ctx: Context, type: string, email: string, name?: string) {
   assert(!ctx.session!.verify.emailTime || Date.now() - ctx.session!.verify.emailTime! > 60 * 1000, 'limit_time')
@@ -163,21 +159,20 @@ export async function sendEmailCode(ctx: Context, type: string, email: string, n
   ctx.session!.verify.emailType = type
   ctx.session!.verify.emailCode = rand.toString()
   ctx.session!.verify.emailTime = Date.now()
-  const contentOptions = {
-    to: email,
-    subject: '【Violet】邮箱验证码',
-    html: mustache.render(fs.readFileSync('layout/email_verify.html', 'utf8'), {
-      name: type === 'register' ? email : name,
-      code: rand,
-      time: moment().format('YYYY-MM-DD HH:mm:ss')
-    })
-  }
-  try {
-    const info = await mailer.sendMail(Object.assign({}, mailOptions, contentOptions))
-    console.log(info)
-  } catch (err) {
-    console.log(err)
-    assert(false, 'send_fail')
+  switch (type) {
+    case 'register':
+      assert(
+        await mailer.sendEmail(config!.email.from.code, email, 'Violet邮箱验证码', fs.readFileSync('layout/register.html', 'utf8'), {
+          code: rand,
+          time: moment().format('YYYY/M/DD HH:mm:ss')
+        }),
+        'send_fail'
+      )
+      break
+    case 'reset':
+      break
+    case 'update':
+      break
   }
 }
 

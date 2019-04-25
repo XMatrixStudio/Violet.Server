@@ -1,6 +1,7 @@
 import * as assert from '../../lib/assert'
 import config from '../config/config'
 import * as crypto from '../../lib/crypto'
+import * as mailer from '../../lib/email'
 import * as file from '../../lib/file'
 import * as util from '../../lib/util'
 import * as appModel from '../model/app'
@@ -13,6 +14,12 @@ export async function auth(id: string, appName: string, duration: number) {
   const app = await appModel.getByName(appName)
   assert(app, 'not_exist_app')
   await userModel.addAuth(id, app!._id, duration)
+}
+
+export async function checkPassword(id: string, password: string) {
+  const user = (await userModel.getById(id))!
+  const hash = crypto.hashPassword(password, user.secure.salt)
+  assert(user.secure.password === hash.password, 'error_password')
 }
 
 /**
@@ -252,16 +259,37 @@ export async function resetPassword(user: RequireOnlyOne<Record<'email' | 'phone
   await userModel.updatePassword(id, hash.password, hash.salt)
 }
 
+export async function sendEmailCode(id: string, email: string, operator: string, code: string) {
+  let user: userModel.IUser | null
+  switch (operator) {
+    case 'register':
+      assert(!(await userModel.getByEmail(email)), 'exist_user')
+      assert(await mailer.sendRegisterEmailCode(email, code), 'send_fail')
+      break
+    case 'reset':
+      user = await userModel.getByEmail(email)
+      assert(user, 'not_exist_user')
+      assert(await mailer.sendResetEmailCode(email, code, user!.info.nickname), 'send_fail')
+      break
+    case 'update':
+      user = (await userModel.getById(id))!
+      assert(user.email !== email.toLowerCase(), 'same_email')
+      assert(await mailer.sendUpdateEmailCode(email, code, user!.info.nickname), 'send_fail')
+      break
+  }
+}
+
 /**
  * 更新用户登陆信息
  * @param {string} id ObjectId
  * @param {RequireOnlyOne<Record<'email' | 'phone', string>>} user 用户登陆邮箱或手机
  */
-export async function updateEmailOrPhone(id: string, user: RequireOnlyOne<Record<'email' | 'phone', string>>): Promise<void> {
-  if (user.email) {
-    await userModel.updateEmail(id, user.email)
+export async function updateEmailOrPhone(id: string, u: OnlyOne<Record<'email' | 'phone', string>>) {
+  const user = (await userModel.getById(id))!
+  if (u.email !== undefined) {
+    await userModel.setEmail(id, user.email)
   } else {
-    await userModel.updatePhone(id, user.phone!)
+    await userModel.setPhone(id, user.phone)
   }
 }
 

@@ -72,7 +72,9 @@ interface EmailConfig {
   user: string
   password: string
   cipherKey: string
-  from: string
+  from: {
+    code: string
+  }
 }
 
 // 默认导出将使用CommonJS模块标准

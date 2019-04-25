@@ -238,6 +238,15 @@ export async function removeAuth(id: string, appId: string) {
 }
 
 /**
+ * 更新用户登陆邮箱
+ * @param {string} id 用户ObjectId
+ * @param {string} email 用户登陆邮箱
+ */
+export async function setEmail(id: string, email: string) {
+  await userDB.updateOne({ _id: id }, { email: email.toLowerCase() })
+}
+
+/**
  * 更新用户个人信息
  * @param {string} id ObjectId
  * @param {Partial<IUserInfo>} info 用户个人信息
@@ -246,6 +255,15 @@ export async function setInfo(id: string, info: Partial<IUserInfo>) {
   const user = (await userDB.findById(id))!
   user.info = Object.assign(user.info, info)
   await user.save()
+}
+
+/**
+ * 更新用户登陆手机
+ * @param {string} id 用户ObjectId
+ * @param {string} phone 用户登陆手机
+ */
+export async function setPhone(id: string, phone: string) {
+  await userDB.updateOne({ _id: id }, { phone: phone.replace('+86', '') })
 }
 
 export async function updateDevInfo(id: string, name: string, email: string, phone: string) {
@@ -272,28 +290,8 @@ export async function updateDevState(id: string, type: 'app.own' | 'org.own' | '
   }
 }
 
-/**
- * 更新用户登陆邮箱
- *
- * @param {string} id ObjectId
- * @param {string} email 用户登陆邮箱
- */
-export async function updateEmail(id: string, email: string): Promise<void> {
-  await userDB.findByIdAndUpdate(id, { email: email.toLowerCase() })
-}
-
 export async function updateLevel(id: string, level: number): Promise<void> {
   await userDB.findByIdAndUpdate(id, { level: level })
-}
-
-/**
- * 更新用户登陆手机
- *
- * @param {string} id ObjectId
- * @param {string} phone 用户登陆手机
- */
-export async function updatePhone(id: string, phone: string): Promise<void> {
-  await userDB.findByIdAndUpdate(id, { phone: phone.replace('+86', '') })
 }
 
 /**
