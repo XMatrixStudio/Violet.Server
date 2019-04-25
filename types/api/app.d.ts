@@ -5,12 +5,13 @@
 declare namespace PostApps {
   interface ReqBody {
     avatar?: string
-    callbackUrl: string
+    callbackHosts: string[]
     description: string
-    homeUrl: string
+    displayName: string
     name: string
     owner: string
     type: number
+    url: string
   }
 }
 
@@ -35,6 +36,7 @@ declare namespace GetAppsByNameOrId {
     info: {
       avatar: string
       description: string
+      displayName: string
       url: string
     }
   }

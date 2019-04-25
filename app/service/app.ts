@@ -13,18 +13,19 @@ import * as userModel from '../model/user'
  * @param {string} owner 所有人，即用户名或组织名
  * @param {string} description 简介
  * @param {number} type 类型
- * @param {string} homeUrl 主页
- * @param {string} callbackUrl 回调域
+ * @param {string} url 主页
+ * @param {string[]} callbackHosts 回调域数组
  * @param {string} avatar 头像的base64串
  */
 export async function createApp(
   userId: string,
   name: string,
+  displayName: string,
   owner: string,
   description: string,
   type: number,
-  homeUrl: string,
-  callbackUrl: string,
+  url: string,
+  callbackHosts: string[],
   avatar?: string
 ) {
   assert(!util.isReservedUsername(name), 'reserved_name')
@@ -34,12 +35,12 @@ export async function createApp(
   if (user) {
     assert(user._id.toString() === userId, 'not_exist_owner')
     assert(user.dev!.app.limit > user.dev!.app.own, 'limit_apps')
-    id = await appModel.addUser(userId, name, description, type, homeUrl, callbackUrl)
+    id = await appModel.addUser(userId, name, displayName, description, type, url, callbackHosts)
   } else {
     const org = await orgModel.getByName(owner)
     assert(org && (await orgModel.isHasMember(org._id, userId)), 'not_exist_owner')
     assert(org!.app.limit > org!.app.own, 'limit_apps')
-    id = await appModel.addOrg(org!._id, name, description, type, homeUrl, callbackUrl)
+    id = await appModel.addOrg(org!._id, name, displayName, description, type, url, callbackHosts)
   }
   if (avatar) {
     console.log('error')
@@ -48,7 +49,11 @@ export async function createApp(
   }
 }
 
-export async function getAppBaseInfo(a: OnlyOne<Record<'id' | 'name', string>>) {
+/**
+ * 获取应用的基本信息
+ * @param {OnlyOne<Record<'id' | 'name', string>>} a 应用ObjectId或应用名
+ */
+export async function getAppBaseInfo(a: OnlyOne<Record<'id' | 'name', string>>): Promise<GetAppsByNameOrId.ResBody> {
   let app: appModel.IApp | null
   if (a.id !== undefined) app = await appModel.getByIdWithOwner(a.id)
   else app = await appModel.getByNameWithOwner(a.name)

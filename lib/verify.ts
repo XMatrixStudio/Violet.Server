@@ -150,14 +150,13 @@ const mailOptions: Mailer.SendMailOptions = {
 
 /**
  * 发送验证码邮件
- *
  * @param {Context} ctx Koa上下文
  * @param {string} type 操作类型
  * @param {string} email 邮箱地址
  * @param {string | undefined} name 名字
  * @returns {boolean} 是否发送成功
  */
-export async function sendEmailCode(ctx: Context, type: string, email: string, name?: string): Promise<void> {
+export async function sendEmailCode(ctx: Context, type: string, email: string, name?: string) {
   assert(!ctx.session!.verify.emailTime || Date.now() - ctx.session!.verify.emailTime! > 60 * 1000, 'limit_time')
   const rand = Math.trunc(Math.random() * 900000 + 100000)
   ctx.session!.verify.email = email

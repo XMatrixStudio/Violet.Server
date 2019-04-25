@@ -12,24 +12,38 @@ import * as appService from '../service/app'
 export async function post(ctx: Context) {
   await verify.requireMinUserLevel(ctx, 1)
 
-  const body = _.pick<PostApps.ReqBody>(ctx.request.body, ['avatar', 'callbackUrl', 'description', 'homeUrl', 'name', 'owner', 'type'])
+  const body = _.pick<PostApps.ReqBody>(ctx.request.body, [
+    'avatar',
+    'callbackHosts',
+    'description',
+    'displayName',
+    'name',
+    'owner',
+    'type',
+    'url'
+  ])
   assert.v(
     { data: body.avatar, require: false, type: 'string', maxLength: 102400, message: 'invalid_avatar' },
-    { data: body.callbackUrl, type: 'string', regExp: regexp.Url, maxLength: 128, message: 'invalid_callback_url' },
+    { data: body.callbackHosts, type: 'string-array', message: 'invalid_callback_hosts' },
     { data: body.description, type: 'string', maxLength: 256, message: 'invalid_description' },
-    { data: body.homeUrl, type: 'string', regExp: regexp.Url, maxLength: 128, message: 'invalid_home_url' },
+    { data: body.displayName, type: 'string', maxLength: 32, message: 'invalid_display_name' },
     { data: body.name, type: 'string', regExp: regexp.Name, message: 'invalid_name' },
     { data: body.owner, type: 'string', regExp: regexp.Name, message: 'invalid_owner' },
-    { data: body.type, type: 'number', message: 'invalid_type' }
+    { data: body.type, type: 'number', message: 'invalid_type' },
+    { data: body.url, type: 'string', regExp: regexp.Url, maxLength: 128, message: 'invalid_url' }
   )
+  for (const host of body.callbackHosts!) {
+    assert.v({ data: host, type: 'string', regExp: regexp.Url, message: 'invalid_callback_hosts' })
+  }
   await appService.createApp(
     ctx.session!.user.id!,
     body.name!,
+    body.displayName!,
     body.owner!,
     body.description!,
     body.type!,
-    body.homeUrl!,
-    body.callbackUrl!,
+    body.url!,
+    body.callbackHosts as string[],
     body.avatar
   )
   ctx.status = 201

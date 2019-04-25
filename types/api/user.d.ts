@@ -88,6 +88,7 @@ declare namespace GetUsersByNameApps {
   interface IApp {
     id: string
     name: string
+    displayName: string
     state: number
     avatar: string
     description: string
@@ -138,63 +139,77 @@ declare namespace PostUsersEmail {
 declare namespace PutUsersEmail {
   interface ReqBody {
     code: string
-    password?: string
     operator: 'register' | 'reset' | 'update'
+    password?: string
   }
 }
 
-declare namespace User.Level {
-  namespace POST {
-    interface RequestBody {
-      level: 1 | 50 | 99
-      name: string
-      email: string
-      phone: string
-      remark: string
-    }
+/**
+ * @method POST
+ * @resource `/i/users/levels`
+ */
+declare namespace PostUsersLevels {
+  interface ReqBody {
+    level: 1 | 50 | 99
+    name: string
+    email: string
+    phone: string
+    remark: string
   }
 }
 
-declare namespace User.Level.App {
-  namespace POST {
-    interface RequestBody {
-      remark: string
-    }
+/**
+ * @method POST
+ * @resource `/i/users/levels/apps`
+ */
+declare namespace PostUsersLevelsApps {
+  interface ReqBody {
+    remark: string
   }
 }
 
-declare namespace User.Level.Org {
-  namespace POST {
-    interface RequestBody {
-      remark: string
-    }
+/**
+ * @method POST
+ * @resource `/i/users/levels/orgs`
+ */
+declare namespace PostUsersLevelsOrgs {
+  interface ReqBody {
+    remark: string
   }
 }
 
-declare namespace User.Phone {
-  namespace POST {
-    interface RequestBody {
-      operator: 'register' | 'reset' | 'update'
-      captcha: string
-      phone: string
-    }
-  }
-
-  namespace PUT {
-    interface RequestBody {
-      operator: 'register' | 'reset' | 'update'
-      code: string
-      password?: string
-    }
+/**
+ * @method POST
+ * @resource `/i/users/phone`
+ */
+declare namespace PostUsersPhone {
+  interface ReqBody {
+    captcha: string
+    operator: 'register' | 'reset' | 'update'
+    phone: string
   }
 }
 
-declare namespace User.Session {
-  namespace POST {
-    interface RequestBody {
-      user: string
-      password: string
-      remember?: boolean
-    }
+/**
+ * @method PUT
+ * @resource `/i/users/phone`
+ */
+declare namespace PutUsersPhone {
+  interface ReqBody {
+    code: string
+    operator: 'register' | 'reset' | 'update'
+    password?: string
+  }
+}
+
+/**
+ * @method POST
+ * @resource `/i/users/session`
+ */
+declare namespace PostUsersSession {
+  interface ReqBody {
+    user: string
+    password: string
+    remember?: boolean
   }
 }
