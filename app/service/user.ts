@@ -10,10 +10,10 @@ import * as orgModel from '../model/org'
 import * as requestModel from '../model/request'
 import * as userModel from '../model/user'
 
-export async function auth(id: string, appName: string, duration: number) {
-  const app = await appModel.getByName(appName)
+export async function auth(id: string, appId: string, duration: number, scope: string[]) {
+  const app = await appModel.getById(id)
   assert(app, 'not_exist_app')
-  await userModel.addAuth(id, app!._id, duration)
+  await userModel.addAuth(id, app!._id, duration, scope)
 }
 
 export async function checkPassword(id: string, password: string) {
@@ -102,9 +102,26 @@ export async function getAuth(id: string, appName: string): Promise<any> {
   }
 }
 
-export async function getAuths(id: string, page: number, limit: number): Promise<any> {
+export async function getAuths(id: string, page: number, limit: number): Promise<GetUsersAuths.ResBody> {
   const auths = await userModel.getAuths(id, page, limit)
-  return { data: auths }
+  const authsCount = await userModel.getAuthsCount(id)
+  const data: GetUsersAuths.IAuth[] = []
+  for (const auth of auths) {
+    data.push({
+      appId: auth.app._id,
+      duration: auth.duration,
+      scope: auth.scope,
+      time: auth.time
+    })
+  }
+  return {
+    pagination: {
+      page: page,
+      limit: limit,
+      total: authsCount
+    },
+    data: data
+  }
 }
 
 /**

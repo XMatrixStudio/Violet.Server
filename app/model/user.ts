@@ -37,6 +37,7 @@ export interface IUserAuth {
   app: IApp
   time: Date
   duration: number
+  scope: string[]
 }
 
 export interface IUserDev {
@@ -88,7 +89,8 @@ const userSchema = new db.Schema({
     {
       app: { type: ObjectId, ref: 'apps', required: true },
       time: { type: Date, default: Date.now },
-      duration: Number
+      duration: Number,
+      scope: [String]
     }
   ],
   dev: {
@@ -137,15 +139,15 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
   return user._id
 }
 
-export async function addAuth(id: string, appId: string, duration: number): Promise<void> {
+export async function addAuth(id: string, appId: string, duration: number, scope: string[]): Promise<void> {
   const result = await userDB.updateOne(
     { _id: id, 'auth.app': { $ne: appId } },
-    { $push: { auth: { $each: [{ app: appId, duration: duration }], $sort: { time: -1 } } } }
+    { $push: { auth: { $each: [{ app: appId, duration: duration, scope: scope }], $sort: { time: -1 } } } }
   )
   if (result.n === 0) {
     await userDB.updateOne(
       { _id: id, 'auth.app': appId },
-      { 'auth.$.time': Date.now(), $push: { auth: { $each: [], $sort: { time: -1 } } } }
+      { 'auth.$': { app: appId, time: Date.now(), duration: duration, scope: scope }, $push: { auth: { $each: [], $sort: { time: -1 } } } }
     )
   }
 }
@@ -177,6 +179,10 @@ export async function getAuths(id: string, page: number, limit: number): Promise
   const user = await userDB.findById(id, { auth: { $skip: (page - 1) * limit, $limit: limit }, 'auth.$': 1, 'auth.$._id': 0 })
   if (!user) return []
   return user.auth
+}
+
+export async function getAuthsCount(id: string): Promise<number> {
+  return (await userDB.aggregate([{ $match: { _id: id } }, { $project: { n: { $size: '$auth' } } }]))[0].n
 }
 
 /**

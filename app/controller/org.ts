@@ -34,3 +34,11 @@ export async function getByNameApps(ctx: Context) {
   ctx.body = await orgService.getAppBaseInfoList(ctx.params.name, body.page, body.limit)
   ctx.status = 200
 }
+
+export async function postByNameMembers(ctx: Context) {
+  await verify.requireMinUserLevel(ctx, 1)
+  const body = _.pick<PostOrgsByNameMembers.ReqBody>(ctx.request.body, ['user'])
+  assert.v({ data: body.user, type: 'string', regExp: regexp.Name, message: 'invalid_user' })
+  await orgService.addMember(ctx.session!.user.id!, ctx.params.name, body.user!)
+  ctx.status = 201
+}

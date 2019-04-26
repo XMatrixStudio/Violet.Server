@@ -5,6 +5,17 @@ import * as appModel from '../model/app'
 import * as orgModel from '../model/org'
 import * as userModel from '../model/user'
 
+export async function addMember(userId: string, orgName: string, memberName: string) {
+  const org = await orgModel.getByName(orgName)
+  assert(org, 'not_exist_org')
+  const permission = await orgModel.getUserPermission(org!._id, userId)
+  assert(permission.invite, 'permission_deny', 403)
+  const user = await userModel.getByName(memberName)
+  assert(user, 'not_exist_user')
+  assert(await orgModel.isHasMember(org!._id, user!._id), 'already_member')
+  await orgModel.addMember(org!._id, user!._id)
+}
+
 /**
  * 创建组织
  * @param {string} userId 用户ObjectId

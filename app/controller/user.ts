@@ -119,12 +119,20 @@ export async function getAuths(ctx: Context) {
 }
 
 export async function postAuths(ctx: Context) {
-  const body = _.pick(ctx.request.body, ['app', 'duration'])
+  const body = _.pick<PostUsersAuths.ReqBody>(ctx.request.body, ['appId', 'duration', 'scope'])
   assert.v(
-    { data: body.app, type: 'string', regExp: regexp.Name, message: 'invalid_app' },
-    { data: body.duration, type: 'number', enums: [0, 1, 7, 30, 90], message: 'invalid_duration' }
+    { data: body.appId, type: 'string', regExp: regexp.Id, message: 'invalid_app_id' },
+    { data: body.duration, type: 'number', enums: [0, 1, 7, 15, 30, 90], message: 'invalid_duration' },
+    { data: body.scope, type: 'string-array', message: 'invalid_scope' }
   )
-  await userService.auth(ctx.session!.user.id!, body.app, body.duration)
+  body.scope = _.uniq(body.scope)
+  let base = false
+  for (const s of body.scope!) {
+    assert.v({ data: s, type: 'string', enums: ['base', 'info', 'email'], message: 'invalid_scope' })
+    if (s === 'base') base = true
+  }
+  assert(base, 'invalid_scope')
+  await userService.auth(ctx.session!.user.id!, body.appId!, body.duration!, body.scope as string[])
   ctx.status = 201
 }
 

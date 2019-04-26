@@ -121,6 +121,36 @@ declare namespace GetUsersByNameOrgs {
 }
 
 /**
+ * @method GET
+ * @resource `/i/users/auths`
+ */
+declare namespace GetUsersAuths {
+  interface IAuth {
+    appId: string
+    time: Date
+    duration: number
+    scope: string[]
+  }
+  interface Query extends PageQuery {}
+  interface ResBody {
+    pagination: PageRes
+    data: IAuth[]
+  }
+}
+
+/**
+ * @method POST
+ * @resource `/i/users/auths`
+ */
+declare namespace PostUsersAuths {
+  interface ReqBody {
+    appId: string
+    duration: number
+    scope: string[]
+  }
+}
+
+/**
  * @method POST
  * @resource `/i/users/email`
  */

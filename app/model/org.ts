@@ -23,11 +23,16 @@ export interface IOrg {
     limit: number // 应用上限
     own: number // 所属应用数量
   }
+  permission: {
+    appRole: number // 添加应用、删除应用的最低权限
+    memberRole: number // 删除成员、更改成员等级的最低权限
+    inviteRole: number // 邀请成员的最低权限
+  }
 }
 
 export interface IOrgMember {
   _user: IUser
-  role: number // 角色：0 - 普通成员，1 - 管理员，2 - 所有人
+  role: number // 角色：0 - 普通成员，1 - 管理员，2 - 创建者
 }
 
 interface OrgDocument extends db.Document, IOrg {}
@@ -60,6 +65,14 @@ const orgSchema = new db.Schema({
   app: {
     type: { limit: Number, own: Number },
     default: { limit: 5, own: 0 }
+  },
+  permission: {
+    type: {
+      appRole: Number,
+      memberRole: Number,
+      inviteRole: Number
+    },
+    default: { appRole: 1, memberRole: 1, inviteRole: 1 }
   }
 })
 
@@ -90,6 +103,10 @@ export async function add(userId: string, name: string, description: string, con
   })
 }
 
+export async function addMember(id: string, userId: string) {
+  await orgDB.updateOne({ _id: id }, { $push: { members: { _user: userId } } })
+}
+
 /**
  * 获取指定名字的组织
  * @param {string} name 组织名
@@ -117,6 +134,15 @@ export async function getListByUserId(userId: string, page: number, limit: numbe
     .find({ 'members._user': userId })
     .skip(limit * (page - 1))
     .limit(limit)
+}
+
+export async function getUserPermission(id: string, userId: string): Promise<Record<'app' | 'invite' | 'member', boolean>> {
+  const org = await orgDB.findById(id, { 'members._user': userId })
+  return {
+    app: org!.permission.appRole <= org!.members[0].role,
+    invite: org!.permission.inviteRole <= org!.members[0].role,
+    member: org!.permission.memberRole <= org!.members[0].role
+  }
 }
 
 /**

@@ -121,6 +121,10 @@ export async function addUser(
   return app._id
 }
 
+export async function getById(id: string): Promise<IApp | null> {
+  return await appDB.findById(id)
+}
+
 /**
  * 获取指定Id的应用，同时连接Owner
  * @param {string} id 应用ObjectId

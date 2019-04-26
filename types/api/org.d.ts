@@ -31,3 +31,13 @@ declare namespace GetOrgsByNameApps {
     data: IApp[]
   }
 }
+
+/**
+ * @method POST
+ * @resource `/i/orgs/:name/members`
+ */
+declare namespace PostOrgsByNameMembers {
+  interface ReqBody {
+    user: string
+  }
+}
