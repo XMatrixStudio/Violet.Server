@@ -153,3 +153,8 @@ export async function getUserPermission(id: string, userId: string): Promise<Rec
 export async function isHasMember(id: string, userId: string): Promise<boolean> {
   return (await orgDB.countDocuments({ _id: id, 'members._user': userId })) !== 0
 }
+
+export async function updateDevState(id: string, type: 'app.own', offset: number) {
+  // 仅支持类型app.own
+  await orgDB.updateOne({ _id: id }, { $inc: { 'app.own': offset } })
+}

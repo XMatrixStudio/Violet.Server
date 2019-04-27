@@ -165,10 +165,6 @@ export async function addDeveloper(id: string, name: string, email: string, phon
   })
 }
 
-export async function checkIfExistByLevel(level: number): Promise<boolean> {
-  return (await userDB.findOne({ level: level }).countDocuments()) !== 0
-}
-
 export async function getAuthById(id: string, appId: string): Promise<IUserAuth | null> {
   const user = await userDB.findOne({ _id: id, 'auth.app': appId }, { 'auth.$': 1, 'auth.$._id': 0 })
   if (!user) return null
@@ -239,6 +235,10 @@ export async function getLevelById(id: string): Promise<number> {
   return parseInt(levelStr)
 }
 
+export async function isExistByLevel(level: number): Promise<boolean> {
+  return (await userDB.countDocuments({ level: level })) !== 0
+}
+
 export async function removeAuth(id: string, appId: string) {
   await userDB.updateOne({ _id: id, 'auth.app': appId }, { $pull: { auth: { app: appId } } })
 }
@@ -263,6 +263,11 @@ export async function setInfo(id: string, info: Partial<IUserInfo>) {
   await user.save()
 }
 
+export async function setLevel(id: string, level: number): Promise<void> {
+  await userDB.updateOne({ _id: id }, { level: level })
+  await redis.set(`level-${id}`, level.toString(), 1296000)
+}
+
 /**
  * 更新用户登陆手机
  * @param {string} id 用户ObjectId
@@ -270,10 +275,6 @@ export async function setInfo(id: string, info: Partial<IUserInfo>) {
  */
 export async function setPhone(id: string, phone: string) {
   await userDB.updateOne({ _id: id }, { phone: phone.replace('+86', '') })
-}
-
-export async function updateDevInfo(id: string, name: string, email: string, phone: string) {
-  await userDB.findByIdAndUpdate(id, { $set: { 'dev.name': name, 'dev.email': email, 'dev.phone': phone } })
 }
 
 /**
@@ -294,11 +295,6 @@ export async function updateDevState(id: string, type: 'app.own' | 'org.own' | '
       await userDB.updateOne({ _id: id }, { $inc: { 'dev.org.join': offset } })
       break
   }
-}
-
-export async function updateLevel(id: string, level: number): Promise<void> {
-  await userDB.findByIdAndUpdate(id, { level: level })
-  await redis.set(`level-${id}`, level.toString(), 1296000)
 }
 
 /**

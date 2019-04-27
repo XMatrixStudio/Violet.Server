@@ -203,13 +203,25 @@ export async function putEmail(ctx: Context) {
  */
 export async function postLevels(ctx: Context) {
   const body = _.pick<PostUsersLevels.ReqBody>(ctx.request.body, ['level', 'name', 'email', 'phone', 'remark'])
-  assert.v({ data: body.level, type: 'number', enums: [1, 50, 99], message: 'invalid_level' })
-  assert.v({ data: body.name, type: 'string', maxLength: 32, message: 'invalid_name' })
-  assert.v({ data: body.email, type: 'string', regExp: regexp.Email, maxLength: 64, message: 'invalid_email' })
-  assert.v({ data: body.phone, type: 'string', regExp: regexp.Phone, message: 'invalid_phone' })
-  assert.v({ data: body.remark, require: false, type: 'string', maxLength: 256, message: 'invalid_remark' })
+  assert.v(
+    { data: body.level, type: 'number', enums: [1, 50, 99], message: 'invalid_level' },
+    { data: body.remark, require: false, type: 'string', maxLength: 256, message: 'invalid_remark' }
+  )
+  if (body.level === 1) {
+    assert.v(
+      { data: body.name, type: 'string', maxLength: 32, message: 'invalid_name' },
+      { data: body.email, type: 'string', regExp: regexp.Email, maxLength: 64, message: 'invalid_email' },
+      { data: body.phone, type: 'string', regExp: regexp.Phone, message: 'invalid_phone' }
+    )
+  } else {
+    assert.v(
+      { data: body.name, require: false, type: 'string', maxLength: 32, message: 'invalid_name' },
+      { data: body.email, require: false, type: 'string', regExp: regexp.Email, maxLength: 64, message: 'invalid_email' },
+      { data: body.phone, require: false, type: 'string', regExp: regexp.Phone, message: 'invalid_phone' }
+    )
+  }
 
-  await userService.updateLevel(ctx.session!.user.id!, body.level!, body.name!, body.email!, body.phone!)
+  await userService.updateLevel(ctx.session!.user.id!, body.level!, body.remark, body.name, body.email, body.phone)
   ctx.status = 201
 }
 

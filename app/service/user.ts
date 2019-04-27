@@ -323,29 +323,29 @@ export async function updateInfo(id: string, info: Partial<userModel.IUserInfo>)
   await userModel.setInfo(id, info)
 }
 
-export async function updateLevel(id: string, level: 1 | 50 | 99, name: string, email: string, phone: string, remark?: string) {
+export async function updateLevel(id: string, level: 1 | 50 | 99, remark?: string, name?: string, email?: string, phone?: string) {
   const user = (await userModel.getById(id))!
   if (level === 1) {
     assert(user.level === 0, 'not_normal_user')
-    await userModel.addDeveloper(id, name, email, phone)
+    await userModel.addDeveloper(id, name!, email!, phone!)
     await requestModel.addUser(id, 0, remark, 1)
   } else if (level === 50) {
     assert(user.level === 1, 'not_developer')
-    assert(!(await requestModel.checkIfExistByTargetAndType(id, 1)), 'repeat_request')
-    await userModel.updateDevInfo(id, name, email, phone)
+    assert(!(await requestModel.isExistByTargetAndType(id, requestModel.RequestType.LevelAdmin)), 'repeat_request')
     await requestModel.addUser(id, 1, remark)
   } else {
-    assert(!(await userModel.checkIfExistByLevel(99)), 'limit_level')
-    await userModel.updateLevel(id, 99)
+    assert(user.level === 1, 'not_developer')
+    assert(!(await userModel.isExistByLevel(99)), 'limit_level')
+    await userModel.setLevel(id, 99)
   }
 }
 
 export async function updateDevLimit(id: string, type: 'app' | 'org', remark: string) {
   if (type === 'app') {
-    assert(!(await requestModel.checkIfExistByTargetAndType(id, 10)), 'repeat_request')
+    assert(!(await requestModel.isExistByTargetAndType(id, 10)), 'repeat_request')
     await requestModel.addUser(id, 10, remark)
   } else {
-    assert(!(await requestModel.checkIfExistByTargetAndType(id, 11)), 'repeat_request')
+    assert(!(await requestModel.isExistByTargetAndType(id, 11)), 'repeat_request')
     await requestModel.addUser(id, 11, remark)
   }
 }
