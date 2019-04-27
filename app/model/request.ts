@@ -7,18 +7,18 @@ import { IUser } from './user'
 export interface IRequest {
   _id: any // ObjectId
   _target: IUser | IOrg // 目标
-  type: RequestType // 申请类型: 0 - 成为开发者, 1 - 成为管理员, 10 - 提高用户应用上限, 11 - 提高用户组织上限, 20 - 提高组织应用上限
+  type: RequestType // 申请类型
   state: number // 申请状态: 0 - 待审核, 1 - 已通过, 2 - 已拒绝
   remark: string // 备注
   time: Date // 申请时间
 }
 
 export enum RequestType {
-  LevelDev = 0,
-  LevelAdmin = 1,
-  UserAppLimit = 10,
-  UserOrgLimit = 11,
-  OrgAppLimit = 20
+  LevelDev = 0, // 成为开发者
+  LevelAdmin = 1, // 成为管理员
+  UserAppLimit = 10, // 提高用户应用上限
+  UserOrgLimit = 11, // 提高用户组织上限
+  OrgAppLimit = 20 //  提高组织应用上限
 }
 
 export interface RequestDocument extends db.Document, IRequest {}

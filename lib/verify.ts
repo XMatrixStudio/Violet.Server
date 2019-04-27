@@ -145,6 +145,10 @@ export async function requireMinUserLevel(ctx: Context, minLevel: number = 0): P
   assert((await userModel.getLevelById(ctx.session!.user.id!)) >= minLevel, 'permission_deny', 403)
 }
 
+export async function requireUserLevel(ctx: Context, level: number = 0): Promise<void> {
+  assert((await userModel.getLevelById(ctx.session!.user.id!)) === level, 'permission_deny', 403)
+}
+
 /**
  * 发送验证码邮件
  * @param {Context} ctx Koa上下文

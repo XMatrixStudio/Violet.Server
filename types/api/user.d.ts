@@ -111,6 +111,7 @@ declare namespace GetUsersByNameOrgs {
     apps: number
     avatar: string
     description: string
+    displayName: string
     location: string
   }
   interface Query extends PageQuery {}
@@ -151,6 +152,18 @@ declare namespace PostUsersAuths {
 }
 
 /**
+ * @method PUT
+ * @resource `/i/users/dev`
+ */
+declare namespace PutUsersDev {
+  interface ReqBody {
+    email: string
+    name: string
+    phone: string
+  }
+}
+
+/**
  * @method POST
  * @resource `/i/users/email`
  */
@@ -181,10 +194,10 @@ declare namespace PutUsersEmail {
 declare namespace PostUsersLevels {
   interface ReqBody {
     level: 1 | 50 | 99
-    name: string
-    email: string
-    phone: string
-    remark: string
+    name?: string
+    email?: string
+    phone?: string
+    remark?: string
   }
 }
 

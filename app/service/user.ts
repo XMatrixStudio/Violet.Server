@@ -29,7 +29,7 @@ export async function checkPassword(id: string, password: string) {
  */
 export async function getAllInfo(id: string): Promise<GetUsersByName.ResBody> {
   const user = (await userModel.getById(id))!
-  user.info.avatar = user.info.avatar || config!.file.cos.url + config!.file.cos.default
+  user.info.avatar = user.info.avatar || config!.file.cos.url + config!.file.cos.default.user
   const log = (await logModel.getUserLog(id))!
   return {
     email: user.email,
@@ -74,7 +74,7 @@ export async function getAppBaseInfoList(
       name: app.rawName,
       displayName: app.info.displayName,
       state: app.state,
-      avatar: app.info.avatar || config!.file.cos.url + config!.file.cos.default,
+      avatar: app.info.avatar || config!.file.cos.url + config!.file.cos.default.app,
       description: app.info.description
     })
   }
@@ -132,7 +132,7 @@ export async function getAuths(id: string, page: number, limit: number): Promise
 export async function getBaseInfo(name: string): Promise<GetUsersByName.ResBody> {
   const user = await userModel.getByName(name)
   assert(user, 'not_exist_user')
-  user!.info.avatar = user!.info.avatar || config!.file.cos.url + config!.file.cos.default
+  user!.info.avatar = user!.info.avatar || config!.file.cos.url + config!.file.cos.default.user
   const devInfo = user!.dev && {
     app: {
       limit: user!.dev!.app.limit,
@@ -180,8 +180,9 @@ export async function getOrgBaseInfoList(
       name: org.rawName,
       members: org.members.length,
       apps: org.app.own,
-      avatar: org.info.avatar || config!.file.cos.url + config!.file.cos.default,
+      avatar: org.info.avatar || config!.file.cos.url + config!.file.cos.default.org,
       description: org.info.description,
+      displayName: org.info.displayName,
       location: org.info.location
     })
   }
@@ -296,6 +297,10 @@ export async function sendEmailCode(id: string, email: string, operator: string,
   }
 }
 
+export async function updateDevInfo(id: string, name: string, email: string, phone: string) {
+  await userModel.setDevInfo(id, name, email, phone)
+}
+
 /**
  * 更新用户登陆信息
  * @param {string} id ObjectId
@@ -326,15 +331,12 @@ export async function updateInfo(id: string, info: Partial<userModel.IUserInfo>)
 export async function updateLevel(id: string, level: 1 | 50 | 99, remark?: string, name?: string, email?: string, phone?: string) {
   const user = (await userModel.getById(id))!
   if (level === 1) {
-    assert(user.level === 0, 'not_normal_user')
     await userModel.addDeveloper(id, name!, email!, phone!)
     await requestModel.addUser(id, 0, remark, 1)
   } else if (level === 50) {
-    assert(user.level === 1, 'not_developer')
     assert(!(await requestModel.isExistByTargetAndType(id, requestModel.RequestType.LevelAdmin)), 'repeat_request')
     await requestModel.addUser(id, 1, remark)
   } else {
-    assert(user.level === 1, 'not_developer')
     assert(!(await userModel.isExistByLevel(99)), 'limit_level')
     await userModel.setLevel(id, 99)
   }

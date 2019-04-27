@@ -59,7 +59,7 @@ export async function getAppBaseInfo(a: OnlyOne<Record<'id' | 'name', string>>):
   if (a.id !== undefined) app = await appModel.getByIdWithOwner(a.id)
   else app = await appModel.getByNameWithOwner(a.name)
   assert(app, 'not_exist_app')
-  app!.info.avatar = app!.info.avatar || config!.file.cos.url + config!.file.cos.default
+  app!.info.avatar = app!.info.avatar || config!.file.cos.url + config!.file.cos.default.app
   return {
     id: app!._id,
     name: app!.rawName,

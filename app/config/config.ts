@@ -27,7 +27,11 @@ interface HttpConfig {
  */
 interface FileConfig {
   cos: {
-    default: string
+    default: {
+      user: string
+      app: string
+      org: string
+    }
     secretId: string
     secretKey: string
     bucket: string

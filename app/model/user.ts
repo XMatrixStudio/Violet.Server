@@ -243,6 +243,10 @@ export async function removeAuth(id: string, appId: string) {
   await userDB.updateOne({ _id: id, 'auth.app': appId }, { $pull: { auth: { app: appId } } })
 }
 
+export async function setDevInfo(id: string, name: string, email: string, phone: string) {
+  await userDB.updateOne({ _id: id }, { 'dev.email': email, 'dev.name': name, 'dev.phone': phone })
+}
+
 /**
  * 更新用户登陆邮箱
  * @param {string} id 用户ObjectId

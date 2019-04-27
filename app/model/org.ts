@@ -17,6 +17,7 @@ export interface IOrg {
   info: {
     avatar: string
     description: string
+    displayName: string // 组织显示名
     location: string
   }
   app: {
@@ -82,13 +83,23 @@ const orgDB = db.model<OrgDocument>('orgs', orgSchema)
  * 创建组织
  * @param {string} userId 所有人ObjectId
  * @param {string} name 组织名
+ * @param {string} displayName 组织显示名
  * @param {string} description 简介
  * @param {string} contact 联系人姓名
  * @param {string} email 联系人邮箱
  * @param {string} phone 联系人电话
+ * @returns {string} 组织ObjectId
  */
-export async function add(userId: string, name: string, description: string, contact: string, email: string, phone: string) {
-  await orgDB.create({
+export async function add(
+  userId: string,
+  name: string,
+  displayName: string,
+  description: string,
+  contact: string,
+  email: string,
+  phone: string
+): Promise<string> {
+  const org = await orgDB.create({
     members: [{ _user: userId, role: 2 }],
     name: name.toLowerCase(),
     rawName: name,
@@ -98,9 +109,11 @@ export async function add(userId: string, name: string, description: string, con
       phone: phone
     },
     info: {
-      description: description
+      description: description,
+      displayName: displayName
     }
   })
+  return org._id
 }
 
 export async function addMember(id: string, userId: string) {
@@ -152,6 +165,10 @@ export async function getUserPermission(id: string, userId: string): Promise<Rec
  */
 export async function isHasMember(id: string, userId: string): Promise<boolean> {
   return (await orgDB.countDocuments({ _id: id, 'members._user': userId })) !== 0
+}
+
+export async function setAvatar(id: string, avatar: string) {
+  await orgDB.updateOne({ _id: id }, { 'info.avatar': avatar })
 }
 
 export async function updateDevState(id: string, type: 'app.own', offset: number) {

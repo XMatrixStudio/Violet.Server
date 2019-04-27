@@ -149,6 +149,19 @@ export async function getAuthsByApp(ctx: Context) {
   ctx.status = 200
 }
 
+export async function putDev(ctx: Context) {
+  await verify.requireMinUserLevel(ctx, 1)
+
+  const body = _.pick<PutUsersDev.ReqBody>(ctx.request.body, ['email', 'name', 'phone'])
+  assert.v(
+    { data: body.email, type: 'string', regExp: regexp.Email, maxLength: 64, message: 'invalid_email' },
+    { data: body.name, type: 'string', maxLength: 32, message: 'invalid_name' },
+    { data: body.phone, type: 'string', maxLength: 32, message: 'invalid_phone' }
+  )
+  await userService.updateDevInfo(ctx.session!.user.id!, body.name!, body.email!, body.phone!)
+  ctx.status = 200
+}
+
 /**
  * 发送邮箱验证邮件
  */
@@ -208,16 +221,19 @@ export async function postLevels(ctx: Context) {
     { data: body.remark, require: false, type: 'string', maxLength: 256, message: 'invalid_remark' }
   )
   if (body.level === 1) {
+    await verify.requireUserLevel(ctx, 0)
     assert.v(
-      { data: body.name, type: 'string', maxLength: 32, message: 'invalid_name' },
       { data: body.email, type: 'string', regExp: regexp.Email, maxLength: 64, message: 'invalid_email' },
-      { data: body.phone, type: 'string', regExp: regexp.Phone, message: 'invalid_phone' }
+      { data: body.name, type: 'string', maxLength: 32, message: 'invalid_name' },
+      { data: body.phone, type: 'string', maxLength: 32, message: 'invalid_phone' }
     )
   } else {
+    if (body.level === 50) await verify.requireUserLevel(ctx, 1)
+    else await verify.requireMinUserLevel(ctx, 1)
     assert.v(
-      { data: body.name, require: false, type: 'string', maxLength: 32, message: 'invalid_name' },
       { data: body.email, require: false, type: 'string', regExp: regexp.Email, maxLength: 64, message: 'invalid_email' },
-      { data: body.phone, require: false, type: 'string', regExp: regexp.Phone, message: 'invalid_phone' }
+      { data: body.name, require: false, type: 'string', maxLength: 32, message: 'invalid_name' },
+      { data: body.phone, require: false, type: 'string', maxLength: 32, message: 'invalid_phone' }
     )
   }
 

@@ -4,8 +4,10 @@
  */
 declare namespace PostOrgs {
   interface ReqBody {
+    avatar: string
     contact: string
     description: string
+    displayName: string
     email: string
     name: string
     phone: string
