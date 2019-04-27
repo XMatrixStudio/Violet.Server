@@ -317,8 +317,8 @@ export async function updateEmailOrPhone(id: string, u: OnlyOne<Record<'email' |
  */
 export async function updateInfo(id: string, info: Partial<userModel.IUserInfo>) {
   if (info.avatar) {
-    await file.upload(id + '.jpg', Buffer.from(info.avatar.replace('data:image/jpeg;base64,', ''), 'base64'))
-    info.avatar = config!.file.cos.url + id + '.jpg'
+    await file.upload(id + '.png', Buffer.from(info.avatar.replace('data:image/png;base64,', ''), 'base64'))
+    info.avatar = config!.file.cos.url + id + '.png'
   }
   await userModel.setInfo(id, info)
 }
