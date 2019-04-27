@@ -181,9 +181,9 @@ declare namespace PutUsersEmail {
 declare namespace PostUsersLevels {
   interface ReqBody {
     level: 1 | 50 | 99
-    name: string
-    email: string
-    phone: string
+    name?: string
+    email?: string
+    phone?: string
     remark: string
   }
 }
