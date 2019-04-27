@@ -298,6 +298,7 @@ export async function updateDevState(id: string, type: 'app.own' | 'org.own' | '
 
 export async function updateLevel(id: string, level: number): Promise<void> {
   await userDB.findByIdAndUpdate(id, { level: level })
+  await redis.set(`level-${id}`, level.toString(), 1296000)
 }
 
 /**
