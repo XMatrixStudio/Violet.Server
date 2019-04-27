@@ -29,12 +29,13 @@ export async function post(ctx: Context) {
     { data: body.displayName, type: 'string', maxLength: 32, message: 'invalid_display_name' },
     { data: body.name, type: 'string', regExp: regexp.Name, message: 'invalid_name' },
     { data: body.owner, type: 'string', regExp: regexp.Name, message: 'invalid_owner' },
-    { data: body.type, type: 'number', message: 'invalid_type' },
-    { data: body.url, type: 'string', regExp: regexp.Url, maxLength: 128, message: 'invalid_url' }
+    { data: body.type, type: 'number', message: 'invalid_type' }
+    // regexp.Url 正则不支持 IP/localhost 先注释掉这些验证
+    // { data: body.url, type: 'string', regExp: regexp.Url, maxLength: 128, message: 'invalid_url' }
   )
-  for (const host of body.callbackHosts!) {
-    assert.v({ data: host, type: 'string', regExp: regexp.Url, message: 'invalid_callback_hosts' })
-  }
+  // for (const host of body.callbackHosts!) {
+  //   assert.v({ data: host, type: 'string', regExp: regexp.Url, message: 'invalid_callback_hosts' })
+  // }
   await appService.createApp(
     ctx.session!.user.id!,
     body.name!,

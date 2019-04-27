@@ -43,9 +43,8 @@ export async function createApp(
     id = await appModel.addOrg(org!._id, name, displayName, description, type, url, callbackHosts)
   }
   if (avatar) {
-    console.log('error')
-    await file.upload(id + '.jpg', Buffer.from(avatar.replace('data:image/jpeg;base64,', ''), 'base64'))
-    await appModel.setAvatar(id, config!.file.cos.url + id + '.jpg')
+    await file.upload(id + '.png', Buffer.from(avatar.replace('data:image/png;base64,', ''), 'base64'))
+    await appModel.setAvatar(id, config!.file.cos.url + id + '.png')
   }
 }
 
