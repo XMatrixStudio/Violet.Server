@@ -11,8 +11,8 @@ declare namespace Admin.Requests {
     interface Query {
       page: number | string
       limit: number | string
-      state: number | string
-      type: number | string
+      state?: number | string
+      type?: number | string
     }
 
     interface ResponseBody {
