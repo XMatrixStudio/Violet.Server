@@ -286,6 +286,29 @@ export async function sendEmailCode(id: string, email: string, operator: string,
   }
 }
 
+export async function sendPhoneCode(id: string, phone: string, operator: string, code: string) {
+  let user: userModel.IUser | null
+  switch (operator) {
+    case 'register':
+      assert(!(await userModel.getByPhone(phone)), 'exist_user')
+      // TODO: 发送短信
+      assert(true, 'send_fail')
+      break
+    case 'reset':
+      user = await userModel.getByPhone(phone)
+      assert(user, 'not_exist_user')
+      // TODO: 发送短信
+      assert(true, 'send_fail')
+      break
+    case 'update':
+      user = (await userModel.getById(id))!
+      assert(user.phone !== phone.replace('+86', ''), 'same_phone')
+      // TODO: 发送短信
+      assert(true, 'send_fail')
+      break
+  }
+}
+
 export async function updateDevInfo(id: string, name: string, email: string, phone: string) {
   await userModel.setDevInfo(id, name, email, phone)
 }
@@ -298,9 +321,9 @@ export async function updateDevInfo(id: string, name: string, email: string, pho
 export async function updateEmailOrPhone(id: string, u: OnlyOne<Record<'email' | 'phone', string>>) {
   const user = (await userModel.getById(id))!
   if (u.email !== undefined) {
-    await userModel.setEmail(id, user.email)
+    await userModel.setEmail(id, u.email)
   } else {
-    await userModel.setPhone(id, user.phone)
+    await userModel.setPhone(id, u.phone)
   }
 }
 

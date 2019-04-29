@@ -201,7 +201,7 @@ export async function putEmail(ctx: Context) {
       await userService.resetPassword({ email: ctx.session!.verify.email! }, body.password!)
       break
     case 'update':
-      verify.checkLoginState(ctx)
+      await verify.requireLogin(ctx)
       assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
       await userService.checkPassword(ctx.session!.user.id!, body.password!)
       verify.checkEmailCode(ctx, body.code!, body.operator!)
@@ -215,30 +215,17 @@ export async function putEmail(ctx: Context) {
  * 发送手机验证短信, 目前固定验证码为`123456`
  */
 export async function postPhone(ctx: Context) {
-  assert(false, 'not_implement')
   const body = _.pick<PostUsersPhone.ReqBody>(ctx.request.body, ['operator', 'captcha', 'phone'])
-  assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
-  assert.v({ data: body.captcha, type: 'string', minLength: 4, maxLength: 4, message: 'invalid_captcha' })
-  assert.v({ data: body.phone, type: 'string', regExp: regexp.Phone, message: 'invalid_phone' })
+  assert.v(
+    { data: body.captcha, type: 'string', minLength: 4, maxLength: 4, message: 'invalid_captcha' },
+    { data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' },
+    { data: body.phone, type: 'string', regExp: regexp.Phone, message: 'invalid_phone' }
+  )
 
   verify.checkCaptcha(ctx, body.captcha!)
-  switch (body.operator) {
-    case 'register':
-      // assert((await userService.getUserNameByPhone(body.phone!)) === null, 'exist_user')
-      await verify.sendPhoneCode(ctx, body.operator, body.phone!)
-      break
-    case 'reset':
-      // const name = await userService.getUserNameByPhone(body.phone!)
-      assert(name, 'not_exist_user')
-      await verify.sendPhoneCode(ctx, body.operator, body.phone!, name!)
-      break
-    case 'update':
-      verify.checkLoginState(ctx)
-      const user = await userService.getAllInfo(ctx.session!.user.id!)
-      assert(user.phone !== body.phone!.replace('+86', ''), 'same_phone')
-      await verify.sendPhoneCode(ctx, body.operator, body.phone!, user.info.nickname)
-      break
-  }
+  if (body.operator === 'update') await verify.requireLogin(ctx)
+  const code = verify.getPhoneCode(ctx, body.phone!, body.operator!)
+  await userService.sendPhoneCode(ctx.session!.user.id!, body.phone!, body.operator!, code)
   ctx.status = 201
 }
 
@@ -247,20 +234,26 @@ export async function postPhone(ctx: Context) {
  */
 export async function putPhone(ctx: Context) {
   const body = _.pick<PutUsersPhone.ReqBody>(ctx.request.body, ['operator', 'code', 'password'])
-  assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
-  assert.v({ data: body.code, type: 'string', minLength: 6, maxLength: 6, message: 'invalid_code' })
-  assert.v({ data: body.password, require: false, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+  assert.v(
+    { data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' },
+    { data: body.code, type: 'string', minLength: 6, maxLength: 6, message: 'invalid_code' }
+  )
 
-  verify.checkPhoneCode(ctx, body.code!, body.operator!)
   switch (body.operator) {
     case 'register':
+      verify.checkPhoneCode(ctx, body.code!, body.operator!)
       ctx.session!.user.register = 'phone'
       break
     case 'reset':
+      assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+      verify.checkPhoneCode(ctx, body.code!, body.operator!)
       await userService.resetPassword({ phone: ctx.session!.verify.phone! }, body.password!)
       break
     case 'update':
-      verify.checkLoginState(ctx)
+      await verify.requireLogin(ctx)
+      assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+      await userService.checkPassword(ctx.session!.user.id!, body.password!)
+      verify.checkPhoneCode(ctx, body.code!, body.operator!)
       await userService.updateEmailOrPhone(ctx.session!.user.id!, { phone: ctx.session!.verify.phone! })
       break
   }

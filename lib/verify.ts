@@ -11,21 +11,18 @@ import moment = require('moment')
 /**
  * 检查图形验证码, 并且清除Session中的验证码记录
  *
- * 当记录不存在时, 抛出`not_exist_captcha`错误;
- * 当记录超过5分钟后, 抛出`timeout_captcha`错误;
+ * 当记录不存在或记录超过5分钟时, 抛出`timeout_captcha`错误;
  * 当记录错误时, 抛出`error_captcha`错误.
- *
  * @param {Context} ctx Koa上下文
  * @param {string} vcode 图形验证码
  * @returns {boolean} 验证码是否正确
  */
 export function checkCaptcha(ctx: Context, vcode: string): void {
-  assert(ctx.session!.verify.captcha, 'not_exist_captcha')
   assert(Date.now() - ctx.session!.verify.captchaTime! < 300 * 1000, 'timeout_captcha')
   if (ctx.session!.verify.captcha === vcode) {
-    ctx.session!.verify.captcha = undefined
+    ctx.session!.verify.captchaTime = undefined
   } else {
-    ctx.session!.verify.captcha = undefined
+    ctx.session!.verify.captchaTime = undefined
     assert(false, 'error_captcha')
   }
 }
@@ -56,40 +53,23 @@ export function checkEmailCode(ctx: Context, code: string, operator: string) {
 /**
  * 检查手机验证码, 并且清除Session中的验证码记录
  *
- * 当记录不存在时, 抛出`not_exist_code`错误;
- * 当记录超过5分钟后, 抛出`timeout_code`错误;
+ * 当记录不存在或记录超过10分钟时, 抛出`timeout_code`错误;
  * 当记录与操作不符时, 抛出`error_operator`错误;
  * 当记录错误时, 抛出`error_code`错误.
- *
  * @param {Context} ctx Koa上下文
  * @param {string} code 手机验证码
  */
-export function checkPhoneCode(ctx: Context, code: string, operator: string): void {
-  assert(ctx.session!.verify.phoneType, 'not_exist_code')
+export function checkPhoneCode(ctx: Context, code: string, operator: string) {
   assert(Date.now() - ctx.session!.verify.phoneTime! < 300 * 1000, 'timeout_code')
   if (ctx.session!.verify.phoneType !== operator) {
-    ctx.session!.verify.phoneType = undefined
+    ctx.session!.verify.phoneTime = undefined
     assert(false, 'error_operator')
   } else if (ctx.session!.verify.phoneCode === code) {
-    ctx.session!.verify.phoneType = undefined
+    ctx.session!.verify.phoneTime = undefined
   } else {
-    ctx.session!.verify.phoneCode = undefined
+    ctx.session!.verify.phoneTime = undefined
     assert(false, 'error_code')
   }
-}
-
-/**
- * 检查登陆状态
- *
- * 当不存在登陆记录时, 抛出`invalid_token`错误;
- * 当登陆记录过期时, 抛出`timeout_token`错误.
- *
- * @param {Context} ctx Koa上下文
- */
-export function checkLoginState(ctx: Context): void {
-  assert(ctx.session!.user.id, 'invalid_token', 401)
-  assert(ctx.session!.user.remember || Date.now() - ctx.session!.user.time! <= 86400 * 1000, 'timeout_token', 401)
-  if (!ctx.session!.user.remember) ctx.session!.user.time = Date.now()
 }
 
 /**
@@ -120,6 +100,18 @@ export function getEmailCode(ctx: Context, email: string, type: string): string 
   ctx.session!.verify.emailType = type
   ctx.session!.verify.emailCode = rand.toString()
   ctx.session!.verify.emailTime = Date.now()
+  return rand.toString()
+}
+
+export function getPhoneCode(ctx: Context, phone: string, type: string): string {
+  assert(!ctx.session!.verify.phoneTime || Date.now() - ctx.session!.verify.phoneTime! > 60 * 1000, 'limit_time')
+  // TODO: 验证码暂时固定为123456
+  // const rand = Math.trunc(Math.random() * 900000 + 100000)
+  const rand = '123456'
+  ctx.session!.verify.phone = phone
+  ctx.session!.verify.phoneType = type
+  ctx.session!.verify.phoneCode = rand.toString()
+  ctx.session!.verify.phoneTime = Date.now()
   return rand.toString()
 }
 
