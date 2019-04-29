@@ -50,6 +50,45 @@ export async function createOrg(
   }
 }
 
+export async function getAllInfo(userId: string, extId: string): Promise<GetOrgsByExtId.ResBody> {
+  let org: orgModel.IOrg | null
+  if (extId[0] === '+') org = await orgModel.getById(extId.substr(1))
+  else org = await orgModel.getByName(extId)
+  assert(org, 'not_exist_org')
+  assert(await orgModel.isHasMember(org!._id, userId), 'not_member')
+  org!.info.avatar = org!.info.avatar || config!.file.cos.url + config!.file.cos.default.org
+  return {
+    id: org!._id,
+    name: org!.rawName,
+    createTime: org!.createTime,
+    dev: {
+      appLimit: org!.dev.appLimit,
+      appOwn: org!.dev.appOwn,
+      memberLimit: org!.dev.memberLimit,
+      memberOwn: org!.members.length
+    },
+    info: org!.info
+  }
+}
+
+export async function getInfo(extId: string): Promise<GetOrgsByExtId.ResBody> {
+  let org: orgModel.IOrg | null
+  if (extId[0] === '+') org = await orgModel.getById(extId.substr(1))
+  else org = await orgModel.getByName(extId)
+  assert(org, 'not_exist_org')
+  org!.info.avatar = org!.info.avatar || config!.file.cos.url + config!.file.cos.default.org
+  return {
+    id: org!._id,
+    name: org!.rawName,
+    createTime: org!.createTime,
+    dev: {
+      appOwn: org!.dev.appOwn,
+      memberOwn: org!.members.length
+    },
+    info: org!.info
+  }
+}
+
 /**
  * 获取应用基本信息的列表
  * @param {string} orgName 组织名

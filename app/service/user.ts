@@ -8,6 +8,7 @@ import * as appModel from '../model/app'
 import * as logModel from '../model/log'
 import * as orgModel from '../model/org'
 import * as requestModel from '../model/request'
+import { RequestType } from '../model/request'
 import * as userModel from '../model/user'
 
 export async function auth(id: string, appId: string, duration: number, scope: string[]) {
@@ -179,7 +180,7 @@ export async function getOrgBaseInfoList(
     data.push({
       name: org.rawName,
       members: org.members.length,
-      apps: org.app.own,
+      apps: org.dev.appOwn,
       avatar: org.info.avatar || config!.file.cos.url + config!.file.cos.default.org,
       description: org.info.description,
       displayName: org.info.displayName,
@@ -344,10 +345,10 @@ export async function updateLevel(id: string, level: 1 | 50 | 99, remark?: strin
   const user = (await userModel.getById(id))!
   if (level === 1) {
     await userModel.addDeveloper(id, name!, email!, phone!)
-    await requestModel.addUser(id, 0, remark, 1)
+    await requestModel.addUser(id, RequestType.LevelDev, remark, 1)
   } else if (level === 50) {
-    assert(!(await requestModel.isExistByTargetAndType(id, requestModel.RequestType.LevelAdmin)), 'repeat_request')
-    await requestModel.addUser(id, 1, remark)
+    assert(!(await requestModel.isExistByTargetAndType(id, RequestType.LevelAdmin)), 'repeat_request')
+    await requestModel.addUser(id, RequestType.LevelAdmin, remark)
   } else {
     assert(!(await userModel.isExistByLevel(99)), 'limit_level')
     await userModel.setLevel(id, 99)
@@ -356,11 +357,11 @@ export async function updateLevel(id: string, level: 1 | 50 | 99, remark?: strin
 
 export async function updateDevLimit(id: string, type: 'app' | 'org', remark: string) {
   if (type === 'app') {
-    assert(!(await requestModel.isExistByTargetAndType(id, 10)), 'repeat_request')
-    await requestModel.addUser(id, 10, remark)
+    assert(!(await requestModel.isExistByTargetAndType(id, RequestType.UserAppLimit)), 'repeat_request')
+    await requestModel.addUser(id, RequestType.UserAppLimit, remark)
   } else {
-    assert(!(await requestModel.isExistByTargetAndType(id, 11)), 'repeat_request')
-    await requestModel.addUser(id, 11, remark)
+    assert(!(await requestModel.isExistByTargetAndType(id, RequestType.UserOrgLimit)), 'repeat_request')
+    await requestModel.addUser(id, RequestType.UserOrgLimit, remark)
   }
 }
 

@@ -40,9 +40,9 @@ export async function createApp(
   } else {
     const org = await orgModel.getByName(owner)
     assert(org && (await orgModel.isHasMember(org._id, userId)), 'not_exist_owner')
-    assert(org!.app.limit > org!.app.own, 'limit_apps')
+    assert(org!.dev.appLimit > org!.dev.appOwn, 'limit_apps')
     id = await appModel.addOrg(org!._id, name, displayName, description, type, url, callbackHosts)
-    await orgModel.updateDevState(org!._id, 'app.own', 1)
+    await orgModel.updateDevState(org!._id, 'appOwn', 1)
   }
   if (avatar) {
     await file.upload(id + '.png', Buffer.from(avatar.replace('data:image/png;base64,', ''), 'base64'))

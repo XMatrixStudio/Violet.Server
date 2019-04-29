@@ -16,6 +16,35 @@ declare namespace PostOrgs {
 
 /**
  * @method GET
+ * @resource `/i/orgs/:extId`
+ */
+declare namespace GetOrgsByExtId {
+  interface Query { all: boolean | string }
+  interface ResBody {
+    id: string
+    name: string
+    createTime: Date
+    dev: {
+      appLimit?: number
+      appOwn: number
+      memberLimit?: number
+      memberOwn: number
+    }
+    info: {
+      avatar: string
+      contact: string
+      description: string
+      displayName: string
+      email: string
+      location: string
+      phone: string
+      url: string
+    }
+  }
+}
+
+/**
+ * @method GET
  * @resource `/i/orgs/:name/apps`
  */
 declare namespace GetOrgsByNameApps {

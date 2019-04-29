@@ -36,6 +36,16 @@ export async function post(ctx: Context) {
   ctx.status = 201
 }
 
+export async function getByExtId(ctx: Context) {
+  const body = _.pick<GetOrgsByExtId.Query>(ctx.request.query, ['all'])
+  body.all = body.all === 'true' || body.all === ''
+  assert.v({ data: ctx.params.extId, type: 'string', regExp: regexp.ExtId, message: 'invalid_ext_id' })
+
+  if (body.all) ctx.body = await orgService.getAllInfo(ctx.session!.user.id!, ctx.params.extId)
+  else ctx.body = await orgService.getInfo(ctx.params.extId)
+  ctx.status = 200
+}
+
 /**
  * 获取指定组织名`name`的应用列表
  */

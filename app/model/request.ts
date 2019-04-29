@@ -18,7 +18,8 @@ export enum RequestType {
   LevelAdmin = 1, // 成为管理员
   UserAppLimit = 10, // 提高用户应用上限
   UserOrgLimit = 11, // 提高用户组织上限
-  OrgAppLimit = 20 //  提高组织应用上限
+  OrgAppLimit = 20, //  提高组织应用上限
+  OrgMemberLimit = 21 // 提高组织成员上限
 }
 
 export interface RequestDocument extends db.Document, IRequest {}

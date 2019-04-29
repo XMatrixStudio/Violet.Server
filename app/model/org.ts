@@ -9,26 +9,30 @@ export interface IOrg {
   rawName: string // 原始组织名
   createTime: Date // 注册时间
   members: IOrgMember[]
-  contact: {
-    name: string
-    email: string
-    phone: string
-  }
-  info: {
-    avatar: string
-    description: string
-    displayName: string // 组织显示名
-    location: string
-  }
-  app: {
-    limit: number // 应用上限
-    own: number // 所属应用数量
-  }
+  dev: IOrgDev
+  info: IOrgInfo
   permission: {
     appRole: number // 添加应用、删除应用的最低权限
     memberRole: number // 删除成员、更改成员等级的最低权限
     inviteRole: number // 邀请成员的最低权限
   }
+}
+
+export interface IOrgDev {
+  appLimit: number // 应用上限
+  appOwn: number // 所属应用数量
+  memberLimit: number // 成员上限
+}
+
+export interface IOrgInfo {
+  avatar: string
+  contact: string
+  description: string
+  displayName: string // 组织显示名
+  email: string
+  location: string
+  phone: string
+  url: string
 }
 
 export interface IOrgMember {
@@ -48,24 +52,21 @@ const orgSchema = new db.Schema({
   name: { type: String, index: { unique: true }, required: true },
   rawName: { type: String, required: true },
   createTime: { type: Date, default: new Date() },
-  contact: {
-    type: {
-      name: { type: String, required: true },
-      email: { type: String, required: true },
-      phone: { type: String, required: true }
-    },
-    required: true
+  dev: {
+    type: { appLimit: Number, appOwn: Number, memberLimit: Number },
+    default: { appLimit: 5, appOwn: 0, memberLimit: 5 }
   },
   info: {
     type: {
       avatar: String,
+      contact: String,
       description: String,
-      location: String
+      displayName: String,
+      email: String,
+      location: String,
+      phone: String,
+      url: String
     }
-  },
-  app: {
-    type: { limit: Number, own: Number },
-    default: { limit: 5, own: 0 }
   },
   permission: {
     type: {
@@ -103,14 +104,12 @@ export async function add(
     members: [{ _user: userId, role: 2 }],
     name: name.toLowerCase(),
     rawName: name,
-    contact: {
-      name: contact,
+    info: {
+      contact: contact,
+      description: description,
+      displayName: displayName,
       email: email,
       phone: phone
-    },
-    info: {
-      description: description,
-      displayName: displayName
     }
   })
   return org._id
@@ -118,6 +117,10 @@ export async function add(
 
 export async function addMember(id: string, userId: string) {
   await orgDB.updateOne({ _id: id }, { $push: { members: { _user: userId } } })
+}
+
+export async function getById(id: string): Promise<IOrg | null> {
+  return await orgDB.findById(id)
 }
 
 /**
@@ -171,7 +174,16 @@ export async function setAvatar(id: string, avatar: string) {
   await orgDB.updateOne({ _id: id }, { 'info.avatar': avatar })
 }
 
-export async function updateDevState(id: string, type: 'app.own', offset: number) {
-  // 仅支持类型app.own
-  await orgDB.updateOne({ _id: id }, { $inc: { 'app.own': offset } })
+export async function updateDevState(id: string, type: 'appOwn' | 'appLimit' | 'memberLimit', offset: number) {
+  switch (type) {
+    case 'appLimit':
+      await orgDB.updateOne({ _id: id }, { $inc: { 'dev.appLimit': offset } })
+      break
+    case 'appOwn':
+      await orgDB.updateOne({ _id: id }, { $inc: { 'dev.appOwn': offset } })
+      break
+    case 'memberLimit':
+      await orgDB.updateOne({ _id: id }, { $inc: { 'dev.memberLimit': offset } })
+      break
+  }
 }
