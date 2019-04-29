@@ -235,6 +235,17 @@ export async function getLevelById(id: string): Promise<number> {
   return parseInt(levelStr)
 }
 
+export async function getListByReg(regexp: RegExp, page: number, limit: number): Promise<IUser[]> {
+  return await userDB
+    .find({ name: { $regex: regexp } })
+    .skip((page - 1) * limit)
+    .limit(limit)
+}
+
+export async function getListByRegCount(regexp: RegExp): Promise<number> {
+  return await userDB.countDocuments({ name: { $regex: regexp } })
+}
+
 export async function isExistByLevel(level: number): Promise<boolean> {
   return (await userDB.countDocuments({ level: level })) !== 0
 }

@@ -6,6 +6,16 @@ import * as verify from '../../lib/verify'
 import { Context } from '../../types/context'
 import * as userService from '../service/user'
 
+export async function get(ctx: Context) {
+  const body = _.pick<GetUsers.Query>(ctx.request.query, ['page', 'limit', 'name'])
+  assert.v({ data: body.name, type: 'string', regExp: regexp.Name, message: 'invalid_name' })
+  body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+  body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+
+  ctx.body = await userService.getUserListByReg(body.name!, body.page, body.limit)
+  ctx.status = 200
+}
+
 /**
  * 注册用户
  */

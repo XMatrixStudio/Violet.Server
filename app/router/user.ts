@@ -5,6 +5,7 @@ import * as userCtrl from '../controller/user'
 
 const user = new Router<IState, ICustom>()
 
+user.get('/', userCtrl.get) // 获取用户列表
 user.post('/', userCtrl.post) // 注册
 user.patch('/', userCtrl.patch) // 修改用户个人信息
 user.get('/auths', userCtrl.getAuths) // 获取授权列表

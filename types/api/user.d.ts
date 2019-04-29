@@ -1,4 +1,23 @@
 /**
+ * @method GET
+ * @resource `/i/users`
+ */
+declare namespace GetUsers {
+  interface IUser {
+    id: string
+    name: string
+    nickname: string
+    avatar: string
+  }
+  interface Query extends PageQuery { name: string }
+  interface ResBody {
+    pagination: PageRes
+    data: IUser[]
+  }
+}
+
+
+/**
  * @method POST
  * @resource `/i/users`
  */
