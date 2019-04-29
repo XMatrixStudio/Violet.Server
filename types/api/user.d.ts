@@ -189,40 +189,6 @@ declare namespace PutUsersEmail {
 
 /**
  * @method POST
- * @resource `/i/users/levels`
- */
-declare namespace PostUsersLevels {
-  interface ReqBody {
-    level: 1 | 50 | 99
-    name?: string
-    email?: string
-    phone?: string
-    remark?: string
-  }
-}
-
-/**
- * @method POST
- * @resource `/i/users/levels/apps`
- */
-declare namespace PostUsersLevelsApps {
-  interface ReqBody {
-    remark: string
-  }
-}
-
-/**
- * @method POST
- * @resource `/i/users/levels/orgs`
- */
-declare namespace PostUsersLevelsOrgs {
-  interface ReqBody {
-    remark: string
-  }
-}
-
-/**
- * @method POST
  * @resource `/i/users/phone`
  */
 declare namespace PostUsersPhone {
@@ -242,6 +208,53 @@ declare namespace PutUsersPhone {
     code: string
     operator: 'register' | 'reset' | 'update'
     password?: string
+  }
+}
+
+/**
+ * @method GET
+ * @resource `/i/users/requests`
+ */
+declare namespace GetUsersRequests {
+  interface IRequest {
+    remark: string
+    time: Date
+    type: number
+  }
+  type ResBody = IRequest[]
+}
+
+/**
+ * @method POST
+ * @resource `/i/users/requests/levels`
+ */
+declare namespace PostUsersRequestsLevels {
+  interface ReqBody {
+    level: 1 | 50 | 99
+    name?: string
+    email?: string
+    phone?: string
+    remark?: string
+  }
+}
+
+/**
+ * @method POST
+ * @resource `/i/users/requests/apps`
+ */
+declare namespace PostUsersRequestsApps {
+  interface ReqBody {
+    remark: string
+  }
+}
+
+/**
+ * @method POST
+ * @resource `/i/users/requests/orgs`
+ */
+declare namespace PostUsersRequestsOrgs {
+  interface ReqBody {
+    remark: string
   }
 }
 

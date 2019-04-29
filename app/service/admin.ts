@@ -4,8 +4,8 @@ export async function getRequests(page: number, limit: number, type?: number, st
   const option: Partial<Record<'type' | 'state', number>> = {}
   if (type) option.type = type
   if (state) option.state = state
-  const count = await requestModel.getListsCount(option)
-  const requests = await requestModel.getLists(page, limit, option)
+  const count = await requestModel.getListCount(option)
+  const requests = await requestModel.getList(page, limit, option)
   const data: Admin.Requests.IRequest[] = []
   for (const i in requests) {
     data[i] = {

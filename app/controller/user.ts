@@ -212,55 +212,10 @@ export async function putEmail(ctx: Context) {
 }
 
 /**
- * 申请更改用户等级
- */
-export async function postLevels(ctx: Context) {
-  const body = _.pick<PostUsersLevels.ReqBody>(ctx.request.body, ['level', 'name', 'email', 'phone', 'remark'])
-  assert.v(
-    { data: body.level, type: 'number', enums: [1, 50, 99], message: 'invalid_level' },
-    { data: body.remark, require: false, type: 'string', maxLength: 256, message: 'invalid_remark' }
-  )
-  if (body.level === 1) {
-    await verify.requireUserLevel(ctx, 0)
-    assert.v(
-      { data: body.email, type: 'string', regExp: regexp.Email, maxLength: 64, message: 'invalid_email' },
-      { data: body.name, type: 'string', maxLength: 32, message: 'invalid_name' },
-      { data: body.phone, type: 'string', maxLength: 32, message: 'invalid_phone' }
-    )
-  } else {
-    if (body.level === 50) await verify.requireUserLevel(ctx, 1)
-    else await verify.requireMinUserLevel(ctx, 1)
-    assert.v(
-      { data: body.email, require: false, type: 'string', regExp: regexp.Email, maxLength: 64, message: 'invalid_email' },
-      { data: body.name, require: false, type: 'string', maxLength: 32, message: 'invalid_name' },
-      { data: body.phone, require: false, type: 'string', maxLength: 32, message: 'invalid_phone' }
-    )
-  }
-
-  await userService.updateLevel(ctx.session!.user.id!, body.level!, body.remark, body.name, body.email, body.phone)
-  ctx.status = 201
-}
-
-export async function postLevelsApps(ctx: Context) {
-  const body = _.pick<PostUsersLevelsApps.ReqBody>(ctx.request.body, ['remark'])
-  assert.v({ data: body.remark, type: 'string', maxLength: 256, message: 'invalid_remark' })
-
-  await userService.updateDevLimit(ctx.session!.user.id!, 'app', body.remark!)
-  ctx.status = 201
-}
-
-export async function postLevelsOrgs(ctx: Context) {
-  const body = _.pick<PostUsersLevelsOrgs.ReqBody>(ctx.request.body, ['remark'])
-  assert.v({ data: body.remark, type: 'string', maxLength: 256, message: 'invalid_remark' })
-
-  await userService.updateDevLimit(ctx.session!.user.id!, 'org', body.remark!)
-  ctx.status = 201
-}
-
-/**
  * 发送手机验证短信, 目前固定验证码为`123456`
  */
 export async function postPhone(ctx: Context) {
+  assert(false, 'not_implement')
   const body = _.pick<PostUsersPhone.ReqBody>(ctx.request.body, ['operator', 'captcha', 'phone'])
   assert.v({ data: body.operator, type: 'string', enums: ['register', 'reset', 'update'], message: 'invalid_operator' })
   assert.v({ data: body.captcha, type: 'string', minLength: 4, maxLength: 4, message: 'invalid_captcha' })
@@ -269,11 +224,11 @@ export async function postPhone(ctx: Context) {
   verify.checkCaptcha(ctx, body.captcha!)
   switch (body.operator) {
     case 'register':
-      assert((await userService.getUserNameByPhone(body.phone!)) === null, 'exist_user')
+      // assert((await userService.getUserNameByPhone(body.phone!)) === null, 'exist_user')
       await verify.sendPhoneCode(ctx, body.operator, body.phone!)
       break
     case 'reset':
-      const name = await userService.getUserNameByPhone(body.phone!)
+      // const name = await userService.getUserNameByPhone(body.phone!)
       assert(name, 'not_exist_user')
       await verify.sendPhoneCode(ctx, body.operator, body.phone!, name!)
       break
@@ -310,6 +265,57 @@ export async function putPhone(ctx: Context) {
       break
   }
   ctx.status = 200
+}
+
+export async function getRequests(ctx: Context) {
+  ctx.body = await userService.getRequestList(ctx.session!.user.id!)
+  ctx.status = 200
+}
+
+/**
+ * 申请更改用户等级
+ */
+export async function postRequestsLevels(ctx: Context) {
+  const body = _.pick<PostUsersRequestsLevels.ReqBody>(ctx.request.body, ['level', 'name', 'email', 'phone', 'remark'])
+  assert.v(
+    { data: body.level, type: 'number', enums: [1, 50, 99], message: 'invalid_level' },
+    { data: body.remark, require: false, type: 'string', maxLength: 256, message: 'invalid_remark' }
+  )
+  if (body.level === 1) {
+    await verify.requireUserLevel(ctx, 0)
+    assert.v(
+      { data: body.email, type: 'string', regExp: regexp.Email, maxLength: 64, message: 'invalid_email' },
+      { data: body.name, type: 'string', maxLength: 32, message: 'invalid_name' },
+      { data: body.phone, type: 'string', maxLength: 32, message: 'invalid_phone' }
+    )
+  } else {
+    if (body.level === 50) await verify.requireUserLevel(ctx, 1)
+    else await verify.requireMinUserLevel(ctx, 1)
+    assert.v(
+      { data: body.email, require: false, type: 'string', regExp: regexp.Email, maxLength: 64, message: 'invalid_email' },
+      { data: body.name, require: false, type: 'string', maxLength: 32, message: 'invalid_name' },
+      { data: body.phone, require: false, type: 'string', maxLength: 32, message: 'invalid_phone' }
+    )
+  }
+
+  await userService.updateLevel(ctx.session!.user.id!, body.level!, body.remark, body.name, body.email, body.phone)
+  ctx.status = 201
+}
+
+export async function postRequestsApps(ctx: Context) {
+  const body = _.pick<PostUsersRequestsApps.ReqBody>(ctx.request.body, ['remark'])
+  assert.v({ data: body.remark, type: 'string', maxLength: 256, message: 'invalid_remark' })
+
+  await userService.updateDevLimit(ctx.session!.user.id!, 'app', body.remark!)
+  ctx.status = 201
+}
+
+export async function postRequestsOrgs(ctx: Context) {
+  const body = _.pick<PostUsersRequestsOrgs.ReqBody>(ctx.request.body, ['remark'])
+  assert.v({ data: body.remark, type: 'string', maxLength: 256, message: 'invalid_remark' })
+
+  await userService.updateDevLimit(ctx.session!.user.id!, 'org', body.remark!)
+  ctx.status = 201
 }
 
 /**

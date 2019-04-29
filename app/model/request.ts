@@ -28,7 +28,7 @@ const requestSchema = new db.Schema({
   __target: { type: String, required: true, enum: ['users', 'orgs'] },
   type: { type: Number, required: true, index: true },
   remark: String,
-  time: { type: Date, default: new Date() },
+  time: { type: Date, default: Date.now },
   state: { type: Number, default: 0, index: true }
 })
 
@@ -42,7 +42,7 @@ export async function addOrganization(orgId: string, type: RequestType, remark?:
   await requestDB.create({ _target: orgId, __target: 'orgs', type: type, remark: remark, state: state })
 }
 
-export async function getLists(page: number, limit: number, option: Partial<IRequest>): Promise<IRequest[]> {
+export async function getList(page: number, limit: number, option: Partial<IRequest>): Promise<IRequest[]> {
   return await requestDB
     .find(option)
     .populate('_target', 'rawName')
@@ -51,8 +51,12 @@ export async function getLists(page: number, limit: number, option: Partial<IReq
     .limit(limit)
 }
 
-export async function getListsCount(option: Partial<IRequest>): Promise<number> {
+export async function getListCount(option: Partial<IRequest>): Promise<number> {
   return await requestDB.countDocuments(option)
+}
+
+export async function getOpenListByTarget(targetId: string): Promise<IRequest[]> {
+  return await requestDB.find({ _target: targetId, state: 0 })
 }
 
 export async function isExistByTargetAndType(targetId: string, type: RequestType): Promise<boolean> {

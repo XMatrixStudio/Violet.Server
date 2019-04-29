@@ -196,24 +196,13 @@ export async function getOrgBaseInfoList(
   }
 }
 
-/**
- * 根据登陆邮箱获取用户名, 如果用户不存在则返回`null`
- * @param {string} email 用户登陆邮箱
- * @returns {string | null} 用户名或
- */
-export async function getUserNameByEmail(email: string): Promise<string | null> {
-  const user = await userModel.getByEmail(email)
-  return user !== null ? user.name : null
-}
-
-/**
- * 根据登陆手机获取用户名, 如果用户不存在则返回`null`
- * @param {string} phone 用户登陆手机
- * @returns {string | null} 用户名或
- */
-export async function getUserNameByPhone(phone: string): Promise<string | null> {
-  const user = await userModel.getByPhone(phone)
-  return user !== null ? user.name : null
+export async function getRequestList(id: string): Promise<GetUsersRequests.ResBody> {
+  const requests = await requestModel.getOpenListByTarget(id)
+  const data: GetUsersRequests.IRequest[] = []
+  for (const request of requests) {
+    data.push({ remark: request.remark, time: request.time, type: request.type })
+  }
+  return data
 }
 
 /**
