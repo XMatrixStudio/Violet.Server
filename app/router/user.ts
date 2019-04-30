@@ -23,8 +23,8 @@ user.post('/requests/apps', userCtrl.postRequestsApps) // 申请提高用户应�
 user.post('/requests/orgs', userCtrl.postRequestsOrgs) // 申请提高用户组织上限
 user.post('/session', userCtrl.postSession) // 用户登陆
 user.delete('/session', userCtrl.deleteSession) // 用户退出登录
-user.get('/:name', userCtrl.getByName) // 获取用户基本信息
-user.get('/:name/apps', userCtrl.getByNameApps) // 获取用户的应用列表
-user.get('/:name/orgs', userCtrl.getByNameOrgs) // 获取用户的组织列表
+user.get('/:extId', userCtrl.getByExtId) // 获取用户基本信息
+user.get('/:id/apps', userCtrl.getByIdApps) // 获取用户的应用列表
+user.get('/:id/orgs', userCtrl.getByIdOrgs) // 获取用户的组织列表
 
 export = user

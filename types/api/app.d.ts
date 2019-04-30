@@ -17,20 +17,23 @@ declare namespace PostApps {
 
 /**
  * @method GET
- * @resource `/i/apps/:nameOrId`
+ * @resource `/i/apps/:extId`
  */
-declare namespace GetAppsByNameOrId {
+declare namespace GetAppsByExtId {
   interface Query {
-    all: boolean
+    all: boolean | string
   }
   interface ResBody {
     id: string
     name: string
     owner: {
+      id: string
       name: string
       type: 'user' | 'org'
     }
-    createTime: Date | string
+    createTime: Date
+    key?: string
+    callbackHosts?: string[]
     state: number
     type: number
     info: {

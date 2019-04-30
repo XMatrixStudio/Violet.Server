@@ -44,15 +44,11 @@ export interface IUserDev {
   name: string // 联系名称
   email: string // 联系邮箱
   phone: string // 联系电话
-  app: {
-    limit: number // 应用上限
-    own: number // 所属应用数量
-  }
-  org: {
-    limit: number // 组织上限
-    own: number // 所属组织数量
-    join: number // 协作组织数量
-  }
+  appLimit: number // 应用上限
+  appOwn: number // 所属应用数量
+  orgJoin: number // 协作组织数量
+  orgLimit: number // 组织上限
+  orgOwn: number // 所属组织数量
 }
 
 interface UserDocument extends db.Document, IUser {}
@@ -98,19 +94,11 @@ const userSchema = new db.Schema({
       name: String,
       email: String,
       phone: String,
-      app: {
-        type: {
-          limit: { type: Number, default: 5 },
-          own: { type: Number, default: 0 }
-        }
-      },
-      org: {
-        type: {
-          limit: { type: Number, default: 5 },
-          own: { type: Number, default: 0 },
-          join: { type: Number, default: 0 }
-        }
-      }
+      appLimit: Number,
+      appOwn: Number,
+      orgJoin: Number,
+      orgLimit: Number,
+      orgOwn: Number
     }
   }
 })
@@ -159,8 +147,11 @@ export async function addDeveloper(id: string, name: string, email: string, phon
       name: name,
       email: email,
       phone: phone,
-      app: { limit: 5, own: 0, join: 0 },
-      org: { limit: 5, own: 0, join: 0 }
+      appLimit: 5,
+      appOwn: 0,
+      orgJoin: 0,
+      orgLimit: 5,
+      orgOwn: 0
     }
   })
 }
@@ -299,26 +290,25 @@ export async function setPhone(id: string, phone: string) {
 /**
  * 更新用户开发状态
  * @param {string} id 用户ObjectId
- * @param {string} type 更新状态类型，可为`app.own`、`org.own`、`org.join`
+ * @param {string} type 更新状态类型，可为`appOwn`、`orgOwn`、`orgJoin`
  * @param {number} offset 修改的偏移量
  */
-export async function updateDevState(id: string, type: 'app.own' | 'org.own' | 'org.join', offset: number) {
+export async function updateDevState(id: string, type: 'appOwn' | 'orgOwn' | 'orgJoin', offset: number) {
   switch (type) {
-    case 'app.own':
-      await userDB.updateOne({ _id: id }, { $inc: { 'dev.app.own': offset } })
+    case 'appOwn':
+      await userDB.updateOne({ _id: id }, { $inc: { 'dev.appOwn': offset } })
       break
-    case 'org.own':
-      await userDB.updateOne({ _id: id }, { $inc: { 'dev.org.own': offset } })
+    case 'orgOwn':
+      await userDB.updateOne({ _id: id }, { $inc: { 'dev.orgOwn': offset } })
       break
-    case 'org.join':
-      await userDB.updateOne({ _id: id }, { $inc: { 'dev.org.join': offset } })
+    case 'orgJoin':
+      await userDB.updateOne({ _id: id }, { $inc: { 'dev.orgJoin': offset } })
       break
   }
 }
 
 /**
  * 更新用户密码
- *
  * @param {string} id ObjectId
  * @param {string} password 经过加盐和哈希的密码
  * @param {string} salt 盐

@@ -38,11 +38,11 @@ export async function createOrg(
   avatar?: string
 ) {
   const user = (await userModel.getById(userId))!
-  assert(user.dev!.org.limit > user.dev!.org.own, 'limit_orgs')
+  assert(user.dev!.orgLimit > user.dev!.orgOwn, 'limit_orgs')
   assert(!util.isReservedUsername(name), 'reserved_name')
   assert(!(await orgModel.getByName(name)) && !(await userModel.getByName(name)), 'exist_name')
   const id = await orgModel.add(userId, name, displayName, description, contact, email, phone)
-  await userModel.updateDevState(userId, 'org.own', 1)
+  await userModel.updateDevState(userId, 'orgOwn', 1)
   if (avatar) {
     await file.upload(id + '.png', Buffer.from(avatar.replace('data:image/png;base64,', ''), 'base64'))
     await orgModel.setAvatar(id, config!.file.cos.url + id + '.png')
@@ -90,17 +90,16 @@ export async function getInfo(extId: string): Promise<GetOrgsByExtId.ResBody> {
 
 /**
  * 获取应用基本信息的列表
- * @param {string} orgName 组织名
+ * @param {string} id 组织Id
  * @param {number} page 资源页码
  * @param {number} limit 资源每页数量
- * @returns {GetOrgsByNameApps.ResBody} 分页信息与应用列表
+ * @returns {GetOrgsByIdApps.ResBody} 分页信息与应用列表
  */
-export async function getAppBaseInfoList(orgName: string, page: number, limit: number): Promise<GetOrgsByNameApps.ResBody> {
-  const org = await orgModel.getByName(orgName)
-  assert(org, 'not_exist_org')
-  const apps = await appModel.getListByOwner(org!._id, page, limit)
-  const total = await appModel.getCountByOwner(org!._id)
-  const data: GetOrgsByNameApps.IApp[] = []
+export async function getAppBaseInfoList(id: string, page: number, limit: number): Promise<GetOrgsByIdApps.ResBody> {
+  assert(await orgModel.isExist(id), 'not_exist_org')
+  const apps = await appModel.getListByOwner(id, page, limit)
+  const count = await appModel.getCountByOwner(id)
+  const data: GetOrgsByIdApps.IApp[] = []
   for (const app of apps) {
     data.push({
       id: app._id,
@@ -112,11 +111,7 @@ export async function getAppBaseInfoList(orgName: string, page: number, limit: n
     })
   }
   return {
-    pagination: {
-      page: page,
-      limit: limit,
-      total: total
-    },
+    pagination: { page: page, limit: limit, total: count },
     data: data
   }
 }

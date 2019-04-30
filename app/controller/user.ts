@@ -11,7 +11,6 @@ export async function get(ctx: Context) {
   assert.v({ data: body.name, type: 'string', regExp: regexp.Name, message: 'invalid_name' })
   body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
   body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-
   ctx.body = await userService.getUserListByReg(body.name!, body.page, body.limit)
   ctx.status = 200
 }
@@ -47,7 +46,7 @@ export async function post(ctx: Context) {
 export async function patch(ctx: Context) {
   const body = _.pick<PatchUsers.ReqBody>(ctx.request.body, ['secure', 'info'])
   if (body.secure) {
-    body.secure = _.pick(body.secure, ['new_password', 'old_password'])
+    body.secure = _.pick(body.secure, ['newPassword', 'oldPassword'])
     assert.v(
       { data: body.secure.newPassword, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_new_password' },
       { data: body.secure.oldPassword, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_old_password' }
@@ -69,53 +68,6 @@ export async function patch(ctx: Context) {
       { data: body.info.url, require: false, type: 'string', regExp: regexp.Url, maxLength: 128, message: 'invalid_url' }
     )
     await userService.updateInfo(ctx.session!.user.id!, body.info as any)
-  }
-  ctx.status = 200
-}
-
-/**
- * 获取用户信息
- */
-export async function getByName(ctx: Context) {
-  if (ctx.params.name === 'me') {
-    await verify.requireLogin(ctx)
-    ctx.body = await userService.getAllInfo(ctx.session!.user.id!)
-  } else {
-    ctx.body = await userService.getBaseInfo(ctx.params.name)
-  }
-  ctx.status = 200
-}
-
-/**
- * 获取指定用户名`name`的应用列表，当`name`为`me`时指定当前用户
- */
-export async function getByNameApps(ctx: Context) {
-  const body = _.pick<GetUsersByNameApps.Query>(ctx.request.query, ['page', 'limit'])
-  body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
-  body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-
-  if (ctx.params.name === 'me') {
-    await verify.requireLogin(ctx)
-    ctx.body = await userService.getAppBaseInfoList({ id: ctx.session!.user.id! }, body.page, body.limit)
-  } else {
-    ctx.body = await userService.getAppBaseInfoList({ name: ctx.params.name }, body.page, body.limit)
-  }
-  ctx.status = 200
-}
-
-/**
- * 获取指定用户名`name`的组织列表，当`name`为`me`时指定当前用户
- */
-export async function getByNameOrgs(ctx: Context) {
-  const body = _.pick<GetUsersByNameOrgs.Query>(ctx.request.query, ['page', 'limit'])
-  body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
-  body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-
-  if (ctx.params.name === 'me') {
-    await verify.requireLogin(ctx)
-    ctx.body = await userService.getOrgBaseInfoList({ id: ctx.session!.user.id! }, body.page, body.limit)
-  } else {
-    ctx.body = await userService.getOrgBaseInfoList({ name: ctx.params.name }, body.page, body.limit)
   }
   ctx.status = 200
 }
@@ -356,4 +308,33 @@ export async function postSession(ctx: Context) {
 export async function deleteSession(ctx: Context) {
   ctx.session = null
   ctx.status = 204
+}
+
+export async function getByExtId(ctx: Context) {
+  if (ctx.params.extId === 'me') {
+    await verify.requireLogin(ctx)
+    ctx.body = await userService.getAllInfo(ctx.session!.user.id!)
+  } else {
+    assert.v({ data: ctx.params.extId, type: 'string', regExp: regexp.ExtId, message: 'invalid_ext_id' })
+    ctx.body = await userService.getBaseInfo(ctx.params.extId)
+  }
+  ctx.status = 200
+}
+
+export async function getByIdApps(ctx: Context) {
+  const body = _.pick<GetUsersByIdApps.Query>(ctx.request.query, ['page', 'limit'])
+  body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+  body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+  assert.v({ data: ctx.params.id, type: 'string', regExp: regexp.Id, message: 'invalid_id' })
+  ctx.body = await userService.getAppBaseInfoList(ctx.params.id, body.page, body.limit)
+  ctx.status = 200
+}
+
+export async function getByIdOrgs(ctx: Context) {
+  const body = _.pick<GetUsersByIdOrgs.Query>(ctx.request.query, ['page', 'limit'])
+  body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+  body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+  assert.v({ data: ctx.params.id, type: 'string', regExp: regexp.Id, message: 'invalid_id' })
+  ctx.body = await userService.getOrgBaseInfoList(ctx.params.id, body.page, body.limit)
+  ctx.status = 200
 }

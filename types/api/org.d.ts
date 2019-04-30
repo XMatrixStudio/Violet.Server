@@ -45,9 +45,9 @@ declare namespace GetOrgsByExtId {
 
 /**
  * @method GET
- * @resource `/i/orgs/:name/apps`
+ * @resource `/i/orgs/:id/apps`
  */
-declare namespace GetOrgsByNameApps {
+declare namespace GetOrgsByIdApps {
   interface IApp {
     id: string
     name: string

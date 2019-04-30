@@ -28,7 +28,7 @@ export async function checkPassword(id: string, password: string) {
  * @param {string} id 用户ObjectId
  * @returns {GetUsersByName.ResBody} 用户信息
  */
-export async function getAllInfo(id: string): Promise<GetUsersByName.ResBody> {
+export async function getAllInfo(id: string): Promise<GetUsersByExtId.ResBody> {
   const user = (await userModel.getById(id))!
   user.info.avatar = user.info.avatar || config!.file.cos.url + config!.file.cos.default.user
   const log = (await logModel.getUserLog(id))!
@@ -49,26 +49,16 @@ export async function getAllInfo(id: string): Promise<GetUsersByName.ResBody> {
 
 /**
  * 获取应用基本信息的列表
- * @param {OnlyOne<Record<'id' | 'name', string>>} u 用户ObjectId或用户名
+ * @param {string} id 用户ObjectId
  * @param {number} page 资源页码
  * @param {number} limit 资源每页数量
  * @returns {GetUsersByNameApps.ResBody} 分页信息与应用列表
  */
-export async function getAppBaseInfoList(
-  u: OnlyOne<{ id: string; name: string }>,
-  page: number,
-  limit: number
-): Promise<GetUsersByNameApps.ResBody> {
-  let id: string
-  if (u.id !== undefined) id = u.id
-  else {
-    const user = await userModel.getByName(u.name)
-    assert(user, 'not_exist_user')
-    id = user!._id
-  }
+export async function getAppBaseInfoList(id: string, page: number, limit: number): Promise<GetUsersByIdApps.ResBody> {
+  assert(await userModel.isExist(id), 'not_exist_user')
   const apps = await appModel.getListByOwner(id, page, limit)
-  const total = await appModel.getCountByOwner(id)
-  const data: GetUsersByNameApps.IApp[] = []
+  const count = await appModel.getCountByOwner(id)
+  const data: GetUsersByIdApps.IApp[] = []
   for (const app of apps) {
     data.push({
       id: app._id,
@@ -80,11 +70,7 @@ export async function getAppBaseInfoList(
     })
   }
   return {
-    pagination: {
-      page: page,
-      limit: limit,
-      total: total
-    },
+    pagination: { page: page, limit: limit, total: count },
     data: data
   }
 }
@@ -127,23 +113,19 @@ export async function getAuths(id: string, page: number, limit: number): Promise
 
 /**
  * 获取用户的基本信息
- * @param {string} name 用户名
- * @returns {GetUsersByName.ResBody} 用户信息
+ * @param {string} extId 用户扩展Id
+ * @returns {GetUsersByExtId.ResBody} 用户信息
  */
-export async function getBaseInfo(name: string): Promise<GetUsersByName.ResBody> {
-  const user = await userModel.getByName(name)
+export async function getBaseInfo(extId: string): Promise<GetUsersByExtId.ResBody> {
+  let user: userModel.IUser | null
+  if (extId[0] === '+') user = await userModel.getById(extId.substr(1))
+  else user = await userModel.getByName(extId)
   assert(user, 'not_exist_user')
   user!.info.avatar = user!.info.avatar || config!.file.cos.url + config!.file.cos.default.user
   const devInfo = user!.dev && {
-    app: {
-      limit: user!.dev!.app.limit,
-      own: user!.dev!.app.own
-    },
-    org: {
-      limit: user!.dev!.org.limit,
-      own: user!.dev!.org.own,
-      join: user!.dev!.org.join
-    }
+    appOwn: user!.dev!.appOwn,
+    orgJoin: user!.dev!.orgJoin,
+    orgOwn: user!.dev!.orgOwn
   }
   return {
     name: user!.rawName,
@@ -156,43 +138,26 @@ export async function getBaseInfo(name: string): Promise<GetUsersByName.ResBody>
 
 /**
  * 获取组织基本信息的列表
- * @param {OnlyOne<Record<'id' | 'name', string>>} u 用户ObjectId或用户名
+ * @param {string} id 用户ObjectId
  * @param {number} page 资源页码
  * @param {number} limit 资源每页数量
  * @returns {GetUsersByNameOrgs.ResBody} 分页信息与组织列表
  */
-export async function getOrgBaseInfoList(
-  u: OnlyOne<Record<'id' | 'name', string>>,
-  page: number,
-  limit: number
-): Promise<GetUsersByNameOrgs.ResBody> {
-  let id: string
-  if (u.id !== undefined) id = u.id
-  else {
-    const user = await userModel.getByName(u.name)
-    assert(user, 'not_exist_user')
-    id = user!._id
-  }
+export async function getOrgBaseInfoList(id: string, page: number, limit: number): Promise<GetUsersByIdOrgs.ResBody> {
+  assert(await userModel.isExist(id), 'not_exist_user')
   const orgs = await orgModel.getListByUserId(id, page, limit)
-  const total = await orgModel.getCountByUserId(id)
-  const data: GetUsersByNameOrgs.IOrg[] = []
+  const count = await orgModel.getCountByUserId(id)
+  const data: GetUsersByIdOrgs.IOrg[] = []
   for (const org of orgs) {
     data.push({
+      id: org._id,
       name: org.rawName,
-      members: org.members.length,
-      apps: org.dev.appOwn,
       avatar: org.info.avatar || config!.file.cos.url + config!.file.cos.default.org,
-      description: org.info.description,
-      displayName: org.info.displayName,
-      location: org.info.location
+      displayName: org.info.displayName
     })
   }
   return {
-    pagination: {
-      page: page,
-      limit: limit,
-      total: total
-    },
+    pagination: { page: page, limit: limit, total: count },
     data: data
   }
 }

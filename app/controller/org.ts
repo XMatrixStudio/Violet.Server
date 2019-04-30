@@ -11,7 +11,6 @@ import * as orgService from '../service/org'
  */
 export async function post(ctx: Context) {
   await verify.requireMinUserLevel(ctx, 1)
-
   const body = _.pick<PostOrgs.ReqBody>(ctx.request.body, ['avatar', 'contact', 'description', 'displayName', 'email', 'name', 'phone'])
   assert.v(
     { data: body.avatar, require: false, type: 'string', maxLength: 102400, message: 'invalid_avatar' },
@@ -22,7 +21,6 @@ export async function post(ctx: Context) {
     { data: body.name, type: 'string', regExp: regexp.Name, message: 'invalid_name' },
     { data: body.phone, type: 'string', maxLength: 32, message: 'invalid_phone' }
   )
-
   await orgService.createOrg(
     ctx.session!.user.id!,
     body.name!,
@@ -40,20 +38,17 @@ export async function getByExtId(ctx: Context) {
   const body = _.pick<GetOrgsByExtId.Query>(ctx.request.query, ['all'])
   body.all = body.all === 'true' || body.all === ''
   assert.v({ data: ctx.params.extId, type: 'string', regExp: regexp.ExtId, message: 'invalid_ext_id' })
-
   if (body.all) ctx.body = await orgService.getAllInfo(ctx.session!.user.id!, ctx.params.extId)
   else ctx.body = await orgService.getInfo(ctx.params.extId)
   ctx.status = 200
 }
 
-/**
- * 获取指定组织名`name`的应用列表
- */
-export async function getByNameApps(ctx: Context) {
-  const body = _.pick<GetOrgsByNameApps.Query>(ctx.request.query, ['page', 'limit'])
+export async function getByIdApps(ctx: Context) {
+  const body = _.pick<GetOrgsByIdApps.Query>(ctx.request.query, ['page', 'limit'])
   body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
   body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-  ctx.body = await orgService.getAppBaseInfoList(ctx.params.name, body.page, body.limit)
+  assert.v({ data: ctx.params.id, type: 'string', regExp: regexp.Id, message: 'invalid_id' })
+  ctx.body = await orgService.getAppBaseInfoList(ctx.params.id, body.page, body.limit)
   ctx.status = 200
 }
 
@@ -61,6 +56,7 @@ export async function getByIdMembers(ctx: Context) {
   const body = _.pick<GetOrgsByIdMembers.Query>(ctx.request.query, ['page', 'limit'])
   body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
   body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+  assert.v({ data: ctx.params.id, type: 'string', regExp: regexp.Id, message: 'invalid_id' })
   ctx.body = await orgService.getMembers(ctx.params.id, body.page, body.limit)
   ctx.status = 200
 }

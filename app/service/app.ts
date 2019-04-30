@@ -34,9 +34,9 @@ export async function createApp(
   let id: string
   if (user) {
     assert(user._id.toString() === userId, 'not_exist_owner')
-    assert(user.dev!.app.limit > user.dev!.app.own, 'limit_apps')
+    assert(user.dev!.appLimit > user.dev!.appOwn, 'limit_apps')
     id = await appModel.addUser(userId, name, displayName, description, type, url, callbackHosts)
-    await userModel.updateDevState(userId, 'app.own', 1)
+    await userModel.updateDevState(userId, 'appOwn', 1)
   } else {
     const org = await orgModel.getByName(owner)
     assert(org && (await orgModel.isHasMember(org._id, userId)), 'not_exist_owner')
@@ -50,20 +50,42 @@ export async function createApp(
   }
 }
 
-/**
- * 获取应用的基本信息
- * @param {OnlyOne<Record<'id' | 'name', string>>} a 应用ObjectId或应用名
- */
-export async function getAppBaseInfo(a: OnlyOne<Record<'id' | 'name', string>>): Promise<GetAppsByNameOrId.ResBody> {
+export async function getAllInfo(userId: string, extId: string): Promise<GetAppsByExtId.ResBody> {
   let app: appModel.IApp | null
-  if (a.id !== undefined) app = await appModel.getByIdWithOwner(a.id)
-  else app = await appModel.getByNameWithOwner(a.name)
+  if (extId[0] === '+') app = await appModel.getByIdWith(extId.substr(1), '_id rawName')
+  else app = await appModel.getByNameWith(extId, '_id rawName')
+  assert(app, 'not_exist_app')
+  assert(!(app!.__owner === 'users' && app!._owner.toString() !== userId), 'not_owner')
+  assert(await orgModel.isHasMember(app!.__owner, userId), 'not_owner')
+  app!.info.avatar = app!.info.avatar || config!.file.cos.url + config!.file.cos.default.app
+  return {
+    id: app!._id,
+    name: app!.rawName,
+    owner: {
+      id: app!._owner._id,
+      name: app!._owner.rawName,
+      type: app!.__owner === 'users' ? 'user' : 'org'
+    },
+    createTime: app!.createTime,
+    key: app!.key,
+    callbackHosts: app!.callbackHosts,
+    state: app!.state,
+    type: app!.type,
+    info: app!.info
+  }
+}
+
+export async function getBaseInfo(extId: string): Promise<GetAppsByExtId.ResBody> {
+  let app: appModel.IApp | null
+  if (extId[0] === '+') app = await appModel.getByIdWith(extId.substr(1), '_id rawName')
+  else app = await appModel.getByNameWith(extId, '_id rawName')
   assert(app, 'not_exist_app')
   app!.info.avatar = app!.info.avatar || config!.file.cos.url + config!.file.cos.default.app
   return {
     id: app!._id,
     name: app!.rawName,
     owner: {
+      id: app!._owner._id,
       name: app!._owner.rawName,
       type: app!.__owner === 'users' ? 'user' : 'org'
     },

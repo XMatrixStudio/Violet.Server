@@ -130,8 +130,8 @@ export async function getById(id: string): Promise<IApp | null> {
  * @param {string} id 应用ObjectId
  * @returns {IApp | null} 应用信息
  */
-export async function getByIdWithOwner(id: string): Promise<IApp | null> {
-  return await appDB.findById(id).populate('_owner')
+export async function getByIdWith(id: string, populate: string): Promise<IApp | null> {
+  return await appDB.findById(id).populate('_owner', populate)
 }
 
 /**
@@ -140,7 +140,11 @@ export async function getByIdWithOwner(id: string): Promise<IApp | null> {
  * @returns {IApp | null} 应用信息
  */
 export async function getByName(name: string): Promise<IApp | null> {
-  return await appDB.findOne({ name: name.toLowerCase() }).populate('_owner')
+  return await appDB.findOne({ name: name.toLowerCase() })
+}
+
+export async function getByNameWith(name: string, populate: string): Promise<IApp | null> {
+  return await appDB.findOne({ name: name.toLowerCase() }).populate('_owner', populate)
 }
 
 /**

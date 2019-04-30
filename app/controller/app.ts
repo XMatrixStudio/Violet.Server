@@ -50,19 +50,11 @@ export async function post(ctx: Context) {
   ctx.status = 201
 }
 
-/**
- * 获取指定`name`或`id`的应用信息
- */
-export async function getByNameOrId(ctx: Context) {
-  const body = _.pick<GetAppsByNameOrId.Query>(ctx.request.query, ['all'])
-  body.all = body.all === true
-  assert(ctx.params.nameOrId && ctx.params.nameOrId.length !== 0, 'invalid_name')
-  if (ctx.params.nameOrId[0] !== '+') {
-    assert.v({ data: ctx.params.nameOrId, type: 'string', regExp: regexp.Name, message: 'invalid_name' })
-    ctx.body = await appService.getAppBaseInfo({ name: ctx.params.nameOrId })
-  } else {
-    assert.v({ data: ctx.params.nameOrId, type: 'string', regExp: regexp.ExtId, message: 'invalid_id' })
-    ctx.body = await appService.getAppBaseInfo({ id: ctx.params.nameOrId.substr(1) })
-  }
+export async function getByExtId(ctx: Context) {
+  const body = _.pick<GetAppsByExtId.Query>(ctx.request.query, ['all'])
+  body.all = body.all === 'true' || body.all === ''
+  assert.v({ data: ctx.params.extId, type: 'string', regExp: regexp.ExtId, message: 'invalid_ext_id' })
+  if (body.all) ctx.body = await appService.getAllInfo(ctx.session!.user.id!, ctx.params.extId)
+  else ctx.body = await appService.getBaseInfo(ctx.params.extId)
   ctx.status = 200
 }

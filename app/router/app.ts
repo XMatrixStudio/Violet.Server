@@ -6,6 +6,6 @@ import * as appCtrl from '../controller/app'
 const app = new Router<IState, ICustom>()
 
 app.post('/', appCtrl.post) // 创建应用
-app.get('/:nameOrId', appCtrl.getByNameOrId) // 获取应用
+app.get('/:extId', appCtrl.getByExtId) // 获取应用
 
 export = app

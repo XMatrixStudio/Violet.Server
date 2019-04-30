@@ -204,9 +204,9 @@ declare namespace PostUsersSession {
 
 /**
  * @method GET
- * @resource `/i/users/:name`
+ * @resource `/i/users/:extId`
  */
-declare namespace GetUsersByName {
+declare namespace GetUsersByExtId {
   interface ResBody {
     email?: string
     phone?: string
@@ -228,15 +228,11 @@ declare namespace GetUsersByName {
       name?: string
       email?: string
       phone?: string
-      app: {
-        limit?: number
-        own: number
-      }
-      org: {
-        limit?: number
-        own: number
-        join: number
-      }
+      appLimit?: number
+      appOwn: number
+      orgJoin: number
+      orgLimit?: number
+      orgOwn: number
     }
     log?: {
       login: {
@@ -250,9 +246,9 @@ declare namespace GetUsersByName {
 
 /**
  * @method GET
- * @resource `/i/users/:name/apps`
+ * @resource `/i/users/:id/apps`
  */
-declare namespace GetUsersByNameApps {
+declare namespace GetUsersByIdApps {
   interface IApp {
     id: string
     name: string
@@ -270,17 +266,14 @@ declare namespace GetUsersByNameApps {
 
 /**
  * @method GET
- * @resource `/i/users/:name/orgs`
+ * @resource `/i/users/:id/orgs`
  */
-declare namespace GetUsersByNameOrgs {
+declare namespace GetUsersByIdOrgs {
   interface IOrg {
+    id: string
     name: string
-    members: number
-    apps: number
     avatar: string
-    description: string
     displayName: string
-    location: string
   }
   interface Query extends PageQuery {}
   interface ResBody {
