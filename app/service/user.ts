@@ -33,6 +33,7 @@ export async function getAllInfo(id: string): Promise<GetUsersByExtId.ResBody> {
   user.info.avatar = user.info.avatar || config!.file.cos.url + config!.file.cos.default.user
   const log = (await logModel.getUserLog(id))!
   return {
+    id: user._id,
     email: user.email,
     phone: user.phone,
     name: user.rawName,
@@ -128,6 +129,7 @@ export async function getBaseInfo(extId: string): Promise<GetUsersByExtId.ResBod
     orgOwn: user!.dev!.orgOwn
   }
   return {
+    id: user!._id,
     name: user!.rawName,
     level: user!.level,
     createTime: user!.createTime,

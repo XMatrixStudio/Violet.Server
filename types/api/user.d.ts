@@ -208,6 +208,7 @@ declare namespace PostUsersSession {
  */
 declare namespace GetUsersByExtId {
   interface ResBody {
+    id: string
     email?: string
     phone?: string
     name: string
