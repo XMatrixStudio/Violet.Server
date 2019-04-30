@@ -53,15 +53,47 @@ export async function getByNameApps(ctx: Context) {
   const body = _.pick<GetOrgsByNameApps.Query>(ctx.request.query, ['page', 'limit'])
   body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
   body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-
   ctx.body = await orgService.getAppBaseInfoList(ctx.params.name, body.page, body.limit)
   ctx.status = 200
 }
 
-export async function postByNameMembers(ctx: Context) {
+export async function getByIdMembers(ctx: Context) {
+  const body = _.pick<GetOrgsByIdMembers.Query>(ctx.request.query, ['page', 'limit'])
+  body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
+  body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
+  ctx.body = await orgService.getMembers(ctx.params.id, body.page, body.limit)
+  ctx.status = 200
+}
+
+export async function postByIdMembers(ctx: Context) {
   await verify.requireMinUserLevel(ctx, 1)
-  const body = _.pick<PostOrgsByNameMembers.ReqBody>(ctx.request.body, ['user'])
-  assert.v({ data: body.user, type: 'string', regExp: regexp.Name, message: 'invalid_user' })
-  await orgService.addMember(ctx.session!.user.id!, ctx.params.name, body.user!)
+  const body = _.pick<PostOrgsByIdMembers.ReqBody>(ctx.request.body, ['userId'])
+  assert.v(
+    { data: ctx.params.id, type: 'string', regExp: regexp.Id, message: 'invalid_id' },
+    { data: body.userId, type: 'string', regExp: regexp.Id, message: 'invalid_user_id' }
+  )
+  await orgService.addMember(ctx.session!.user.id!, ctx.params.id, body.userId!)
   ctx.status = 201
+}
+
+export async function putByIdMembers(ctx: Context) {
+  await verify.requireMinUserLevel(ctx, 1)
+  const body = _.pick<PutOrgsByIdMembers.ReqBody>(ctx.request.body, ['userId', 'role'])
+  assert.v(
+    { data: ctx.params.id, type: 'string', regExp: regexp.Id, message: 'invalid_id' },
+    { data: body.userId, type: 'string', regExp: regexp.Id, message: 'invalid_user_id' },
+    { data: body.role, type: 'number', enums: [0, 1], message: 'invalid_role' }
+  )
+  await orgService.updateMemberRole(ctx.session!.user.id!, ctx.params.id, body.userId!, body.role!)
+  ctx.status = 200
+}
+
+export async function deleteByIdMembersByUserId(ctx: Context) {
+  await verify.requireMinUserLevel(ctx, 1)
+  assert.v(
+    { data: ctx.params.id, type: 'string', regExp: regexp.Id, message: 'invalid_id' },
+    { data: ctx.params.userId, type: 'string', regExp: regexp.Id, message: 'invalid_user_id' }
+  )
+  await orgService.removeMember(ctx.session!.user.id!, ctx.params.id, ctx.params.userId)
+  ctx.status = 204
 }

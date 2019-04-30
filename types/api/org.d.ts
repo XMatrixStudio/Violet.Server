@@ -64,11 +64,41 @@ declare namespace GetOrgsByNameApps {
 }
 
 /**
- * @method POST
- * @resource `/i/orgs/:name/members`
+ * @method GET
+ * @resource `/i/orgs/:id/members`
  */
-declare namespace PostOrgsByNameMembers {
+declare namespace GetOrgsByIdMembers {
+  interface IUser {
+    id: string
+    name: string
+    nickname: string
+    avatar: string
+    role: number
+  }
+  interface Query extends PageQuery {}
+  interface ResBody {
+    pagination: PageRes
+    data: IUser[]
+  }
+}
+
+/**
+ * @method POST
+ * @resource `/i/orgs/:id/members`
+ */
+declare namespace PostOrgsByIdMembers {
   interface ReqBody {
-    user: string
+    userId: string
+  }
+}
+
+/**
+ * @method PUT
+ * @resource `/i/orgs/:id/members`
+ */
+declare namespace PutOrgsByIdMembers {
+  interface ReqBody {
+    userId: string
+    role: 0 | 1
   }
 }

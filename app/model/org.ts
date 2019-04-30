@@ -152,6 +152,15 @@ export async function getListByUserId(userId: string, page: number, limit: numbe
     .limit(limit)
 }
 
+export async function getMembersCount(id: string): Promise<number> {
+  return (await orgDB.aggregate([{ $match: { _id: new ObjectId(id) } }, { $project: { n: { $size: '$members' } } }]))[0].n
+}
+
+export async function getMembersWith(id: string, populate: string, page: number, limit: number): Promise<IOrgMember[]> {
+  const org = await orgDB.findById(id, { members: { $slice: [(page - 1) * limit, limit] } }).populate('members._user', populate)
+  return org!.members
+}
+
 export async function getUserPermission(id: string, userId: string): Promise<Record<'app' | 'invite' | 'member', boolean>> {
   const org = await orgDB.findById(id, { 'members._user': userId })
   return {
@@ -159,6 +168,10 @@ export async function getUserPermission(id: string, userId: string): Promise<Rec
     invite: org!.permission.inviteRole <= org!.members[0].role,
     member: org!.permission.memberRole <= org!.members[0].role
   }
+}
+
+export async function isExist(id: string): Promise<boolean> {
+  return (await orgDB.findById(id).countDocuments()) !== 0
 }
 
 /**
@@ -170,8 +183,16 @@ export async function isHasMember(id: string, userId: string): Promise<boolean> 
   return (await orgDB.countDocuments({ _id: id, 'members._user': userId })) !== 0
 }
 
+export async function removeMember(id: string, userId: string) {
+  return await orgDB.updateOne({ _id: id }, { $pull: { members: { _user: userId } } })
+}
+
 export async function setAvatar(id: string, avatar: string) {
   await orgDB.updateOne({ _id: id }, { 'info.avatar': avatar })
+}
+
+export async function setMemberRole(id: string, userId: string, role: number) {
+  await orgDB.updateOne({ _id: id, 'members._user': userId }, { 'members.$.role': role })
 }
 
 export async function updateDevState(id: string, type: 'appOwn' | 'appLimit' | 'memberLimit', offset: number) {

@@ -246,6 +246,10 @@ export async function getListByRegCount(regexp: RegExp): Promise<number> {
   return await userDB.countDocuments({ name: { $regex: regexp } })
 }
 
+export async function isExist(id: string): Promise<boolean> {
+  return (await userDB.findById(id).countDocuments()) !== 0
+}
+
 export async function isExistByLevel(level: number): Promise<boolean> {
   return (await userDB.countDocuments({ level: level })) !== 0
 }

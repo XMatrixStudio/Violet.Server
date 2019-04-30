@@ -6,15 +6,14 @@ import * as appModel from '../model/app'
 import * as orgModel from '../model/org'
 import * as userModel from '../model/user'
 
-export async function addMember(userId: string, orgName: string, memberName: string) {
-  const org = await orgModel.getByName(orgName)
-  assert(org, 'not_exist_org')
-  const permission = await orgModel.getUserPermission(org!._id, userId)
-  assert(permission.invite, 'permission_deny', 403)
-  const user = await userModel.getByName(memberName)
-  assert(user, 'not_exist_user')
-  assert(await orgModel.isHasMember(org!._id, user!._id), 'already_member')
-  await orgModel.addMember(org!._id, user!._id)
+export async function addMember(userId: string, orgId: string, memberId: string) {
+  assert(await orgModel.isExist(orgId), 'not_exist_org')
+  assert(await orgModel.isHasMember(orgId, userId), 'permission_deny', 403)
+  const permission = await orgModel.getUserPermission(orgId, userId)
+  assert(permission.invite, 'need_invite_permission')
+  assert(await userModel.isExist(memberId), 'not_exist_user')
+  assert(!(await orgModel.isHasMember(orgId, memberId)), 'already_member')
+  await orgModel.addMember(orgId, memberId)
 }
 
 /**
@@ -120,4 +119,45 @@ export async function getAppBaseInfoList(orgName: string, page: number, limit: n
     },
     data: data
   }
+}
+
+export async function getMembers(id: string, page: number, limit: number): Promise<GetOrgsByIdMembers.ResBody> {
+  assert(await orgModel.isExist(id), 'not_exist_org')
+  const members = await orgModel.getMembersWith(id, '_id rawName info.avatar info.nickname', page, limit)
+  const count = await orgModel.getMembersCount(id)
+  const data: GetOrgsByIdMembers.IUser[] = []
+  for (const member of members) {
+    member._user.info.avatar = member._user.info.avatar || config!.file.cos.url + config!.file.cos.default.user
+    data.push({
+      id: member._user._id,
+      name: member._user.rawName,
+      nickname: member._user.info.nickname,
+      avatar: member._user.info.avatar,
+      role: member.role
+    })
+  }
+  return {
+    pagination: { page: page, limit: limit, total: count },
+    data: data
+  }
+}
+
+export async function removeMember(userId: string, orgId: string, memberId: string) {
+  assert(await orgModel.isExist(orgId), 'not_exist_org')
+  assert(await orgModel.isHasMember(orgId, userId), 'permission_deny', 403)
+  const permission = await orgModel.getUserPermission(orgId, userId)
+  assert(permission.member, 'need_member_permission')
+  assert(await userModel.isExist(memberId), 'not_exist_user')
+  assert(await orgModel.isHasMember(orgId, memberId), 'not_member')
+  await orgModel.removeMember(orgId, memberId)
+}
+
+export async function updateMemberRole(userId: string, orgId: string, memberId: string, role: number) {
+  assert(await orgModel.isExist(orgId), 'not_exist_org')
+  assert(await orgModel.isHasMember(orgId, userId), 'permission_deny', 403)
+  const permission = await orgModel.getUserPermission(orgId, userId)
+  assert(permission.member, 'need_member_permission')
+  assert(await userModel.isExist(memberId), 'not_exist_user')
+  assert(await orgModel.isHasMember(orgId, memberId), 'not_member')
+  await orgModel.setMemberRole(orgId, memberId, role)
 }
