@@ -325,8 +325,10 @@ export async function getByUidApps(ctx: Context) {
   const body = _.pick<GetUsersByUidApps.Query>(ctx.request.query, ['page', 'limit'])
   body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
   body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-  if (ctx.params.uid === 'me') ctx.body = await userService.getAppBaseInfoList(ctx.session!.user.id!, body.page, body.limit)
-  else {
+  if (ctx.params.uid === 'me') {
+    await verify.requireLogin(ctx)
+    ctx.body = await userService.getAppBaseInfoList(ctx.session!.user.id!, body.page, body.limit)
+  } else {
     assert.v({ data: ctx.params.uid, type: 'string', regExp: regexp.Id, message: 'invalid_uid' })
     ctx.body = await userService.getAppBaseInfoList(ctx.params.uid, body.page, body.limit)
   }
@@ -337,8 +339,10 @@ export async function getByUidOrgs(ctx: Context) {
   const body = _.pick<GetUsersByUidOrgs.Query>(ctx.request.query, ['page', 'limit'])
   body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
   body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-  if (ctx.params.uid === 'me') ctx.body = await userService.getOrgBaseInfoList(ctx.session!.user.id!, body.page, body.limit)
-  else {
+  if (ctx.params.uid === 'me') {
+    await verify.requireLogin(ctx)
+    ctx.body = await userService.getOrgBaseInfoList(ctx.session!.user.id!, body.page, body.limit)
+  } else {
     assert.v({ data: ctx.params.uid, type: 'string', regExp: regexp.Id, message: 'invalid_uid' })
     ctx.body = await userService.getOrgBaseInfoList(ctx.params.uid, body.page, body.limit)
   }
