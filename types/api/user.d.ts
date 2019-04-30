@@ -204,9 +204,9 @@ declare namespace PostUsersSession {
 
 /**
  * @method GET
- * @resource `/i/users/:extId`
+ * @resource `/i/users/:extUid`
  */
-declare namespace GetUsersByExtId {
+declare namespace GetUsersByExtUid {
   interface ResBody {
     id: string
     email?: string
@@ -247,9 +247,9 @@ declare namespace GetUsersByExtId {
 
 /**
  * @method GET
- * @resource `/i/users/:id/apps`
+ * @resource `/i/users/:uid/apps`
  */
-declare namespace GetUsersByIdApps {
+declare namespace GetUsersByUidApps {
   interface IApp {
     id: string
     name: string
@@ -267,9 +267,9 @@ declare namespace GetUsersByIdApps {
 
 /**
  * @method GET
- * @resource `/i/users/:id/orgs`
+ * @resource `/i/users/:uid/orgs`
  */
-declare namespace GetUsersByIdOrgs {
+declare namespace GetUsersByUidOrgs {
   interface IOrg {
     id: string
     name: string

@@ -28,7 +28,7 @@ export async function checkPassword(id: string, password: string) {
  * @param {string} id 用户ObjectId
  * @returns {GetUsersByName.ResBody} 用户信息
  */
-export async function getAllInfo(id: string): Promise<GetUsersByExtId.ResBody> {
+export async function getAllInfo(id: string): Promise<GetUsersByExtUid.ResBody> {
   const user = (await userModel.getById(id))!
   user.info.avatar = user.info.avatar || config!.file.cos.url + config!.file.cos.default.user
   const log = (await logModel.getUserLog(id))!
@@ -55,11 +55,11 @@ export async function getAllInfo(id: string): Promise<GetUsersByExtId.ResBody> {
  * @param {number} limit 资源每页数量
  * @returns {GetUsersByNameApps.ResBody} 分页信息与应用列表
  */
-export async function getAppBaseInfoList(id: string, page: number, limit: number): Promise<GetUsersByIdApps.ResBody> {
+export async function getAppBaseInfoList(id: string, page: number, limit: number): Promise<GetUsersByUidApps.ResBody> {
   assert(await userModel.isExist(id), 'not_exist_user')
   const apps = await appModel.getListByOwner(id, page, limit)
   const count = await appModel.getCountByOwner(id)
-  const data: GetUsersByIdApps.IApp[] = []
+  const data: GetUsersByUidApps.IApp[] = []
   for (const app of apps) {
     data.push({
       id: app._id,
@@ -117,7 +117,7 @@ export async function getAuths(id: string, page: number, limit: number): Promise
  * @param {string} extId 用户扩展Id
  * @returns {GetUsersByExtId.ResBody} 用户信息
  */
-export async function getBaseInfo(extId: string): Promise<GetUsersByExtId.ResBody> {
+export async function getBaseInfo(extId: string): Promise<GetUsersByExtUid.ResBody> {
   let user: userModel.IUser | null
   if (extId[0] === '+') user = await userModel.getById(extId.substr(1))
   else user = await userModel.getByName(extId)
@@ -145,11 +145,11 @@ export async function getBaseInfo(extId: string): Promise<GetUsersByExtId.ResBod
  * @param {number} limit 资源每页数量
  * @returns {GetUsersByNameOrgs.ResBody} 分页信息与组织列表
  */
-export async function getOrgBaseInfoList(id: string, page: number, limit: number): Promise<GetUsersByIdOrgs.ResBody> {
+export async function getOrgBaseInfoList(id: string, page: number, limit: number): Promise<GetUsersByUidOrgs.ResBody> {
   assert(await userModel.isExist(id), 'not_exist_user')
   const orgs = await orgModel.getListByUserId(id, page, limit)
   const count = await orgModel.getCountByUserId(id)
-  const data: GetUsersByIdOrgs.IOrg[] = []
+  const data: GetUsersByUidOrgs.IOrg[] = []
   for (const org of orgs) {
     data.push({
       id: org._id,

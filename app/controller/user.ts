@@ -310,31 +310,37 @@ export async function deleteSession(ctx: Context) {
   ctx.status = 204
 }
 
-export async function getByExtId(ctx: Context) {
-  if (ctx.params.extId === 'me') {
+export async function getByExtUid(ctx: Context) {
+  if (ctx.params.extUid === 'me') {
     await verify.requireLogin(ctx)
     ctx.body = await userService.getAllInfo(ctx.session!.user.id!)
   } else {
-    assert.v({ data: ctx.params.extId, type: 'string', regExp: regexp.ExtId, message: 'invalid_ext_id' })
-    ctx.body = await userService.getBaseInfo(ctx.params.extId)
+    assert.v({ data: ctx.params.extUid, type: 'string', regExp: regexp.ExtId, message: 'invalid_ext_uid' })
+    ctx.body = await userService.getBaseInfo(ctx.params.extUid)
   }
   ctx.status = 200
 }
 
-export async function getByIdApps(ctx: Context) {
-  const body = _.pick<GetUsersByIdApps.Query>(ctx.request.query, ['page', 'limit'])
+export async function getByUidApps(ctx: Context) {
+  const body = _.pick<GetUsersByUidApps.Query>(ctx.request.query, ['page', 'limit'])
   body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
   body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-  assert.v({ data: ctx.params.id, type: 'string', regExp: regexp.Id, message: 'invalid_id' })
-  ctx.body = await userService.getAppBaseInfoList(ctx.params.id, body.page, body.limit)
+  if (ctx.params.uid === 'me') ctx.body = await userService.getAppBaseInfoList(ctx.session!.user.id!, body.page, body.limit)
+  else {
+    assert.v({ data: ctx.params.uid, type: 'string', regExp: regexp.Id, message: 'invalid_uid' })
+    ctx.body = await userService.getAppBaseInfoList(ctx.params.uid, body.page, body.limit)
+  }
   ctx.status = 200
 }
 
-export async function getByIdOrgs(ctx: Context) {
-  const body = _.pick<GetUsersByIdOrgs.Query>(ctx.request.query, ['page', 'limit'])
+export async function getByUidOrgs(ctx: Context) {
+  const body = _.pick<GetUsersByUidOrgs.Query>(ctx.request.query, ['page', 'limit'])
   body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
   body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
-  assert.v({ data: ctx.params.id, type: 'string', regExp: regexp.Id, message: 'invalid_id' })
-  ctx.body = await userService.getOrgBaseInfoList(ctx.params.id, body.page, body.limit)
+  if (ctx.params.uid === 'me') ctx.body = await userService.getOrgBaseInfoList(ctx.session!.user.id!, body.page, body.limit)
+  else {
+    assert.v({ data: ctx.params.uid, type: 'string', regExp: regexp.Id, message: 'invalid_uid' })
+    ctx.body = await userService.getOrgBaseInfoList(ctx.params.uid, body.page, body.limit)
+  }
   ctx.status = 200
 }
