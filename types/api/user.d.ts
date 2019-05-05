@@ -8,6 +8,8 @@ declare namespace GetUsers {
     name: string
     nickname: string
     avatar: string
+    email: string
+    phone: string
   }
   interface Query extends PageQuery { name: string }
   interface ResBody {

@@ -55,6 +55,7 @@ export async function getAllInfo(userId: string, extId: string): Promise<GetOrgs
   else org = await orgModel.getByName(extId)
   assert(org, 'not_exist_org')
   assert(await orgModel.isHasMember(org!._id, userId), 'not_member')
+  const role = await orgModel.getMemberRole(org!._id, userId)
   org!.info.avatar = org!.info.avatar || config!.file.cos.url + config!.file.cos.default.org
   return {
     id: org!._id,
@@ -66,7 +67,13 @@ export async function getAllInfo(userId: string, extId: string): Promise<GetOrgs
       memberLimit: org!.dev.memberLimit,
       memberOwn: org!.members.length
     },
-    info: org!.info
+    info: org!.info,
+    permission: {
+      app: org!.permission.appRole,
+      invite: org!.permission.inviteRole,
+      member: org!.permission.memberRole
+    },
+    myRole: role
   }
 }
 
@@ -118,7 +125,7 @@ export async function getAppBaseInfoList(id: string, page: number, limit: number
 
 export async function getMembers(id: string, page: number, limit: number): Promise<GetOrgsByIdMembers.ResBody> {
   assert(await orgModel.isExist(id), 'not_exist_org')
-  const members = await orgModel.getMembersWith(id, '_id rawName info.avatar info.nickname', page, limit)
+  const members = await orgModel.getMembersWith(id, '_id rawName info.avatar info.email info.nickname info.phone', page, limit)
   const count = await orgModel.getMembersCount(id)
   const data: GetOrgsByIdMembers.IUser[] = []
   for (const member of members) {
@@ -128,6 +135,8 @@ export async function getMembers(id: string, page: number, limit: number): Promi
       name: member._user.rawName,
       nickname: member._user.info.nickname,
       avatar: member._user.info.avatar,
+      email: member._user.info.email,
+      phone: member._user.info.phone,
       role: member.role
     })
   }

@@ -37,7 +37,7 @@ export interface IOrgInfo {
 
 export interface IOrgMember {
   _user: IUser
-  role: number // 角色：0 - 普通成员，1 - 管理员，2 - 创建者
+  role: number // 角色: 0 - 普通成员，1 - 管理员，2 - 创建者
 }
 
 interface OrgDocument extends db.Document, IOrg {}
@@ -54,7 +54,7 @@ const orgSchema = new db.Schema({
   createTime: { type: Date, default: new Date() },
   dev: {
     type: { appLimit: Number, appOwn: Number, memberLimit: Number },
-    default: { appLimit: 5, appOwn: 0, memberLimit: 5 }
+    default: { appLimit: 5, appOwn: 0, memberLimit: 10 }
   },
   info: {
     type: {
@@ -116,7 +116,7 @@ export async function add(
 }
 
 export async function addMember(id: string, userId: string) {
-  await orgDB.updateOne({ _id: id }, { $push: { members: { _user: userId } } })
+  await orgDB.updateOne({ _id: id }, { $push: { members: { $each: [{ _user: userId }], $sort: { role: -1 } } } })
 }
 
 export async function getById(id: string): Promise<IOrg | null> {
@@ -150,6 +150,13 @@ export async function getListByUserId(userId: string, page: number, limit: numbe
     .find({ 'members._user': userId })
     .skip(limit * (page - 1))
     .limit(limit)
+}
+
+export async function getMemberRole(id: string, userId: string): Promise<number> {
+  return (await orgDB.aggregate([
+    { $match: { _id: new ObjectId(id), 'members._user': new ObjectId(userId) } },
+    { $project: { role: { $arrayElemAt: ['$members.role', 0] } } }
+  ]))[0].role
 }
 
 export async function getMembersCount(id: string): Promise<number> {
@@ -192,7 +199,10 @@ export async function setAvatar(id: string, avatar: string) {
 }
 
 export async function setMemberRole(id: string, userId: string, role: number) {
-  await orgDB.updateOne({ _id: id, 'members._user': userId }, { 'members.$.role': role })
+  await orgDB.updateOne(
+    { _id: id, 'members._user': userId },
+    { 'members.$.role': role, $push: { member: { $each: [], $sort: { role: -1 } } } }
+  )
 }
 
 export async function updateDevState(id: string, type: 'appOwn' | 'appLimit' | 'memberLimit', offset: number) {

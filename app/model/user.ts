@@ -154,6 +154,7 @@ export async function addDeveloper(id: string, name: string, email: string, phon
       orgOwn: 0
     }
   })
+  await redis.set(`level-${id}`, '1', 1296000)
 }
 
 export async function getAuthById(id: string, appId: string): Promise<IUserAuth | null> {
@@ -228,13 +229,13 @@ export async function getLevelById(id: string): Promise<number> {
 
 export async function getListByReg(regexp: RegExp, page: number, limit: number): Promise<IUser[]> {
   return await userDB
-    .find({ name: { $regex: regexp } })
+    .find({ $or: [{ name: { $regex: regexp } }, { email: { $regex: regexp } }, { phone: { $regex: regexp } }] })
     .skip((page - 1) * limit)
     .limit(limit)
 }
 
 export async function getListByRegCount(regexp: RegExp): Promise<number> {
-  return await userDB.countDocuments({ name: { $regex: regexp } })
+  return await userDB.countDocuments({ $or: [{ name: { $regex: regexp } }, { email: { $regex: regexp } }, { phone: { $regex: regexp } }] })
 }
 
 export async function isExist(id: string): Promise<boolean> {
@@ -273,7 +274,7 @@ export async function setInfo(id: string, info: Partial<IUserInfo>) {
   await user.save()
 }
 
-export async function setLevel(id: string, level: number): Promise<void> {
+export async function setLevel(id: string, level: number) {
   await userDB.updateOne({ _id: id }, { level: level })
   await redis.set(`level-${id}`, level.toString(), 1296000)
 }

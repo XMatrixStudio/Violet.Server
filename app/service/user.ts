@@ -173,14 +173,21 @@ export async function getRequestList(id: string): Promise<GetUsersRequests.ResBo
   return data
 }
 
-export async function getUserListByReg(regName: string, page: number, limit: number): Promise<GetUsers.ResBody> {
-  const reg = new RegExp(regName, 'i')
+export async function getUserListByReg(regExp: string, page: number, limit: number): Promise<GetUsers.ResBody> {
+  const reg = new RegExp(regExp, 'i')
   const users = await userModel.getListByReg(reg, page, limit)
   const count = await userModel.getListByRegCount(reg)
   const data: GetUsers.IUser[] = []
   for (const user of users) {
     user.info.avatar = user.info.avatar || config!.file.cos.url + config!.file.cos.default.user
-    data.push({ id: user._id, name: user.rawName, nickname: user.info.nickname, avatar: user.info.avatar })
+    data.push({
+      id: user._id,
+      name: user.rawName,
+      nickname: user.info.nickname,
+      avatar: user.info.avatar,
+      email: user.info.email,
+      phone: user.info.phone
+    })
   }
   return {
     pagination: { page: page, limit: limit, total: count },

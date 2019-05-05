@@ -55,8 +55,12 @@ export async function getAllInfo(userId: string, extId: string): Promise<GetApps
   if (extId[0] === '+') app = await appModel.getByIdWith(extId.substr(1), '_id rawName')
   else app = await appModel.getByNameWith(extId, '_id rawName')
   assert(app, 'not_exist_app')
-  assert(!(app!.__owner === 'users' && app!._owner.toString() !== userId), 'not_owner')
-  assert(await orgModel.isHasMember(app!.__owner, userId), 'not_owner')
+  console.log(app!.__owner)
+  console.log(app!._owner)
+  console.log(userId)
+  console.log(app!._owner._id.toString() !== userId)
+  assert(app!.__owner !== 'users' || app!._owner._id.toString() === userId, 'not_owner')
+  assert(app!.__owner !== 'orgs' || (await orgModel.isHasMember(app!._owner._id, userId)), 'not_owner')
   app!.info.avatar = app!.info.avatar || config!.file.cos.url + config!.file.cos.default.app
   return {
     id: app!._id,
