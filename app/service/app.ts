@@ -111,8 +111,8 @@ export async function updateInfo(
 ) {
   const app = await appModel.getById(appId)
   assert(app, 'not_exist_app')
-  assert(app!.__owner !== 'users' || app!._owner.toString() !== userId, 'not_owner')
-  assert(app!.__owner !== 'orgs' || orgModel.isHasMember(app!._owner.toString(), userId), 'not_owner')
+  assert(app!.__owner !== 'users' || app!._owner._id.toString() === userId, 'not_owner')
+  assert(app!.__owner !== 'orgs' || (await orgModel.isHasMember(app!._owner._id, userId)), 'not_owner')
   if (keyUpdate) await appModel.updateKey(appId)
   if (info.avatar) {
     await file.upload(appId + '.png', Buffer.from(info.avatar.replace('data:image/png;base64,', ''), 'base64'))
