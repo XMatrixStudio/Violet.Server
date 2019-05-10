@@ -39,11 +39,10 @@ const appSchema = new db.Schema({
   key: { type: String, required: true },
   callbackHosts: [String],
   info: {
-    type: {
-      avatar: String,
-      description: String,
-      url: String
-    }
+    avatar: String,
+    description: String,
+    displayName: String,
+    url: String
   }
 })
 
