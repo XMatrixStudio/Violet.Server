@@ -76,10 +76,10 @@ export async function getAppBaseInfoList(id: string, page: number, limit: number
   }
 }
 
-export async function getAuth(id: string, appName: string): Promise<GetUsersAuthsByAppId.ResBody> {
-  const app = await appModel.getByName(appName)
+export async function getAuth(id: string, appId: string): Promise<GetUsersAuthsByAppId.ResBody> {
+  const app = await appModel.getById(appId)
   assert(app, 'not_exist_app')
-  const auth = await userModel.getAuthById(id, app!._id)
+  const auth = await userModel.getAuthById(id, appId)
   assert(auth, 'not_exist_auth')
   return {
     appId: app!._id,
