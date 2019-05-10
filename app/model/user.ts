@@ -129,12 +129,12 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
 
 export async function addAuth(id: string, appId: string, duration: number, scope: string[]): Promise<void> {
   const result = await userDB.updateOne(
-    { _id: id, 'auth.app': { $ne: appId } },
+    { _id: id, 'auth._app': { $ne: appId } },
     { $push: { auth: { $each: [{ _app: appId, duration: duration, scope: scope }], $sort: { time: -1 } } } }
   )
   if (result.n === 0) {
     await userDB.updateOne(
-      { _id: id, 'auth.app': appId },
+      { _id: id, 'auth._app': appId },
       { 'auth.$': { _app: appId, time: Date.now(), duration: duration, scope: scope }, $push: { auth: { $each: [], $sort: { time: -1 } } } }
     )
   }
@@ -158,7 +158,7 @@ export async function addDeveloper(id: string, name: string, email: string, phon
 }
 
 export async function getAuthById(id: string, appId: string): Promise<IUserAuth | null> {
-  const user = await userDB.findOne({ _id: id, 'auth.app': appId }, { 'auth.$': 1, 'auth.$._id': 0 })
+  const user = await userDB.findOne({ _id: id, 'auth._app': appId })
   if (!user) return null
   return user.auth[0]
 }
@@ -249,7 +249,7 @@ export async function isExistByLevel(level: number): Promise<boolean> {
 }
 
 export async function removeAuth(id: string, appId: string) {
-  await userDB.updateOne({ _id: id, 'auth.app': appId }, { $pull: { auth: { app: appId } } })
+  await userDB.updateOne({ _id: id, 'auth._app': appId }, { $pull: { auth: { _app: appId } } })
 }
 
 export async function setDevInfo(id: string, name: string, email: string, phone: string) {
