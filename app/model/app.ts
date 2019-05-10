@@ -42,6 +42,7 @@ const appSchema = new db.Schema({
     type: {
       avatar: String,
       description: String,
+      displayName: String,
       url: String
     }
   }

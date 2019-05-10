@@ -78,20 +78,23 @@ export async function patchById(ctx: Context) {
     { data: body.description, require: false, type: 'string', maxLength: 256, message: 'invalid_description' },
     { data: body.displayName, require: false, type: 'string', maxLength: 32, message: 'invalid_display_name' },
     { data: body.state, require: false, type: 'number', enums: [0, 1], message: 'invalid_state' },
-    { data: body.type, type: 'number', message: 'invalid_type' },
-    { data: body.url, type: 'string', regExp: regexp.Url, maxLength: 128, message: 'invalid_url' }
+    { data: body.type, require: false, type: 'number', message: 'invalid_type' },
+    { data: body.url, require: false, type: 'string', regExp: regexp.Url, maxLength: 128, message: 'invalid_url' }
   )
   // TODO: callbackHosts check
   await appService.updateInfo(
     ctx.session!.user.id!,
     ctx.params.id,
     body.keyUpdate,
-    {
-      avatar: body.avatar,
-      description: body.description,
-      displayName: body.displayName,
-      url: body.url
-    },
+    _.pickBy(
+      {
+        avatar: body.avatar,
+        description: body.description,
+        displayName: body.displayName,
+        url: body.url
+      },
+      _.identity
+    ),
     body.state,
     body.type,
     body.callbackHosts as string[]
