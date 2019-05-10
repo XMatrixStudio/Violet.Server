@@ -44,3 +44,20 @@ declare namespace GetAppsByExtId {
     }
   }
 }
+
+/**
+ * @method PATCH
+ * @resource `/i/apps/:id`
+ */
+declare namespace PatchAppsById {
+  interface ReqBody {
+    avatar?: string
+    callbackHosts?: string[]
+    description?: string
+    displayName?: string
+    keyUpdate?: boolean
+    state?: number
+    type?: number
+    url?: string
+  }
+}

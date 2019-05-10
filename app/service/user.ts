@@ -76,27 +76,32 @@ export async function getAppBaseInfoList(id: string, page: number, limit: number
   }
 }
 
-export async function getAuth(id: string, appName: string): Promise<any> {
+export async function getAuth(id: string, appName: string): Promise<GetUsersAuthsByAppId.ResBody> {
   const app = await appModel.getByName(appName)
   assert(app, 'not_exist_app')
   const auth = await userModel.getAuthById(id, app!._id)
-  if (!auth) {
-    return { auth: false }
-  }
+  assert(auth, 'not_exist_auth')
   return {
-    auth: true,
-    time: auth.time,
-    duration: auth.duration
+    appId: app!._id,
+    appName: app!.rawName,
+    appAvatar: app!.info.avatar || config!.file.cos.url + config!.file.cos.default.app,
+    appDisplayName: app!.info.displayName,
+    duration: auth!.duration,
+    scope: auth!.scope,
+    time: auth!.time
   }
 }
 
 export async function getAuths(id: string, page: number, limit: number): Promise<GetUsersAuths.ResBody> {
-  const auths = await userModel.getAuths(id, page, limit)
-  const authsCount = await userModel.getAuthsCount(id)
+  const auths = await userModel.getAuthsWith(id, page, limit, '_id rawName info.displayName ')
+  const count = await userModel.getAuthsCount(id)
   const data: GetUsersAuths.IAuth[] = []
   for (const auth of auths) {
     data.push({
-      appId: auth.app._id,
+      appId: auth._app._id,
+      appName: auth._app.rawName,
+      appAvatar: auth._app.info.avatar || config!.file.cos.url + config!.file.cos.default.app,
+      appDisplayName: auth._app.info.displayName,
       duration: auth.duration,
       scope: auth.scope,
       time: auth.time
@@ -106,7 +111,7 @@ export async function getAuths(id: string, page: number, limit: number): Promise
     pagination: {
       page: page,
       limit: limit,
-      total: authsCount
+      total: count
     },
     data: data
   }
@@ -234,10 +239,9 @@ export async function register(email: string, phone: string, name: string, nickn
   await logModel.addUser(id)
 }
 
-export async function removeAuth(id: string, appName: string) {
-  const app = await appModel.getByName(appName)
-  assert(app, 'not_exist_app')
-  await userModel.removeAuth(id, app!._id)
+export async function removeAuth(id: string, appId: string) {
+  assert(await appModel.isExist(appId), 'not_exist_app')
+  await userModel.removeAuth(id, appId)
 }
 
 /**

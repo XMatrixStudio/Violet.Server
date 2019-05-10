@@ -7,5 +7,6 @@ const app = new Router<IState, ICustom>()
 
 app.post('/', appCtrl.post) // 创建应用
 app.get('/:extId', appCtrl.getByExtId) // 获取应用
+app.patch('/:id', appCtrl.patchById) // 修改应用信息
 
 export = app

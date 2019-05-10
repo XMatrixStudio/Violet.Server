@@ -99,3 +99,24 @@ export async function getBaseInfo(extId: string): Promise<GetAppsByExtId.ResBody
     info: app!.info
   }
 }
+
+export async function updateInfo(
+  userId: string,
+  appId: string,
+  keyUpdate: boolean,
+  info: Partial<appModel.IAppInfo>,
+  state?: number,
+  type?: number,
+  callbackHosts?: string[]
+) {
+  const app = await appModel.getById(appId)
+  assert(app, 'not_exist_app')
+  assert(app!.__owner !== 'users' || app!._owner.toString() !== userId, 'not_owner')
+  assert(app!.__owner !== 'orgs' || orgModel.isHasMember(app!._owner.toString(), userId), 'not_owner')
+  if (keyUpdate) await appModel.updateKey(appId)
+  if (info.avatar) {
+    await file.upload(appId + '.png', Buffer.from(info.avatar.replace('data:image/png;base64,', ''), 'base64'))
+    info.avatar = config!.file.cos.url + appId + '.png'
+  }
+  await appModel.set(appId, info, state, type, callbackHosts)
+}

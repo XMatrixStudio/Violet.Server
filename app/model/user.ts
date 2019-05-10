@@ -34,7 +34,7 @@ export interface IUserInfo {
 }
 
 export interface IUserAuth {
-  app: IApp
+  _app: IApp
   time: Date
   duration: number
   scope: string[]
@@ -83,7 +83,7 @@ const userSchema = new db.Schema({
   },
   auth: [
     {
-      app: { type: ObjectId, ref: 'apps', required: true },
+      _app: { type: ObjectId, ref: 'apps', required: true },
       time: { type: Date, default: Date.now },
       duration: Number,
       scope: [String]
@@ -130,12 +130,12 @@ export async function add(data: Record<'email' | 'phone' | 'name' | 'nickname' |
 export async function addAuth(id: string, appId: string, duration: number, scope: string[]): Promise<void> {
   const result = await userDB.updateOne(
     { _id: id, 'auth.app': { $ne: appId } },
-    { $push: { auth: { $each: [{ app: appId, duration: duration, scope: scope }], $sort: { time: -1 } } } }
+    { $push: { auth: { $each: [{ _app: appId, duration: duration, scope: scope }], $sort: { time: -1 } } } }
   )
   if (result.n === 0) {
     await userDB.updateOne(
       { _id: id, 'auth.app': appId },
-      { 'auth.$': { app: appId, time: Date.now(), duration: duration, scope: scope }, $push: { auth: { $each: [], $sort: { time: -1 } } } }
+      { 'auth.$': { _app: appId, time: Date.now(), duration: duration, scope: scope }, $push: { auth: { $each: [], $sort: { time: -1 } } } }
     )
   }
 }
@@ -163,8 +163,10 @@ export async function getAuthById(id: string, appId: string): Promise<IUserAuth 
   return user.auth[0]
 }
 
-export async function getAuths(id: string, page: number, limit: number): Promise<IUserAuth[]> {
-  const user = await userDB.findById(id, { auth: { $skip: (page - 1) * limit, $limit: limit }, 'auth.$': 1, 'auth.$._id': 0 })
+export async function getAuthsWith(id: string, page: number, limit: number, populate: string): Promise<IUserAuth[]> {
+  const user = await userDB
+    .findById(id, { auth: { $skip: (page - 1) * limit, $limit: limit }, 'auth.$': 1, 'auth.$._id': 0 })
+    .populate('auth._app', populate)
   if (!user) return []
   return user.auth
 }

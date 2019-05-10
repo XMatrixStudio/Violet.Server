@@ -73,7 +73,7 @@ export async function patch(ctx: Context) {
 }
 
 export async function getAuths(ctx: Context) {
-  const body = _.pick(ctx.request.query, ['page', 'limit'])
+  const body = _.pick<GetUsersAuths.Query>(ctx.request.query, ['page', 'limit'])
   body.page = typeof body.page === 'string' ? parseInt(body.page) : 1
   body.limit = typeof body.limit === 'string' ? parseInt(body.limit) : 10
   ctx.body = await userService.getAuths(ctx.session!.user.id!, body.page, body.limit)
@@ -98,10 +98,15 @@ export async function postAuths(ctx: Context) {
   ctx.status = 201
 }
 
-export async function deleteAuths(ctx: Context) {
-  const body = _.pick(ctx.request.body, ['app'])
-  assert.v({ data: body.app, type: 'string', regExp: regexp.Name, message: 'invalid_app' })
-  await userService.removeAuth(ctx.session!.user.id!, body.app)
+export async function getAuthsByAppId(ctx: Context) {
+  assert.v({ data: ctx.params.appId, type: 'string', regExp: regexp.Id, message: 'invalid_app_id' })
+  ctx.body = await userService.getAuth(ctx.session!.user.id!, ctx.params.appId)
+  ctx.status = 200
+}
+
+export async function deleteAuthsByAppId(ctx: Context) {
+  assert.v({ data: ctx.params.appId, type: 'string', regExp: regexp.Id, message: 'invalid_app_id' })
+  await userService.removeAuth(ctx.session!.user.id!, ctx.params.appId)
   ctx.status = 204
 }
 

@@ -16,12 +16,14 @@ export interface IApp {
   state: number // 状态，0 - 运行中，1 - 已暂停
   key: string // 密钥
   callbackHosts: string[] // 回调域
-  info: {
-    avatar: string
-    description: string
-    displayName: string
-    url: string
-  }
+  info: IAppInfo
+}
+
+export interface IAppInfo {
+  avatar: string
+  description: string
+  displayName: string
+  url: string
 }
 
 export interface AppDocument extends db.Document, IApp {}
@@ -178,6 +180,19 @@ export async function getListByOwner(ownerId: string, page: number, limit: numbe
     .limit(limit)
 }
 
+export async function isExist(id: string): Promise<boolean> {
+  return (await appDB.countDocuments({ _id: id })) !== 0
+}
+
+export async function set(id: string, info: Partial<IAppInfo>, state?: number, type?: number, callbackHosts?: string[]) {
+  const app = (await appDB.findById(id))!
+  if (state !== undefined) app.state = state
+  if (type !== undefined) app.type = type
+  if (callbackHosts !== undefined) app.callbackHosts = callbackHosts
+  app.info = Object.assign(app.info, info)
+  await app.save()
+}
+
 /**
  * 更新应用头像
  * @param {string} id 应用ObjectId
@@ -185,4 +200,8 @@ export async function getListByOwner(ownerId: string, page: number, limit: numbe
  */
 export async function setAvatar(id: string, avatar: string) {
   await appDB.updateOne({ _id: id }, { 'info.avatar': avatar })
+}
+
+export async function updateKey(id: string) {
+  await appDB.updateOne({ _id: id }, { key: rand(200).substr(0, 24) })
 }
