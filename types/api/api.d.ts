@@ -1,12 +1,52 @@
 /**
+ * @method GET
+ * @resource `/user`
+ */
+declare namespace ApiGetUser {
+  interface Query {
+    appSecret: string
+    token: string
+  }
+  interface ResBody {
+    id: string
+    avatar: string
+    bio?: string
+    birthday?: Date
+    email?: string
+    gender?: number
+    location?: string
+    nickname: string
+    phone?: string
+    url?: string
+  }
+}
+
+/**
+ * @method POST
+ * @resource `/util/secret`
+ */
+declare namespace ApiPostUtilSecret {
+  interface ReqBody {
+    appId: string
+    appKey: string
+  }
+  interface ResBody {
+    appSecret: string
+  }
+}
+
+/**
  * @method POST
  * @resource `/verify/token`
  */
-declare namespace PostVerifyToken {
+declare namespace ApiPostVerifyToken {
   interface ReqBody {
     appSecret: string
     code: string
     grantType: string
-    state: string
+  }
+  interface ResBody {
+    token: string
+    userId: string
   }
 }

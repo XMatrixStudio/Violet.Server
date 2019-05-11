@@ -78,7 +78,7 @@ export async function getAppBaseInfoList(id: string, page: number, limit: number
 export async function getAuth(id: string, appId: string): Promise<GetUsersAuthsByAppId.ResBody> {
   assert(await appModel.isExist(appId), 'not_exist_app')
   const auth = await userModel.getAuthById(id, appId)
-  assert(auth, 'not_exist_auth')
+  assert(auth && Date.now() - auth.time.getTime() < 1000 * 60 * 60 * 24 * auth.duration, 'not_exist_auth')
   return {
     code: crypto.generateCode(id, appId),
     duration: auth!.duration,

@@ -10,7 +10,7 @@ import * as assert from './assert'
  * @param {string} key 密码
  * @return {string} 加密后的字符串
  */
-function encrypt(str: string, key: string): string {
+export function encrypt(str: string, key: string): string {
   key = key || config!.auth.codeSecret
   const hash = crypto.createHash('sha256')
   hash.update(key)
@@ -28,7 +28,7 @@ function encrypt(str: string, key: string): string {
  * @param {string | undefined} key 密码
  * @return {string} 解密后的字符串
  */
-function decrypt(str: string, key: string): string {
+export function decrypt(str: string, key: string): string {
   key = key || config!.auth.codeSecret
   const hash = crypto.createHash('sha256')
   hash.update(key)
@@ -44,6 +44,10 @@ function decrypt(str: string, key: string): string {
 
 export function generateCode(userId: string, appId: string): string {
   return encrypt(JSON.stringify({ t: Date.now(), u: userId, a: appId }), config!.auth.codeSecret)
+}
+
+export function generateOpenId(userId: string, appId: string): string {
+  return hash(userId + appId)
 }
 
 export function generateToken(userId: string, appId: string): string {
