@@ -91,10 +91,11 @@ export async function getAuth(id: string, appId: string, url: string): Promise<G
 }
 
 export async function getAuths(id: string, page: number, limit: number): Promise<GetUsersAuths.ResBody> {
-  const auths = await userModel.getAuthsWith(id, page, limit, '_id rawName info.displayName ')
+  const auths = await userModel.getAuthsWith(id, page, limit, '_id rawName info.displayName info.avatar')
   const count = await userModel.getAuthsCount(id)
   const data: GetUsersAuths.IAuth[] = []
   for (const auth of auths) {
+    console.log(auth)
     data.push({
       appId: auth._app._id,
       appName: auth._app.rawName,
