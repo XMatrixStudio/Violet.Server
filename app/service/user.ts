@@ -75,8 +75,10 @@ export async function getAppBaseInfoList(id: string, page: number, limit: number
   }
 }
 
-export async function getAuth(id: string, appId: string): Promise<GetUsersAuthsByAppId.ResBody> {
-  assert(await appModel.isExist(appId), 'not_exist_app')
+export async function getAuth(id: string, appId: string, url: string): Promise<GetUsersAuthsByAppId.ResBody> {
+  const app = await appModel.getById(appId)
+  assert(app, 'not_exist_app')
+  assert(app!.callbackHosts.some(value => url.indexOf(value) === 0), 'error_redirect_url')
   const auth = await userModel.getAuthById(id, appId)
   assert(auth && Date.now() - auth.time.getTime() < 1000 * 60 * 60 * 24 * auth.duration, 'not_exist_auth')
   return {

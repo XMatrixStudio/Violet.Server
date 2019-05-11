@@ -15,14 +15,14 @@ export async function getUser(ctx: Context) {
   ctx.status = 200
 }
 
-export async function postUtilSecret(ctx: Context) {
-  const body = _.pick<ApiPostUtilSecret.ReqBody>(ctx.request.body, ['appId', 'appKey'])
+export async function getUtilSecret(ctx: Context) {
+  const body = _.pick<ApiGetUtilSecret.Query>(ctx.request.body, ['appId', 'appKey'])
   assert.v(
     { data: body.appId, type: 'string', regExp: regexp.Id, message: 'invalid_app_id' },
     { data: body.appKey, type: 'string', minLength: 26, maxLength: 26, message: 'invalid_app_key' }
   )
   ctx.body = await apiService.getSecret(body.appId!, body.appKey!)
-  ctx.status = 201
+  ctx.status = 200
 }
 
 export async function postVerifyPassword(ctx: Context) {}

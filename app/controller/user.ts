@@ -99,8 +99,13 @@ export async function postAuths(ctx: Context) {
 }
 
 export async function getAuthsByAppId(ctx: Context) {
-  assert.v({ data: ctx.params.appId, type: 'string', regExp: regexp.Id, message: 'invalid_app_id' })
-  ctx.body = await userService.getAuth(ctx.session!.user.id!, ctx.params.appId)
+  const body = _.pick<GetUsersAuthsByAppId.Query>(ctx.request.query, ['redirectHost'])
+  assert.v(
+    { data: ctx.params.appId, type: 'string', regExp: regexp.Id, message: 'invalid_app_id' },
+    { data: body.redirectUrl, type: 'string', message: 'invalid_redirect_url' }
+  )
+  if (body.redirectUrl![body.redirectUrl!.length - 1] !== '/') body.redirectUrl += '/'
+  ctx.body = await userService.getAuth(ctx.session!.user.id!, ctx.params.appId, body.redirectUrl!)
   ctx.status = 200
 }
 
@@ -108,12 +113,6 @@ export async function deleteAuthsByAppId(ctx: Context) {
   assert.v({ data: ctx.params.appId, type: 'string', regExp: regexp.Id, message: 'invalid_app_id' })
   await userService.removeAuth(ctx.session!.user.id!, ctx.params.appId)
   ctx.status = 204
-}
-
-export async function getAuthsByApp(ctx: Context) {
-  assert.v({ data: ctx.params.app, type: 'string', regExp: regexp.Name, message: 'invalid_app' })
-  ctx.body = await userService.getAuth(ctx.session!.user.id!, ctx.params.app)
-  ctx.status = 200
 }
 
 export async function putDev(ctx: Context) {

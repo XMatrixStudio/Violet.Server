@@ -5,7 +5,7 @@ import * as crypto from '../../lib/crypto'
 import * as appModel from '../model/app'
 import * as userModel from '../model/user'
 
-export async function getSecret(appId: string, appKey: string): Promise<ApiPostUtilSecret.ResBody> {
+export async function getSecret(appId: string, appKey: string): Promise<ApiGetUtilSecret.ResBody> {
   const enc = crypto.encrypt(Date.now().toString(), appKey)
   const hash = crypto.hash(appId + enc + appKey)
   return {

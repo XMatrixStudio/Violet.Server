@@ -22,11 +22,11 @@ declare namespace ApiGetUser {
 }
 
 /**
- * @method POST
+ * @method GET
  * @resource `/util/secret`
  */
-declare namespace ApiPostUtilSecret {
-  interface ReqBody {
+declare namespace ApiGetUtilSecret {
+  interface Query {
     appId: string
     appKey: string
   }

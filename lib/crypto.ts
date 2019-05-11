@@ -95,7 +95,7 @@ export function readCode(code: string, time?: number): Record<'userId' | 'appId'
   assert(data.t && data.u && data.a, 'invalid_code') // 检测code的完整性
   const validTime = new Date(data.t)
   assert(!Number.isNaN(validTime.getTime()), 'invalid_code') // 检测有效期的合法性
-  assert(Date.now() - validTime.getTime() < time, 'invalid_code') // 检测有效期
+  assert(Date.now() - validTime.getTime() < time, 'timeout_code') // 检测有效期
   return {
     userId: data.u,
     appId: data.a
@@ -103,7 +103,7 @@ export function readCode(code: string, time?: number): Record<'userId' | 'appId'
 }
 
 export function readToken(token: string, time?: number): Record<'userId' | 'appId', string> {
-  time = time || 1000 * 60 * 60 * 24 * 30
+  time = time || 1000 * 60 * 60 * 24 * 15
   const arr = token.split('&')
   assert(arr.length === 2, 'invalid_token') // 检测数据完整性
   assert(hash(arr[0] + config!.auth.tokenPadding) === arr[1], 'invalid_token') // 检测签名有效性
