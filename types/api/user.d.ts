@@ -112,10 +112,7 @@ declare namespace PostUsersAuths {
  */
 declare namespace GetUsersAuthsByAppId {
   interface ResBody {
-    appId: string
-    appName: string
-    appAvatar: string
-    appDisplayName: string
+    code: string
     duration: number
     scope: string[]
     time: Date

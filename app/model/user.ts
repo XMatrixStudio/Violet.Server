@@ -135,8 +135,9 @@ export async function addAuth(id: string, appId: string, duration: number, scope
   if (result.n === 0) {
     await userDB.updateOne(
       { _id: id, 'auth._app': appId },
-      { 'auth.$': { _app: appId, time: Date.now(), duration: duration, scope: scope }, $push: { auth: { $each: [], $sort: { time: -1 } } } }
+      { 'auth.$': { _app: appId, time: Date.now(), duration: duration, scope: scope } }
     )
+    await userDB.updateOne({ _id: id, 'auth._app': appId }, { $push: { auth: { $each: [], $sort: { time: -1 } } } })
   }
 }
 

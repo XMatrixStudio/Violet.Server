@@ -12,9 +12,8 @@ import { RequestType } from '../model/request'
 import * as userModel from '../model/user'
 
 export async function auth(id: string, appId: string, duration: number, scope: string[]) {
-  const app = await appModel.getById(id)
-  assert(app, 'not_exist_app')
-  await userModel.addAuth(id, app!._id, duration, scope)
+  assert(await appModel.isExist(appId), 'not_exist_app')
+  await userModel.addAuth(id, appId, duration, scope)
 }
 
 export async function checkPassword(id: string, password: string) {
@@ -77,15 +76,11 @@ export async function getAppBaseInfoList(id: string, page: number, limit: number
 }
 
 export async function getAuth(id: string, appId: string): Promise<GetUsersAuthsByAppId.ResBody> {
-  const app = await appModel.getById(appId)
-  assert(app, 'not_exist_app')
+  assert(await appModel.isExist(appId), 'not_exist_app')
   const auth = await userModel.getAuthById(id, appId)
   assert(auth, 'not_exist_auth')
   return {
-    appId: app!._id,
-    appName: app!.rawName,
-    appAvatar: app!.info.avatar || config!.file.cos.url + config!.file.cos.default.app,
-    appDisplayName: app!.info.displayName,
+    code: crypto.generateCode(id, appId),
     duration: auth!.duration,
     scope: auth!.scope,
     time: auth!.time

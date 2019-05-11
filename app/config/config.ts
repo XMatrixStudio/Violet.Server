@@ -6,6 +6,7 @@ import * as yaml from 'js-yaml'
  */
 export interface Config {
   http: HttpConfig
+  auth: AuthConfig
   file: FileConfig
   db: DBConfig
   cache: CacheConfig
@@ -19,6 +20,10 @@ interface HttpConfig {
   host: string
   port: number
   dev: boolean
+}
+
+interface AuthConfig {
+  codeSecret: string
 }
 
 /**
