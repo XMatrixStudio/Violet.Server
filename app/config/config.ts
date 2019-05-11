@@ -24,6 +24,8 @@ interface HttpConfig {
 
 interface AuthConfig {
   codeSecret: string
+  tokenPadding: string
+  tokenSecret: string
 }
 
 /**

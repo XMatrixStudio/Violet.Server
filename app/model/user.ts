@@ -165,15 +165,13 @@ export async function getAuthById(id: string, appId: string): Promise<IUserAuth 
 }
 
 export async function getAuthsWith(id: string, page: number, limit: number, populate: string): Promise<IUserAuth[]> {
-  const user = await userDB
-    .findById(id, { auth: { $skip: (page - 1) * limit, $limit: limit }, 'auth.$': 1, 'auth.$._id': 0 })
-    .populate('auth._app', populate)
+  const user = await userDB.findById(id, { auth: { $slice: [(page - 1) * limit, limit] } }).populate('auth._app', populate)
   if (!user) return []
   return user.auth
 }
 
 export async function getAuthsCount(id: string): Promise<number> {
-  return (await userDB.aggregate([{ $match: { _id: id } }, { $project: { n: { $size: '$auth' } } }]))[0].n
+  return (await userDB.aggregate([{ $match: { _id: new ObjectId(id) } }, { $project: { n: { $size: '$auth' } } }]))[0].n
 }
 
 /**

@@ -7,10 +7,10 @@ import * as assert from './assert'
 /**
  * 加密字符串
  * @param {string} str 需要加密的字符串
- * @param {string | undefined} key 密码
+ * @param {string} key 密码
  * @return {string} 加密后的字符串
  */
-function encrypt(str: string, key?: string): string {
+function encrypt(str: string, key: string): string {
   key = key || config!.auth.codeSecret
   const hash = crypto.createHash('sha256')
   hash.update(key)
@@ -28,7 +28,7 @@ function encrypt(str: string, key?: string): string {
  * @param {string | undefined} key 密码
  * @return {string} 解密后的字符串
  */
-function decrypt(str: string, key?: string): string {
+function decrypt(str: string, key: string): string {
   key = key || config!.auth.codeSecret
   const hash = crypto.createHash('sha256')
   hash.update(key)
@@ -43,12 +43,13 @@ function decrypt(str: string, key?: string): string {
 }
 
 export function generateCode(userId: string, appId: string): string {
-  const str = JSON.stringify({
-    t: Date.now(),
-    u: userId,
-    a: appId
-  })
-  return encrypt(str)
+  return encrypt(JSON.stringify({ t: Date.now(), u: userId, a: appId }), config!.auth.codeSecret)
+}
+
+export function generateToken(userId: string, appId: string): string {
+  const enc = encrypt(JSON.stringify({ c: generateCode(userId, appId), t: 'MAC-Token' }), config!.auth.tokenSecret)
+  const hashData = hash(enc + config!.auth.tokenPadding)
+  return `${enc}&${hashData}`
 }
 
 /**
@@ -82,9 +83,9 @@ export const rand = (length: number): string => {
   return csprng(length, 36)
 }
 
-export function readCode(code: string, time: number): Record<'userId' | 'appId', string> {
+export function readCode(code: string, time?: number): Record<'userId' | 'appId', string> {
   time = time || 1000 * 60
-  const str = decrypt(code)
+  const str = decrypt(code, config!.auth.codeSecret)
   assert(str, 'invalid_code') // 解密code
   const data: { t: number; u: string; a: string } = JSON.parse(str)
   assert(data.t && data.u && data.a, 'invalid_code') // 检测code的完整性
@@ -95,4 +96,17 @@ export function readCode(code: string, time: number): Record<'userId' | 'appId',
     userId: data.u,
     appId: data.a
   }
+}
+
+export function readToken(token: string, time?: number): Record<'userId' | 'appId', string> {
+  time = time || 1000 * 60 * 60 * 24 * 30
+  const arr = token.split('&')
+  assert(arr.length === 2, 'invalid_token') // 检测数据完整性
+  assert(hash(arr[0] + config!.auth.tokenPadding) === arr[1], 'invalid_token') // 检测签名有效性
+  const str = decrypt(arr[0], config!.auth.tokenSecret)
+  assert(str, 'invalid_token') // 检测解密状态
+  const data: Record<'c' | 't', string> = JSON.parse(str)
+  assert(data.t && data.c, 'invalid_token') // 检测token完整性
+  assert(data.t === 'MAC-Token', 'invalid_token') // 检测token类型
+  return readCode(data.c, time) // 一个月的有效期
 }

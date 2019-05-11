@@ -62,24 +62,6 @@ declare namespace PatchUsers {
 declare namespace GetUsersAuths {
   interface IAuth {
     appId: string
-    time: Date
-    duration: number
-    scope: string[]
-  }
-  interface Query extends PageQuery {}
-  interface ResBody {
-    pagination: PageRes
-    data: IAuth[]
-  }
-}
-
-/**
- * @method GET
- * @resource `/i/users/auths`
- */
-declare namespace GetUsersAuths {
-  interface IAuth {
-    appId: string
     appName: string
     appAvatar: string
     appDisplayName: string
