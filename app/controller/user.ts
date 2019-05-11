@@ -99,7 +99,7 @@ export async function postAuths(ctx: Context) {
 }
 
 export async function getAuthsByAppId(ctx: Context) {
-  const body = _.pick<GetUsersAuthsByAppId.Query>(ctx.request.query, ['redirectHost'])
+  const body = _.pick<GetUsersAuthsByAppId.Query>(ctx.request.query, ['redirectUrl'])
   assert.v(
     { data: ctx.params.appId, type: 'string', regExp: regexp.Id, message: 'invalid_app_id' },
     { data: body.redirectUrl, type: 'string', message: 'invalid_redirect_url' }
