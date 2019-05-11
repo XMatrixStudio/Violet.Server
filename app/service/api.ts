@@ -17,8 +17,10 @@ export async function getToken(code: string, appSecret: string): Promise<ApiPost
   const app = await readSecret(appSecret)
   const data = crypto.readCode(code)
   assert(app._id.toString() === data.appId, 'invalid_code')
+  const state = Math.floor(Math.random() * 1000000000)
+  await userModel.setAuthState(data.userId, data.appId, state)
   return {
-    token: crypto.generateToken(data.userId, data.appId),
+    token: crypto.generateToken(data.userId, data.appId, state),
     userId: crypto.generateOpenId(data.userId, data.appId)
   }
 }
@@ -30,7 +32,7 @@ export async function getUser(token: string, appSecret: string): Promise<ApiGetU
   const user = await userModel.getById(data.userId)
   assert(user, 'invalid_token')
   const auth = await userModel.getAuthById(data.userId, data.appId)
-  assert(auth && Date.now() - auth.time.getTime() < auth.duration * 1000 * 60 * 60 * 24, 'timeout_token')
+  assert(auth && auth.state === data.state && Date.now() - auth.time.getTime() < auth.duration * 1000 * 60 * 60 * 24, 'timeout_token')
   let res: ApiGetUser.ResBody = {
     id: user!._id,
     avatar: user!.info.avatar,

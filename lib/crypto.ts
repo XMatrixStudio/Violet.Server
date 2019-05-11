@@ -50,8 +50,8 @@ export function generateOpenId(userId: string, appId: string): string {
   return hash(userId + appId)
 }
 
-export function generateToken(userId: string, appId: string): string {
-  const enc = encrypt(JSON.stringify({ c: generateCode(userId, appId), t: 'MAC-Token' }), config!.auth.tokenSecret)
+export function generateToken(userId: string, appId: string, state: number): string {
+  const enc = encrypt(JSON.stringify({ c: generateCode(userId, appId), s: state, t: 'MAC-Token' }), config!.auth.tokenSecret)
   const hashData = hash(enc + config!.auth.tokenPadding)
   return `${enc}&${hashData}`
 }
@@ -102,15 +102,16 @@ export function readCode(code: string, time?: number): Record<'userId' | 'appId'
   }
 }
 
-export function readToken(token: string, time?: number): Record<'userId' | 'appId', string> {
-  time = time || 1000 * 60 * 60 * 24 * 15
+export function readToken(token: string, time?: number): { userId: string; appId: string; state: number } {
+  time = time || 1000 * 60 * 60 * 24 * 15 // 一个月的有效期
   const arr = token.split('&')
   assert(arr.length === 2, 'invalid_token') // 检测数据完整性
   assert(hash(arr[0] + config!.auth.tokenPadding) === arr[1], 'invalid_token') // 检测签名有效性
   const str = decrypt(arr[0], config!.auth.tokenSecret)
   assert(str, 'invalid_token') // 检测解密状态
-  const data: Record<'c' | 't', string> = JSON.parse(str)
-  assert(data.t && data.c, 'invalid_token') // 检测token完整性
+  const data: { c: string; s: number; t: string } = JSON.parse(str)
+  assert(data.c && data.s && data.t, 'invalid_token') // 检测token完整性
   assert(data.t === 'MAC-Token', 'invalid_token') // 检测token类型
-  return readCode(data.c, time) // 一个月的有效期
+  const code = readCode(data.c, time)
+  return { userId: code.userId, appId: code.appId, state: data.s }
 }

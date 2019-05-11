@@ -35,6 +35,7 @@ export interface IUserInfo {
 
 export interface IUserAuth {
   _app: IApp
+  state: number // 随机状态，用于判断Token的有效性
   time: Date
   duration: number
   scope: string[]
@@ -249,6 +250,10 @@ export async function isExistByLevel(level: number): Promise<boolean> {
 
 export async function removeAuth(id: string, appId: string) {
   await userDB.updateOne({ _id: id, 'auth._app': appId }, { $pull: { auth: { _app: appId } } })
+}
+
+export async function setAuthState(id: string, appId: string, state: number) {
+  await userDB.updateOne({ _id: id, 'auth._app': appId }, { 'auth.$.state': state })
 }
 
 export async function setDevInfo(id: string, name: string, email: string, phone: string) {
