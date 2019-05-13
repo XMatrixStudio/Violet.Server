@@ -9,17 +9,17 @@ export async function getUser(ctx: Context) {
   const body = _.pick<ApiGetUser.Query>(ctx.request.query, ['appSecret', 'token'])
   assert.v(
     { data: body.appSecret, type: 'string', minLength: 128, maxLength: 512, message: 'invalid_app_secret' },
-    { data: body.token, type: 'string', minLength: 128, maxLength: 512, message: 'invalid_token' }
+    { data: body.token, type: 'string', minLength: 128, maxLength: 1024, message: 'invalid_token' }
   )
   ctx.body = await apiService.getUser(body.token!, body.appSecret!)
   ctx.status = 200
 }
 
 export async function getUtilSecret(ctx: Context) {
-  const body = _.pick<ApiGetUtilSecret.Query>(ctx.request.body, ['appId', 'appKey'])
+  const body = _.pick<ApiGetUtilSecret.Query>(ctx.request.query, ['appId', 'appKey'])
   assert.v(
     { data: body.appId, type: 'string', regExp: regexp.Id, message: 'invalid_app_id' },
-    { data: body.appKey, type: 'string', minLength: 26, maxLength: 26, message: 'invalid_app_key' }
+    { data: body.appKey, type: 'string', minLength: 24, maxLength: 24, message: 'invalid_app_key' }
   )
   ctx.body = await apiService.getSecret(body.appId!, body.appKey!)
   ctx.status = 200

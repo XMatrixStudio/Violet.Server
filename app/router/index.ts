@@ -70,7 +70,7 @@ router.use('/i/', async (ctx: Context, next: () => Promise<any>) => {
   return next()
 })
 
-router.use('/', api.routes())
+router.use('', api.routes())
 
 router.use('/i/admin', admin.routes())
 router.use('/i/apps', app.routes())

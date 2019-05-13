@@ -87,6 +87,7 @@ const userSchema = new db.Schema({
       _app: { type: ObjectId, ref: 'apps', required: true },
       time: { type: Date, default: Date.now },
       duration: Number,
+      state: Number,
       scope: [String]
     }
   ],

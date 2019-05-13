@@ -88,17 +88,22 @@ export const rand = (length: number): string => {
 }
 
 export function readCode(code: string, time?: number): Record<'userId' | 'appId', string> {
-  time = time || 1000 * 60
+  time = time || 1000 * 60 * 10
   const str = decrypt(code, config!.auth.codeSecret)
   assert(str, 'invalid_code') // 解密code
-  const data: { t: number; u: string; a: string } = JSON.parse(str)
+  let data: { t?: number; u?: string; a?: string } = {}
+  try {
+    data = JSON.parse(str)
+  } catch (error) {
+    assert(false, 'invalid_code') // 检测 code 的完整性
+  }
   assert(data.t && data.u && data.a, 'invalid_code') // 检测code的完整性
-  const validTime = new Date(data.t)
+  const validTime = new Date(data.t!)
   assert(!Number.isNaN(validTime.getTime()), 'invalid_code') // 检测有效期的合法性
   assert(Date.now() - validTime.getTime() < time, 'timeout_code') // 检测有效期
   return {
-    userId: data.u,
-    appId: data.a
+    userId: data.u!,
+    appId: data.a!
   }
 }
 
@@ -109,9 +114,14 @@ export function readToken(token: string, time?: number): { userId: string; appId
   assert(hash(arr[0] + config!.auth.tokenPadding) === arr[1], 'invalid_token') // 检测签名有效性
   const str = decrypt(arr[0], config!.auth.tokenSecret)
   assert(str, 'invalid_token') // 检测解密状态
-  const data: { c: string; s: number; t: string } = JSON.parse(str)
+  let data: { c?: string; s?: number; t?: string } = {}
+  try {
+    data = JSON.parse(str)
+  } catch (error) {
+    assert(false, 'invalid_token') // 检测 code 的完整性
+  }
   assert(data.c && data.s && data.t, 'invalid_token') // 检测token完整性
   assert(data.t === 'MAC-Token', 'invalid_token') // 检测token类型
-  const code = readCode(data.c, time)
-  return { userId: code.userId, appId: code.appId, state: data.s }
+  const code = readCode(data.c!, time)
+  return { userId: code.userId, appId: code.appId, state: data.s! }
 }
