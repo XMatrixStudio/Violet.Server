@@ -289,15 +289,16 @@ export async function postSession(ctx: Context) {
   body.remember = body.remember === true
 
   let userId
+  const ip = ctx.request.header['x-real-ip'] || ctx.request.ip
   if (body.user!.indexOf('@') !== -1) {
     assert.v({ data: body.user, type: 'string', maxLength: 64, regExp: regexp.Email, message: 'invalid_email' })
-    userId = await userService.login({ email: body.user! }, body.password!, ctx.request.ip)
+    userId = await userService.login({ email: body.user! }, body.password!, ip)
   } else if (body.user![0] >= '0' && body.user![0] <= '9') {
     assert.v({ data: body.user, type: 'string', regExp: regexp.Phone, message: 'invalid_phone' })
-    userId = await userService.login({ phone: body.user! }, body.password!, ctx.request.ip)
+    userId = await userService.login({ phone: body.user! }, body.password!, ip)
   } else {
     assert.v({ data: body.user, type: 'string', regExp: regexp.Name, message: 'invalid_name' })
-    userId = await userService.login({ name: body.user! }, body.password!, ctx.request.ip)
+    userId = await userService.login({ name: body.user! }, body.password!, ip)
   }
 
   ctx.session!.user.id = userId

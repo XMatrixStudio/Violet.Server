@@ -4,6 +4,8 @@ import * as assert from '../../lib/assert'
 import * as regexp from '../../lib/regexp'
 import { Context } from '../../types/context'
 import * as apiService from '../service/api'
+import * as userService from '../service/user'
+import * as verify from '../../lib/verify'
 
 export async function getUser(ctx: Context) {
   const body = _.pick<ApiGetUser.Query>(ctx.request.query, ['appSecret', 'token'])
@@ -36,4 +38,24 @@ export async function postVerifyToken(ctx: Context) {
   )
   ctx.body = await apiService.getToken(body.code!, body.appSecret!)
   ctx.status = 201
+}
+
+export async function getVerifyAuthorize(ctx: Context) {
+  try {
+    // 执行快速登陆
+    verify.requireLogin(ctx)
+    const body = _.pick<ApiGetVerifyAuthorize.Query>(ctx.request.query, ['responseType', 'appId', 'quickMode', 'redirectUrl', 'state'])
+    assert(body.quickMode === 'true', 'not_quick_mode')
+    assert(body.responseType === 'code', 'error_response_type')
+    assert.v(
+      { data: body.appId, type: 'string', regExp: regexp.Id, message: 'invalid_app_id' },
+      { data: body.redirectUrl, type: 'string', message: 'invalid_redirect_url' },
+      { data: body.state, type: 'string', message: 'invalid_state' }
+    )
+    if (body.redirectUrl![body.redirectUrl!.length - 1] !== '/') body.redirectUrl += '/'
+    const auth = await userService.getAuth(ctx.session!.user.id!, body.appId!, body.redirectUrl!)
+    ctx.redirect(body.redirectUrl + '?code=' + auth.code + '&state=' + body.state)
+  } catch (error) {
+    ctx.redirect('/account/auth?' + ctx.request.querystring)
+  }
 }

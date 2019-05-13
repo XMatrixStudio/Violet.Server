@@ -36,6 +36,21 @@ declare namespace ApiGetUtilSecret {
 }
 
 /**
+ * @method GET
+ * @resource `/verify/authorize`
+ */
+declare namespace ApiGetVerifyAuthorize {
+  interface Query {
+    responseType: string
+    appId: string
+    state: string
+    scope: string[]
+    redirectUrl: string
+    quickMode: string
+  }
+}
+
+/**
  * @method POST
  * @resource `/verify/token`
  */
