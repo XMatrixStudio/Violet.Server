@@ -55,8 +55,8 @@ export interface IUserDev {
 interface UserDocument extends db.Document, IUser {}
 
 const userSchema = new db.Schema({
-  email: { type: String, index: { unique: true } },
-  phone: { type: String, index: { unique: true } },
+  email: { type: String, index: true },
+  phone: { type: String, index: true },
   name: { type: String, index: { unique: true }, required: true },
   rawName: { type: String, required: true },
   level: { type: Number, default: 0 },
