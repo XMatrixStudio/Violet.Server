@@ -52,9 +52,10 @@ export async function getVerifyAuthorize(ctx: Context) {
       { data: body.redirectUrl, type: 'string', message: 'invalid_redirect_url' },
       { data: body.state, type: 'string', message: 'invalid_state' }
     )
+    const realUrl = body.redirectUrl
     if (body.redirectUrl![body.redirectUrl!.length - 1] !== '/') body.redirectUrl += '/'
     const auth = await userService.getAuth(ctx.session!.user.id!, body.appId!, body.redirectUrl!)
-    ctx.redirect(body.redirectUrl + '?code=' + auth.code + '&state=' + body.state)
+    ctx.redirect(realUrl + '?code=' + auth.code + '&state=' + body.state)
   } catch (error) {
     ctx.redirect('/account/auth?' + ctx.request.querystring)
   }
