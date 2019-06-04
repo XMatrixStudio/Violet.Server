@@ -2,6 +2,7 @@ import * as _ from 'lodash'
 
 import * as assert from '../../lib/assert'
 import * as crypto from '../../lib/crypto'
+import config from '../config/config'
 import * as appModel from '../model/app'
 import * as userModel from '../model/user'
 
@@ -35,7 +36,7 @@ export async function getUser(token: string, appSecret: string): Promise<ApiGetU
   assert(auth && auth.state === data.state && Date.now() - auth.time.getTime() < auth.duration * 1000 * 60 * 60 * 24, 'timeout_token')
   let res: ApiGetUser.ResBody = {
     id: user!._id,
-    avatar: user!.info.avatar,
+    avatar: user!.info.avatar || config!.file.cos.url + config!.file.cos.default.user,
     nickname: user!.info.nickname
   }
   if (_.includes(auth!.scope, 'info')) {
