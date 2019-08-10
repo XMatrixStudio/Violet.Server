@@ -1,91 +1,59 @@
 {
   "name": "violet",
-  "version": "3.0.0-alpha",
-  "description": "Violet, a user system with OAuth 2.0",
-  "main": "index.ts",
-  "directories": {
-    "doc": "docs",
-    "lib": "lib"
-  },
-  "scripts": {
-    "build": "tsc",
-    "coveralls": "npm run testWithCoverage && cat coverage/lcov.info | coveralls",
-    "dev": "nodemon",
-    "serve": "node dist/index.js",
-    "test": "jest",
-    "testWithCoverage": "jest --coverage --verbose"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/XMatrixStudio/Violet.git"
-  },
-  "keywords": [
-    "Violet"
-  ],
-  "author": "XMatrixStudio",
+  "version": "0.0.1",
+  "description": "",
+  "author": "",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/XMatrixStudio/Violet/issues"
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "start:dev": "tsc-watch -p tsconfig.build.json --onSuccess \"node dist/main.js\"",
+    "start:debug": "tsc-watch -p tsconfig.build.json --onSuccess \"node --inspect-brk dist/main.js\"",
+    "start:prod": "node dist/main.js",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
-  "homepage": "https://github.com/XMatrixStudio/Violet#readme",
   "dependencies": {
-    "@koa/cors": "^2.2.3",
-    "captchapng2": "^1.0.3",
-    "commander": "^2.19.0",
-    "cos-nodejs-sdk-v5": "^2.5.7",
-    "csprng": "^0.1.2",
-    "github-reserved-names": "^1.1.5",
-    "js-yaml": "^3.13.1",
-    "koa": "^2.7.0",
-    "koa-bodyparser": "^4.2.1",
-    "koa-helmet": "^4.1.0",
-    "koa-morgan": "^1.0.1",
-    "koa-router": "^7.4.0",
-    "koa-session": "^5.10.1",
-    "lodash": "^4.17.13",
-    "moment": "^2.24.0",
-    "mongoose": "^5.4.20",
-    "mustache": "^3.0.1",
-    "nodemailer": "^5.1.1",
-    "qcloudsms_js": "^0.1.1",
-    "redis": "^2.8.0"
+    "@nestjs/common": "^6.0.0",
+    "@nestjs/core": "^6.0.0",
+    "@nestjs/platform-express": "^6.0.0",
+    "reflect-metadata": "^0.1.12",
+    "rimraf": "^2.6.2",
+    "rxjs": "^6.3.3"
   },
   "devDependencies": {
-    "@types/csprng": "^0.1.1",
-    "@types/http-errors": "^1.6.1",
-    "@types/jest": "^24.0.11",
-    "@types/js-yaml": "^3.12.0",
-    "@types/koa": "^2.0.48",
-    "@types/koa-bodyparser": "^4.2.2",
-    "@types/koa-helmet": "^3.1.2",
-    "@types/koa-morgan": "^1.0.4",
-    "@types/koa-router": "^7.0.40",
-    "@types/koa-session": "^5.10.0",
-    "@types/koa__cors": "^2.2.3",
-    "@types/lodash": "^4.14.123",
-    "@types/mongoose": "^5.3.24",
-    "@types/mustache": "^0.8.32",
-    "@types/node": "^10.14.4",
-    "@types/nodemailer": "^4.6.7",
-    "@types/redis": "^2.8.11",
-    "@types/supertest": "^2.0.7",
-    "coveralls": "^3.0.3",
-    "jest": "^24.5.0",
-    "nodemon": "^1.18.10",
-    "prettier": "^1.16.4",
-    "supertest": "^3.4.2",
-    "ts-jest": "^23.10.5",
-    "tslint": "^5.14.0",
-    "tslint-microsoft-contrib": "^6.1.0",
-    "tslint-plugin-prettier": "^2.0.1",
-    "typescript": "^3.3.4000"
+    "@nestjs/testing": "6.1.1",
+    "@types/express": "4.16.1",
+    "@types/jest": "24.0.11",
+    "@types/node": "11.13.4",
+    "@types/supertest": "2.0.7",
+    "jest": "24.7.1",
+    "prettier": "1.17.0",
+    "supertest": "4.0.2",
+    "ts-jest": "24.0.2",
+    "ts-node": "8.1.0",
+    "tsc-watch": "2.2.1",
+    "tsconfig-paths": "3.8.0",
+    "tslint": "5.16.0",
+    "typescript": "3.4.3"
   },
-  "prettier": {
-    "singleQuote": true,
-    "printWidth": 140,
-    "semi": false,
-    "bracketSpacing": true,
-    "arrowParens": "avoid",
-    "parser": "typescript"
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".spec.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
   }
 }

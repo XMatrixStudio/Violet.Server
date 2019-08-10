@@ -1,71 +1,38 @@
 {
-  "rulesDirectory": [
-    "tslint-microsoft-contrib",
-    "tslint-plugin-prettier"
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:recommended"
   ],
+  "jsRules": {
+    "no-unused-expression": true
+  },
   "rules": {
-    "prettier": true,
-    "class-name": true,
-    "comment-format": [
-      true,
-      "check-space"
-    ],
-    "indent": [
-      true,
-      "spaces",
-      2
-    ],
-    "linebreak-style": [
-      true,
-      "CRLF"
-    ],
-    "one-line": [
-      true,
-      "check-open-brace",
-      "check-whitespace"
-    ],
-    "no-console": false,
-    "no-var-keyword": true,
-    "quotemark": [
-      true,
-      "single",
-      "avoid-escape",
-      "avoid-template"
-    ],
-    "semicolon": [
-      true,
-      "never"
-    ],
-    "whitespace": [
-      true,
-      "check-branch",
-      "check-decl",
-      "check-operator",
-      "check-module",
-      "check-separator",
-      "check-type"
-    ],
-    "typedef-whitespace": [
+    "ban-ts-ignore": true,
+    "member-ordering": [
       true,
       {
-        "call-signature": "nospace",
-        "index-signature": "nospace",
-        "parameter": "nospace",
-        "property-declaration": "nospace",
-        "variable-declaration": "nospace"
-      },
-      {
-        "call-signature": "onespace",
-        "index-signature": "onespace",
-        "parameter": "onespace",
-        "property-declaration": "onespace",
-        "variable-declaration": "onespace"
+        "alphabetize": true,
+        "order": "instance-sandwich"
       }
     ],
-    "no-internal-module": true,
-    "no-trailing-whitespace": true,
-    "no-null-keyword": false,
-    "prefer-const": true,
-    "jsdoc-format": true
-  }
+    "no-any": true,
+    "no-import-side-effect": true,
+    "quotemark": [
+      true,
+      "single"
+    ],
+    "ordered-imports": [
+      false
+    ],
+    "max-line-length": [
+      true,
+      150
+    ],
+    "interface-name": [
+      false
+    ],
+    "arrow-parens": false,
+    "object-literal-sort-keys": false
+  },
+  "rulesDirectory": []
 }
