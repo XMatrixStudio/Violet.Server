@@ -8,6 +8,7 @@
     "sourceMap": true,
     /* Addition Options */
     "alwaysStrict": true,
+    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "incremental": true,
     "newLine": "CRLF",
