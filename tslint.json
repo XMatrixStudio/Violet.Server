@@ -1,8 +1,6 @@
 {
   "defaultSeverity": "error",
-  "extends": [
-    "tslint:recommended"
-  ],
+  "extends": ["tslint:recommended"],
   "jsRules": {
     "no-unused-expression": true
   },
@@ -12,29 +10,16 @@
     "ban-comma-operator": true,
     "ban-ts-ignore": true,
     "binary-expression-operand-order": true,
-    "curly": [
-      true,
-      "ignore-same-line"
-    ],
+    "curly": [true, "ignore-same-line"],
     "cyclomatic-complexity": true,
     "deprecation": true,
     "encoding": true,
     "function-constructor": true,
     "increment-decrement": true,
-    "indent": [
-      true,
-      "spaces",
-      2
-    ],
-    "linebreak-style": [
-      true,
-      "CRLF"
-    ],
+    "indent": [true, "spaces", 2],
+    "linebreak-style": [true, "CRLF"],
     "match-default-export-name": true,
-    "max-classes-per-file": [
-      true,
-      1
-    ],
+    "max-classes-per-file": [true, 1],
     "member-ordering": [
       true,
       {
@@ -52,10 +37,7 @@
     "no-dynamic-delete": true,
     "no-floating-promises": true,
     "no-for-in-array": true,
-    "no-implicit-dependencies": [
-      true,
-      "dev"
-    ],
+    "no-implicit-dependencies": [true, "dev"],
     "no-import-side-effect": true,
     "no-inferrable-types": true,
     "no-inferred-empty-object-type": true,
@@ -92,16 +74,10 @@
     "prefer-readonly": true,
     "prefer-template": true,
     "promise-function-async": true,
-    "quotemark": [
-      true,
-      "single"
-    ],
+    "quotemark": [true, "single"],
     "restrict-plus-operands": true,
     "return-undefined": true,
-    "semicolon": [
-      true,
-      "never"
-    ],
+    "semicolon": [true, "never"],
     "space-within-parens": true,
     "static-this": true,
     "strict-boolean-expressions": true,
