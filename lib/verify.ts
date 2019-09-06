@@ -45,7 +45,7 @@ export function checkEmailCode(ctx: Context, code: string, operator: string) {
   } else if (ctx.session!.verify.emailCode === code) {
     ctx.session!.verify.emailTime = undefined
   } else {
-    ctx.session!.verify.emailTime = undefined
+    // ctx.session!.verify.emailTime = undefined
     assert(false, 'error_code')
   }
 }

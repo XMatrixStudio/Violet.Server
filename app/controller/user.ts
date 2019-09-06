@@ -147,6 +147,27 @@ export async function postEmail(ctx: Context) {
 }
 
 /**
+ * 重置密码
+ */
+export async function reset(ctx: Context) {
+  const body = _.pick<PostUsers.ReqBody>(ctx.request.body, ['password'])
+  assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+  body.nickname = body.nickname || body.name!
+
+  assert(ctx.session!.user.reset, 'not_exist_reset_record')
+  switch (ctx.session!.user.reset) {
+    case 'email':
+      await userService.resetPassword({ email: ctx.session!.verify.email! }, body.password!)
+      break
+    case 'phone':
+      await userService.resetPassword({ phone: ctx.session!.verify.phone! }, body.password!)
+      break
+  }
+  ctx.session!.user.reset = undefined
+  ctx.status = 201
+}
+
+/**
  * 验证邮箱
  */
 export async function putEmail(ctx: Context) {
@@ -162,9 +183,10 @@ export async function putEmail(ctx: Context) {
       ctx.session!.user.register = 'email'
       break
     case 'reset':
-      assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+      // assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
       verify.checkEmailCode(ctx, body.code!, body.operator!)
-      await userService.resetPassword({ email: ctx.session!.verify.email! }, body.password!)
+      ctx.session!.user.reset = 'email'
+      // await userService.resetPassword({ email: ctx.session!.verify.email! }, body.password!)
       break
     case 'update':
       await verify.requireLogin(ctx)
@@ -211,9 +233,10 @@ export async function putPhone(ctx: Context) {
       ctx.session!.user.register = 'phone'
       break
     case 'reset':
-      assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
+      // assert.v({ data: body.password, type: 'string', minLength: 128, maxLength: 128, message: 'invalid_password' })
       verify.checkPhoneCode(ctx, body.code!, body.operator!)
-      await userService.resetPassword({ phone: ctx.session!.verify.phone! }, body.password!)
+      ctx.session!.user.reset = 'phone'
+      // await userService.resetPassword({ phone: ctx.session!.verify.phone! }, body.password!)
       break
     case 'update':
       await verify.requireLogin(ctx)

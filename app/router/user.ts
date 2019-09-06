@@ -13,6 +13,7 @@ user.post('/auths', userCtrl.postAuths) // 添加授权
 user.get('/auths/:appId', userCtrl.getAuthsByAppId) // 获取授权信息
 user.delete('/auths/:appId', userCtrl.deleteAuthsByAppId) // 删除授权
 user.put('/dev', userCtrl.putDev) // 修改开发者个人信息
+user.post('/reset', userCtrl.reset) // 重置密码
 user.post('/email', userCtrl.postEmail) // 发送邮箱验证邮件
 user.put('/email', userCtrl.putEmail) // 验证邮箱
 user.post('/phone', userCtrl.postPhone) // 发送手机验证短信
