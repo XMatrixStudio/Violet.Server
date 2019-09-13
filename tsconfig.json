@@ -5,6 +5,7 @@
     "module": "commonjs",
     "baseUrl": "./",
     "outDir": "./dist",
+    "declaration": true,
     "sourceMap": true,
     /* Addition Options */
     "alwaysStrict": true,

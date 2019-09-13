@@ -1,9 +1,14 @@
-import { Controller, Get } from '@nestjs/common'
+import { Body, Controller, Post } from '@nestjs/common'
+
+import { RegisterRequest } from './user.entity'
+import { UserService } from './user.service'
 
 @Controller('users')
 export class UserController {
-  @Get()
-  public async getUsers(): Promise<string> {
-    return 'hello, world'
+  constructor(private readonly userService: UserService) {}
+
+  @Post()
+  async register(@Body() body: RegisterRequest) {
+    await this.userService.register()
   }
 }
