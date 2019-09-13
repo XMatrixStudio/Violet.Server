@@ -20,6 +20,7 @@
     "linebreak-style": [true, "CRLF"],
     "match-default-export-name": true,
     "max-classes-per-file": [true, 1],
+    "member-access": [true, "no-public"],
     "member-ordering": [
       true,
       {
