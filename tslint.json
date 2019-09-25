@@ -70,7 +70,6 @@
     "number-literal-format": true,
     "object-literal-sort-keys": [true, "match-declaration-order"],
     "prefer-conditional-expression": true,
-    "prefer-function-over-method": true,
     "prefer-method-signature": true,
     "prefer-object-spread": true,
     "prefer-readonly": true,

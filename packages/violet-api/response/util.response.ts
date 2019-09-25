@@ -1,4 +1,4 @@
-import { THttpResponse, IErrorResponse } from './http.response'
+import { IErrorResponse, THttpResponse } from './http.response'
 
 export interface IGetCaptchaSuccessResponse {
   captcha: string
