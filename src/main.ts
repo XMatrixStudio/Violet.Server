@@ -18,7 +18,7 @@ async function bootstrap() {
       exceptionFactory: validationErrorFactory,
     }),
   )
-  app.use(session({ secret: 'xmatrix-studio-violet' }))
+  app.use(session({ secret: 'xm.violet.sid' }))
   await app.listen(APP_PORT)
 }
 
