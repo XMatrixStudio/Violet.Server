@@ -9,7 +9,10 @@
       "args": ["${workspaceFolder}/src/main.ts"],
       "cwd": "${workspaceFolder}",
       "protocol": "inspector",
-      "console": "internalConsole"
+      "console": "internalConsole",
+      "env": {
+        "TS_NODE_FILES": "true"
+      }
     }
   ]
 }

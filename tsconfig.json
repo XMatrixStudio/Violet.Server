@@ -3,8 +3,8 @@
     /* Base Options */
     "target": "es2019",
     "module": "commonjs",
-    "baseUrl": "./",
-    "outDir": "./dist",
+    "baseUrl": ".",
+    "outDir": "dist",
     "declaration": true,
     "sourceMap": true,
     /* Addition Options */

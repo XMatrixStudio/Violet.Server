@@ -2,11 +2,14 @@ import { Controller, Get, NotImplementedException, Req, Session } from '@nestjs/
 
 import { IGetCaptchaSuccessResponse } from '../../../packages/violet-api'
 import { ISession } from '../../types/session'
+import { UtilService } from './util.service'
 
 @Controller('util')
 export class UtilController {
+  constructor(private readonly utilService: UtilService) {}
+
   @Get('captcha')
   getCaptcha(@Session() session: ISession): IGetCaptchaSuccessResponse {
-    throw new NotImplementedException()
+    return { captcha: this.utilService.createCaptcha(session) }
   }
 }

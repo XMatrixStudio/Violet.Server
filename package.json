@@ -7,7 +7,7 @@
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\"",
-    "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "start": "ts-node --files -r tsconfig-paths/register src/main.ts",
     "start:dev": "tsc-watch -p tsconfig.build.json --onSuccess \"node dist/main.js\"",
     "start:debug": "tsc-watch -p tsconfig.build.json --onSuccess \"node --inspect-brk dist/main.js\"",
     "start:prod": "node dist/main.js",
@@ -19,9 +19,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@nestjs/common": "^6.8.0",
-    "@nestjs/core": "^6.8.0",
-    "@nestjs/platform-express": "^6.8.0",
+    "@nestjs/common": "^6.8.2",
+    "@nestjs/core": "^6.8.2",
+    "@nestjs/platform-express": "^6.8.2",
     "captchapng2": "^1.0.3",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.10.1",
@@ -31,11 +31,11 @@
     "rxjs": "^6.5.3"
   },
   "devDependencies": {
-    "@nestjs/testing": "^6.8.0",
+    "@nestjs/testing": "^6.8.2",
     "@types/express": "^4.17.1",
     "@types/express-session": "^1.15.14",
     "@types/jest": "^24.0.18",
-    "@types/node": "^12.7.8",
+    "@types/node": "^12.7.12",
     "@types/supertest": "^2.0.8",
     "jest": "^24.9.0",
     "prettier": "^1.18.2",
