@@ -1,8 +1,8 @@
 # Violet
 
-> Violet 正在重构，**dev**分支无法正常工作，请切换至**next**分支。
+> Violet 正在重构，**next**分支无法正常工作，**master**分支即将无法正常工作。
 >
-> **master**分支版本为 2.0，**next**分支版本为 3.0，**dev**分支版本为 3.1。
+> 请使用 Tag 版本`2.0`或`v3.0-alpha`
 
 Violet 中央授权系统的 Nodejs 服务端，提供一系列的 API 接口。
 

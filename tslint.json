@@ -45,7 +45,6 @@
     "no-invalid-template-strings": true,
     "no-invalid-this": true,
     "no-irregular-whitespace": true,
-    "no-magic-numbers": true,
     "no-mergeable-namespace": true,
     "no-misused-new": true,
     "no-non-null-assertion": true,
