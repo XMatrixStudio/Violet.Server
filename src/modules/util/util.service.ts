@@ -14,7 +14,7 @@ export class UtilService {
     return png.getBase64()
   }
 
-  verifyCaptcha(session: ISession): boolean {
+  verifyCaptcha(session: ISession, captcha: number): boolean {
     throw new NotImplementedException()
   }
 }
