@@ -1,10 +1,10 @@
-import { BadRequestException } from '@nestjs/common'
+import { HttpException, HttpStatus } from '@nestjs/common'
 
-import { IErrorResponse } from '../../packages/violet-api/response/http.response'
+export class BadRequestError extends HttpException {
+  readonly message: string
 
-export class BadRequestError extends BadRequestException {
   constructor(errMessage: string) {
-    const err: IErrorResponse = { error: errMessage }
-    super(err)
+    super(errMessage, HttpStatus.BAD_REQUEST)
+    this.message = `${HttpStatus.BAD_REQUEST.toString()}_${errMessage}`
   }
 }

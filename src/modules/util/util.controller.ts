@@ -10,6 +10,6 @@ export class UtilController {
 
   @Get('captcha')
   getCaptcha(@Session() session: ISession): IGetCaptchaSuccessResponse {
-    return { captcha: 'data:image/png;base64,'.concat(this.utilService.createCaptcha(session)) }
+    return { captcha: 'data:image/png;base64,'.concat(this.utilService.createCaptcha(session, 5 * 60 * 1000)) }
   }
 }

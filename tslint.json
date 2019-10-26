@@ -65,7 +65,7 @@
     "no-unnecessary-qualifier": true,
     "no-unnecessary-type-assertion": true,
     "no-unsafe-any": true,
-    "no-void-expression": true,
+    "no-void-expression": [true, "ignore-arrow-function-shorthand"],
     "number-literal-format": true,
     "object-literal-sort-keys": [true, "match-declaration-order"],
     "prefer-conditional-expression": true,
