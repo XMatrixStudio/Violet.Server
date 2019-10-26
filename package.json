@@ -53,12 +53,15 @@
       "json",
       "ts"
     ],
-    "rootDir": "test/src",
+    "rootDir": ".",
     "testRegex": ".spec.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "coverageDirectory": "../../coverage",
-    "testEnvironment": "node"
+    "coverageDirectory": "coverage",
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      ".e2e-spec.ts$"
+    ]
   }
 }

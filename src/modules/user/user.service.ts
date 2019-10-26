@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotImplementedException } from '@nestjs/common'
 
 @Injectable()
 export class UserService {
+  // tslint:disable-next-line: no-async-without-await
   async register() {
-    // tslint:disable-next-line: no-console
-    console.log('hello, register')
+    throw new NotImplementedException()
   }
 }

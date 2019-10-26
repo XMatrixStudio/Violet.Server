@@ -61,7 +61,7 @@
     "no-this-assignment": true,
     "no-unbound-method": true,
     "no-unnecessary-callback-wrapper": true,
-    "no-unnecessary-class": true,
+    "no-unnecessary-class": [true, "allow-empty-class"],
     "no-unnecessary-qualifier": true,
     "no-unnecessary-type-assertion": true,
     "no-unsafe-any": true,

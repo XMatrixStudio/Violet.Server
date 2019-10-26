@@ -1,4 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common'
+// tslint:disable-next-line: no-implicit-dependencies
 import { Response } from 'express'
 
 @Catch(HttpException)
