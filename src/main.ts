@@ -1,13 +1,20 @@
 import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import * as program from 'commander'
 import * as session from 'express-session'
-
+import { AppConfig, initConfig } from './app.config'
 import { AppModule } from './app.module'
 import { validationErrorFactory } from './errors/validation.error'
 import { HttpExceptionFilter } from './filters/error.filter'
 
-const DEFAULT_APP_PORT = 30001
-const APP_PORT = process.env.APP_PORT || DEFAULT_APP_PORT
+async function init() {
+  program
+    .version('3.0-alpha', '-v, --version')
+    .option('-c, --config <file>', 'specify configuration file', 'config.yaml')
+    .parse(process.argv)
+  initConfig(program.config as string)
+  return
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -19,10 +26,17 @@ async function bootstrap() {
     }),
   )
   app.use(session({ secret: 'xm.violet.sid' }))
-  await app.listen(APP_PORT)
+  await app.listen(AppConfig.port)
 }
 
-void bootstrap().then(() => {
-  // tslint:disable-next-line: no-console
-  console.log(`Listen at ${APP_PORT}`)
-})
+void init()
+  .then(() => {
+    void bootstrap().then(() => {
+      // tslint:disable-next-line: no-console
+      console.log(`Listen at ${AppConfig.port}`)
+    })
+  })
+  .catch(reason => {
+    // tslint:disable-next-line: no-console
+    console.error('Init failed', reason)
+  })

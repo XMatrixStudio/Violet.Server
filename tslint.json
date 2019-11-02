@@ -5,6 +5,7 @@
     "no-unused-expression": true
   },
   "rules": {
+    "arrow-parens": [true, "ban-single-arg-parens"],
     "await-promise": true,
     "ban": true,
     "ban-comma-operator": true,
