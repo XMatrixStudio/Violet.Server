@@ -3,7 +3,6 @@ import { NestFactory } from '@nestjs/core'
 import * as program from 'commander'
 import * as session from 'express-session'
 import { AppConfig, initConfig } from './app.config'
-import { AppModule } from './app.module'
 import { validationErrorFactory } from './errors/validation.error'
 import { HttpExceptionFilter } from './filters/error.filter'
 
@@ -17,7 +16,7 @@ async function init() {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(require('./app.module').AppModule)
   app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalPipes(
     new ValidationPipe({
