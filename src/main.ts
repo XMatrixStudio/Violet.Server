@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
+import { NestExpressApplication } from '@nestjs/platform-express'
 import * as program from 'commander'
 import * as session from 'express-session'
 import { AppModule } from './app.module'
@@ -16,7 +17,7 @@ async function init() {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create<NestExpressApplication>(AppModule)
   app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalPipes(
     new ValidationPipe({
@@ -25,6 +26,7 @@ async function bootstrap() {
     }),
   )
   app.use(session({ secret: 'xm.violet.sid' }))
+  app.disable('x-powered-by')
   await app.listen(ConfigService.getAppConfig().port)
 }
 

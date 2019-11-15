@@ -8,14 +8,12 @@ import { UtilModule } from './modules/util/util.module'
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      // tslint:disable-next-line: object-literal-sort-keys
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService): Promise<TypeOrmModuleOptions> => {
         const dbConfig = configService.getDBConfig()
         return {
           type: 'mysql',
-          // tslint:disable-next-line: object-literal-sort-keys
           host: dbConfig.host,
           port: dbConfig.port,
           database: dbConfig.dbname,
@@ -29,6 +27,5 @@ import { UtilModule } from './modules/util/util.module'
     UserModule,
     UtilModule,
   ],
-  providers: [ConfigService],
 })
 export class AppModule {}
