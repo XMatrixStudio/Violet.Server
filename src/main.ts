@@ -13,7 +13,6 @@ async function init() {
     .option('-c, --config <file>', 'specify configuration file', 'config.yaml')
     .parse(process.argv)
   ConfigService.init(program.config as string)
-  return
 }
 
 async function bootstrap() {
@@ -31,12 +30,17 @@ async function bootstrap() {
 
 void init()
   .then(() => {
-    void bootstrap().then(() => {
-      // tslint:disable-next-line: no-console
-      console.log(`Listen at ${ConfigService.getAppConfig().port}`)
-    })
+    void bootstrap()
+      .then(() => {
+        // eslint-disable-next-line no-console
+        console.log(`Listen at ${ConfigService.getAppConfig().port}`)
+      })
+      .catch(reason => {
+        // eslint-disable-next-line no-console
+        console.log('Listen failed', reason)
+      })
   })
   .catch(reason => {
-    // tslint:disable-next-line: no-console
+    // eslint-disable-next-line no-console
     console.error('Init failed', reason)
   })

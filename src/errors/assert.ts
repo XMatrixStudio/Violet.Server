@@ -1,6 +1,5 @@
 import * as _assert from 'assert'
 
-import { HttpException } from '@nestjs/common'
 import { BadRequestError } from './bad-request.error'
 
 export function assert(value: unknown, message: string, status = 400) {

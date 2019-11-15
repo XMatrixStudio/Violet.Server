@@ -1,0 +1,9 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.autoFixOnSave": true,
+  "eslint.validate": [
+    "javascript",
+    "typescript"
+  ],
+  "eslint.enable": true
+}

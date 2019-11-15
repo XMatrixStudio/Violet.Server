@@ -14,9 +14,10 @@ import { UtilModule } from './modules/util/util.module'
       useFactory: async (configService: ConfigService): Promise<TypeOrmModuleOptions> => {
         const dbConfig = configService.getDBConfig()
         return {
+          type: 'mysql',
+          // tslint:disable-next-line: object-literal-sort-keys
           host: dbConfig.host,
           port: dbConfig.port,
-          // tslint:disable-next-line: object-literal-sort-keys
           database: dbConfig.dbname,
           username: dbConfig.user,
           password: dbConfig.password,

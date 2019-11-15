@@ -14,6 +14,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     switch (status) {
       case 400:
+        // eslint-disable-next-line no-case-declarations
         const err: IErrorResponse = { error: errMessage }
         return response.status(status).json(err)
       case 401:

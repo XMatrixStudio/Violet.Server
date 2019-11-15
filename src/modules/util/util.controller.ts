@@ -1,5 +1,4 @@
-import { Controller, Get, NotImplementedException, Req, Session } from '@nestjs/common'
-
+import { Controller, Get, Session } from '@nestjs/common'
 import { IGetCaptchaSuccessResponse } from '../../../packages/violet-api'
 import { ISession } from '../../types/session'
 import { UtilService } from './util.service'
