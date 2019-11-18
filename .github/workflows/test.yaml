@@ -1,12 +1,16 @@
 name: Violet CI
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - next
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - run: git config --global core.autocrlf true
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
@@ -18,7 +22,6 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - run: git config --global core.autocrlf true
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
@@ -30,7 +33,6 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - run: git config --global core.autocrlf true
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:

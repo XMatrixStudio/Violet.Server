@@ -3,7 +3,7 @@ import { IGetCaptchaSuccessResponse } from '../../../packages/violet-api'
 import { ISession } from '../../types/session'
 import { UtilService } from './util.service'
 
-@Controller('api/v3/i/util')
+@Controller('i/util')
 export class UtilController {
   constructor(private readonly utilService: UtilService) {}
 

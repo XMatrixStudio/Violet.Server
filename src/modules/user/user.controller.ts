@@ -4,7 +4,7 @@ import { EmailService } from '../email/email.service'
 import { RegisterRequest, SendEmailRequest } from './user.request'
 import { UserService } from './user.service'
 
-@Controller('api/v3/i/users')
+@Controller('i/users')
 export class UserController {
   constructor(private readonly emailService: EmailService, private readonly userService: UserService) {}
 

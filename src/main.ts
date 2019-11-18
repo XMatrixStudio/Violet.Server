@@ -18,6 +18,8 @@ async function init() {
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
+  app.disable('x-powered-by')
+  app.setGlobalPrefix('api/v3')
   app.useGlobalFilters(new HttpExceptionFilter())
   app.useGlobalPipes(
     new ValidationPipe({
@@ -26,7 +28,6 @@ async function bootstrap() {
     }),
   )
   app.use(session({ secret: 'xm.violet.sid' }))
-  app.disable('x-powered-by')
   await app.listen(ConfigService.getAppConfig().port)
 }
 

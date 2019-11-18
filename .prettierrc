@@ -1,6 +1,5 @@
 {
   "arrowParens": "avoid",
-  "endOfLine": "crlf",
   "printWidth": 120,
   "quoteProps": "as-needed",
   "semi": false,
