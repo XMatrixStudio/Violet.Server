@@ -18,9 +18,10 @@ async function init() {
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule)
+  const configService = app.get<ConfigService>(ConfigService)
   app.disable('x-powered-by')
   app.setGlobalPrefix('api/v3')
-  app.useGlobalFilters(new HttpExceptionFilter())
+  app.useGlobalFilters(new HttpExceptionFilter(configService))
   app.useGlobalPipes(
     new ValidationPipe({
       disableErrorMessages: true,
