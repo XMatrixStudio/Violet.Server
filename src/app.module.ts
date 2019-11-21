@@ -26,6 +26,7 @@ import { UtilModule } from './modules/util/util.module'
     }),
     UserModule,
     UtilModule,
+    ConfigModule,
   ],
 })
 export class AppModule {}

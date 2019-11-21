@@ -14,5 +14,10 @@ export type THttp204Response = 'No Content'
  * Http Error Response
  */
 export interface IErrorResponse {
+  debug?: {
+    error: {
+      stack?: string
+    }
+  }
   error: string
 }

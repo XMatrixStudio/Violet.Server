@@ -17,6 +17,10 @@ export class ConfigService {
     ConfigService.path = path
   }
 
+  getAppConfig(): IAppConfig {
+    return ConfigService.config.app
+  }
+
   getDBConfig(): IMySQLConfig {
     return ConfigService.config.db
   }

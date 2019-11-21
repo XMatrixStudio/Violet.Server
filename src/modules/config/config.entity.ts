@@ -4,6 +4,7 @@ export interface IConfig {
 }
 
 export interface IAppConfig {
+  env: 'prod' | 'dev' | 'test'
   port: number
 }
 

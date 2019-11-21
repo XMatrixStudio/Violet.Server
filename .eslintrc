@@ -16,7 +16,7 @@
     // TypeScript-ESLint
     "@typescript-eslint/array-type": ["error", { "default": "generic", "readonly": "generic" }],
     "brace-style": "off",
-    "@typescript-eslint/brace-style": "error",
+    "@typescript-eslint/brace-style": ["error", "1tbs", { "allowSingleLine": true }],
     "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-member-accessibility": ["error", { "accessibility": "no-public" }],
@@ -31,6 +31,7 @@
     // TODO
     // "@typescript-eslint/no-dynamic-delete": "error",
     "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-require-imports": "error",
     "@typescript-eslint/no-unnecessary-condition": "error",
     "@typescript-eslint/no-unnecessary-qualifier": "error",
@@ -114,7 +115,6 @@
     "strict": "error",
 
     // ESLint: Variables
-    "no-undefined": "error",
 
     // ESLint: Node.js and CommonJS
     "no-buffer-constructor": "error",
