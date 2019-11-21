@@ -1,11 +1,11 @@
 import { Controller, Get, HttpException, HttpStatus, INestApplication, Query } from '@nestjs/common'
-import { ConfigModule } from '../../../src/modules/config/config.module'
-import { ConfigService } from '../../../src/modules/config/config.service'
+import { Test } from '@nestjs/testing'
+import * as request from 'supertest'
+import { IErrorResponse } from '../../../packages/violet-api/response/http.response'
 import { HttpExceptionFilter } from '../../../src/filters/error.filter'
 import { IAppConfig } from '../../../src/modules/config/config.entity'
-import { IErrorResponse } from '../../../packages/violet-api/response/http.response'
-import * as request from 'supertest'
-import { Test } from '@nestjs/testing'
+import { ConfigModule } from '../../../src/modules/config/config.module'
+import { ConfigService } from '../../../src/modules/config/config.service'
 
 @Controller()
 class TestController {
