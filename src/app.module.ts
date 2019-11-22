@@ -20,7 +20,7 @@ import { UtilModule } from './modules/util/util.module'
           username: dbConfig.user,
           password: dbConfig.password,
           entities: [`${__dirname}/**/*.entity.ts`],
-          synchronize: false,
+          synchronize: true,
         }
       },
     }),
