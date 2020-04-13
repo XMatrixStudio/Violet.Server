@@ -10,7 +10,7 @@ import { ConfigService } from './modules/config/config.service'
 
 async function init() {
   program
-    .version('3.0-alpha', '-v, --version')
+    .version('4.0.0-alpha', '-v, --version')
     .option('-c, --config <file>', 'specify configuration file', 'config.yaml')
     .parse(process.argv)
   ConfigService.init(program.config as string)

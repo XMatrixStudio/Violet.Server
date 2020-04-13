@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
-import { IAppConfig, IConfig, IMySQLConfig } from './config.entity'
+import { IAppConfig, IConfig, IEmailConfig, IMySQLConfig } from './config.entity'
 
 @Injectable()
 export class ConfigService {
@@ -23,5 +23,9 @@ export class ConfigService {
 
   getDBConfig(): IMySQLConfig {
     return ConfigService.config.db
+  }
+
+  getEmailConfig(): IEmailConfig {
+    return ConfigService.config.email
   }
 }

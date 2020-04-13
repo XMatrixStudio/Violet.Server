@@ -1,5 +1,7 @@
 {
   "arrowParens": "avoid",
+  "bracketSpacing": true,
+  "endOfLine": "lf",
   "printWidth": 140,
   "quoteProps": "as-needed",
   "semi": false,

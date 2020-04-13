@@ -1,5 +1,6 @@
 import { Injectable, NotImplementedException } from '@nestjs/common'
-import { Transporter } from 'nodemailer'
+import * as fs from 'fs'
+import { createTransport, Transporter } from 'nodemailer'
 import { assert } from '../../errors/assert'
 import { ISession } from '../../types/session'
 import { ConfigService } from '../config/config.service'
@@ -8,8 +9,20 @@ import { ConfigService } from '../config/config.service'
 export class EmailService {
   private readonly transporter: Transporter
 
+  private readonly layout: string
+  private readonly registerLayout: string
+
   constructor(private readonly configService: ConfigService) {
-    this.transporter = {} as Transporter
+    const emailConfig = configService.getEmailConfig()
+    this.transporter = createTransport({
+      host: emailConfig.host,
+      port: emailConfig.port,
+      auth: { user: emailConfig.user, pass: emailConfig.password },
+      secure: false,
+      tls: { ciphers: 'SSLv3' },
+    })
+    this.layout = fs.readFileSync('layout/email.html', 'utf-8')
+    this.registerLayout = fs.readFileSync('layout/register.email.html', 'utf-8')
   }
 
   sendRegisterUserEmailCode(session: ISession, email: string) {
