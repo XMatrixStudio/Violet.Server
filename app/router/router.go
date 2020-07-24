@@ -1,8 +1,10 @@
 package router
 
 import (
+	"fmt"
+
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/xmatrixstudio/violet.server/app/config"
 )
@@ -11,10 +13,11 @@ func New() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
 
-	store := cookie.NewStore([]byte("secret"))
-	r.Use(sessions.Sessions("violet", store))
-
 	injector := config.NewInject()
+	c := injector.Inject(new(config.Config)).(*config.Config)
+
+	store, _ := redis.NewStore(10, "tcp", fmt.Sprintf("%s:%s", c.Redis.Host, c.Redis.Port), c.Redis.Password, []byte("secret"))
+	r.Use(sessions.Sessions("violet", store))
 	BindUtil(r.Group("/i/util"), injector)
 
 	return r
