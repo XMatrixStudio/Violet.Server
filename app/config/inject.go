@@ -2,11 +2,9 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 
 	"github.com/afocus/captcha"
 	"github.com/xmatrixstudio/violet.server/lib/inject"
-	"gopkg.in/yaml.v3"
 )
 
 func NewCaptcha() *captcha.Captcha {
@@ -18,22 +16,8 @@ func NewCaptcha() *captcha.Captcha {
 	return cap
 }
 
-func NewConfig() *Config {
-	bytes, err := ioutil.ReadFile("config.yaml")
-	if err != nil {
-		panic(err)
-	}
-	config := &Config{}
-	err = yaml.Unmarshal(bytes, config)
-	if err != nil {
-		panic(err)
-	}
-	return config
-}
-
 func NewInject() *inject.Injector {
 	injector := inject.New()
 	injector.Register(NewCaptcha())
-	injector.Register(NewConfig())
 	return injector
 }
