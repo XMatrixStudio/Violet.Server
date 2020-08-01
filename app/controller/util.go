@@ -18,7 +18,7 @@ type UtilController struct {
 func (c *UtilController) GetCaptcha(ctx *gin.Context) *result.Resp {
 	key := ctx.Query("key")
 	if !uslice.StringIn(key, []string{"register"}) {
-		return result.OnFail(result.KeyError.ErrorCode, result.KeyError.ErrorMsg)
+		return result.OnFail(result.GlobalKeyError)
 	}
 	data := c.CaptchaService.GetCaptcha(ctx, key, 5*time.Minute)
 	return result.OnSuccess(fmt.Sprintf("data:image/png;base64,%s", data))
