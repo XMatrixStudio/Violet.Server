@@ -7,14 +7,19 @@ import (
 )
 
 type Config struct {
+	App   *AppConfig   `yaml:"app"`
 	Redis *RedisConfig `yaml:"redis"`
+}
+
+type AppConfig struct {
+	Env  string `yaml:"env"`
+	Port int    `yaml:"port"`
 }
 
 type RedisConfig struct {
 	Host     string `yaml:"host"`
 	Port     string `yaml:"port"`
 	Password string `yaml:"password"`
-	DB       int    `yaml:"db"`
 }
 
 func NewConfig(path string) *Config {
@@ -35,6 +40,7 @@ func NewConfig(path string) *Config {
 
 func newDefaultConfig() *Config {
 	return &Config{
-		Redis: &RedisConfig{Host: "127.0.0.1", Port: "6379", Password: "", DB: 0},
+		App:   &AppConfig{Env: "prod", Port: 3000},
+		Redis: &RedisConfig{Host: "127.0.0.1", Port: "6379", Password: ""},
 	}
 }
