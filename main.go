@@ -1,9 +1,15 @@
 package main
 
-import "github.com/xmatrixstudio/violet.server/app/router"
+import (
+	"fmt"
+
+	"github.com/xmatrixstudio/violet.server/app/config"
+	"github.com/xmatrixstudio/violet.server/app/router"
+)
 
 func main() {
 	filename := parseFlag()
-	r := router.New(filename)
-	_ = r.Run(":80")
+	c := config.NewConfig(filename)
+	r := router.New(c)
+	_ = r.Run(fmt.Sprintf(":%v", c.App.Port))
 }
