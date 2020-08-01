@@ -1,0 +1,33 @@
+name: Violet CI
+
+on:
+  push:
+    branches: [ $default-branch, next, next-go ]
+  pull_request:
+    branches: [ $default-branch, next, next-go ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.29
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ^1.14
+      - run: go build -v .
+      - run: go test -v ./... -covermode=atomic -coverprofile=coverage.txt
+      - uses: codecov/codecov-action@v1
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
