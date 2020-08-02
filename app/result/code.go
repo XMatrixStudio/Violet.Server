@@ -38,9 +38,9 @@ var (
 
 // Global* 全局错误: 1*
 var (
-	GlobalKeyError      = StandardError{112101, "invalid key"}
-	GlobalPageError     = StandardError{112102, "invalid page"}
-	GlobalPageSizeError = StandardError{112103, "invalid page_size"}
+	GlobalKeyError      = StandardError{110001, "invalid key"}
+	GlobalPageError     = StandardError{110002, "invalid page"}
+	GlobalPageSizeError = StandardError{110003, "invalid page_size"}
 )
 
 // Captcha* 验证码模块错误: 21
