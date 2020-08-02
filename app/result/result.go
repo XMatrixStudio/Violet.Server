@@ -22,13 +22,13 @@ func OnSuccess(data ...interface{}) *Resp {
 	return &Resp{Code: CodeOk, Msg: "success", Data: data[0]}
 }
 
-func OnFail(code int, msg string) *Resp {
-	return &Resp{Code: code, Msg: msg}
+func OnFail(standardError StandardError) *Resp {
+	return &Resp{Code: standardError.ErrorCode, Msg: standardError.ErrorMsg}
 }
 
-func OnError(code int, msg string, err error) *Resp {
+func OnError(standardError StandardError, err error) *Resp {
 	if resultEnv == config.AppConfigEnvDev {
-		return &Resp{Code: code, Msg: msg, Debug: err.Error()}
+		return &Resp{Code: standardError.ErrorCode, Msg: standardError.ErrorMsg, Debug: err.Error()}
 	}
-	return &Resp{Code: code, Msg: msg}
+	return &Resp{Code: standardError.ErrorCode, Msg: standardError.ErrorMsg}
 }
