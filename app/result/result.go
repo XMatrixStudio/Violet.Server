@@ -1,34 +1,32 @@
 package result
 
-import "github.com/xmatrixstudio/violet.server/app/config"
+import (
+	"net/http"
 
-var resultEnv string
+	"github.com/gin-gonic/gin"
+	"github.com/xmatrixstudio/violet.server/lib/logs"
+	"go.uber.org/zap"
+)
 
 type Resp struct {
-	Code  int         `json:"code"`
-	Msg   string      `json:"msg"`
-	Data  interface{} `json:"data,omitempty"`
-	Debug string      `json:"debug,omitempty"`
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data,omitempty"`
 }
 
-func InitEnv(env string) {
-	resultEnv = env
+func OnDo(c *gin.Context, err error) {
+	OnFetch(c, nil, err)
 }
 
-func OnSuccess(data ...interface{}) *Resp {
-	if len(data) == 0 {
-		return &Resp{Code: CodeOk, Msg: "success"}
+func OnFetch(c *gin.Context, data interface{}, err error) {
+	if err != nil {
+		if httpErr, ok := err.(*Error); ok {
+			c.PureJSON(http.StatusOK, Resp{Code: httpErr.ErrCode, Msg: httpErr.ErrMsg})
+		} else {
+			logs.CtxError(c, "fetch unknown error", zap.Error(err))
+			c.PureJSON(http.StatusOK, Resp{Code: CodeInternalServerError, Msg: "unknown_error"})
+		}
+	} else {
+		c.PureJSON(http.StatusOK, Resp{Code: CodeOk, Msg: "success", Data: data})
 	}
-	return &Resp{Code: CodeOk, Msg: "success", Data: data[0]}
-}
-
-func OnFail(standardError StandardError) *Resp {
-	return &Resp{Code: standardError.ErrorCode, Msg: standardError.ErrorMsg}
-}
-
-func OnError(standardError StandardError, err error) *Resp {
-	if resultEnv == config.AppConfigEnvDev {
-		return &Resp{Code: standardError.ErrorCode, Msg: standardError.ErrorMsg, Debug: err.Error()}
-	}
-	return &Resp{Code: standardError.ErrorCode, Msg: standardError.ErrorMsg}
 }

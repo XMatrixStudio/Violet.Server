@@ -17,14 +17,17 @@ type AppConfig struct {
 }
 
 type RedisConfig struct {
-	Host     string `yaml:"host"`
-	Port     string `yaml:"port"`
-	Password string `yaml:"password"`
+	Host          string `yaml:"host"`
+	Port          string `yaml:"port"`
+	Password      string `yaml:"password"`
+	SessionSecret string `yaml:"sessionSecret"`
 }
+
+var defaultConfig = newDefaultConfig()
 
 func NewConfig(path string) *Config {
 	if path == "" {
-		return newDefaultConfig()
+		return defaultConfig
 	}
 	bytes, err := ioutil.ReadFile(path)
 	if err != nil {

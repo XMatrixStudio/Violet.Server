@@ -1,12 +1,17 @@
 package result
 
 const (
-	CodeOk = 200
+	CodeOk                  = 200
+	CodeInternalServerError = 500
 )
 
-type StandardError struct {
-	ErrorCode int
-	ErrorMsg  string
+type Error struct {
+	ErrCode int
+	ErrMsg  string
+}
+
+func (err *Error) Error() string {
+	return ""
 }
 
 // 错误码由 模块-错误类型-错误编码 组成
@@ -27,29 +32,40 @@ type StandardError struct {
 
 // 通用错误: 10
 var (
-	SystemError     = StandardError{101000, "system error"}
-	ModuleError     = StandardError{101100, "module error"}
-	DatabaseError   = StandardError{101200, "database error"}
-	FileIOError     = StandardError{101300, "file error"}
-	NetworkIOError  = StandardError{101400, "network error"}
-	ParametersError = StandardError{102100, "invalid parameter"}
-	PrivilegeError  = StandardError{102200, "permission denied"}
+	SystemError     = Error{101000, "system error"}
+	ModuleError     = Error{101100, "module error"}
+	DatabaseError   = Error{101200, "database error"}
+	FileIOError     = Error{101300, "file error"}
+	NetworkIOError  = Error{101400, "network error"}
+	ParametersError = Error{102100, "invalid parameter"}
+	PrivilegeError  = Error{102200, "permission denied"}
+)
+
+const (
+	invalidCaptcha = 120001 + iota
+	invalidEmail
+	invalidType
 )
 
 // Global* 全局错误: 1*
 var (
-	GlobalKeyError      = StandardError{110001, "invalid key"}
-	GlobalPageError     = StandardError{110002, "invalid page"}
-	GlobalPageSizeError = StandardError{110003, "invalid page_size"}
+	InvalidParameter    = &Error{110001, "invalid_parameter"}
+	GlobalKeyError      = Error{110001, "invalid key"}
+	GlobalPageError     = Error{110002, "invalid page"}
+	GlobalPageSizeError = Error{110003, "invalid page_size"}
+
+	InvalidCaptcha = &Error{invalidCaptcha, "invalid_captcha"}
+	InvalidEmail   = &Error{invalidEmail, "invalid_captcha"}
+	InvalidType    = &Error{invalidType, "invalid_type"}
 )
 
 // Captcha* 验证码模块错误: 21
 var (
-	CaptchaGenerateError = StandardError{212301, "captcha generate error"}
+	CaptchaGenerateError = Error{212301, "captcha generate error"}
 )
 
 // User* 用户模块错误: 22
 var (
-	UserEmailError           = StandardError{222301, "email duplicate"}
-	UserPasswordConfirmError = StandardError{222102, "password confirmation error"}
+	UserEmailError           = Error{222301, "email duplicate"}
+	UserPasswordConfirmError = Error{222102, "password confirmation error"}
 )
