@@ -9,23 +9,29 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/xmatrixstudio/violet.server/app/config"
 	utilHandler "github.com/xmatrixstudio/violet.server/app/handler/util"
+	"github.com/xmatrixstudio/violet.server/app/result"
 	"github.com/xmatrixstudio/violet.server/app/service/generator"
 	"github.com/xmatrixstudio/violet.server/lib/logs"
 	"go.uber.org/zap"
 )
 
 type Router struct {
-	RouterFunc gin.HandlerFunc
-	MethodName string
+	URL    string
+	Func   RouterFunc
+	Method string
 }
 
-var Routers = map[string]Router{
-	"/i/util/captcha": {RouterFunc: utilHandler.GetCaptcha, MethodName: http.MethodGet},
+type RouterFunc func(*gin.Context) result.Resp
+
+var Routers = []Router{
+	{URL: "/i/utils/captcha", Func: utilHandler.GetCaptcha, Method: http.MethodGet},
+	{URL: "/i/utils/email", Func: utilHandler.PostEmail, Method: http.MethodPost},
+	{URL: "/i/utils/email", Func: utilHandler.PutEmail, Method: http.MethodPut},
 }
 
-func BindRouters(r *gin.Engine, routers map[string]Router) {
-	for url, router := range routers {
-		r.Handle(router.MethodName, url, router.RouterFunc)
+func BindRouters(r *gin.Engine, routers []Router) {
+	for _, router := range routers {
+		r.Handle(router.Method, router.URL, Wrap(router.Func))
 	}
 }
 
@@ -51,4 +57,10 @@ func New(c *config.Config) *gin.Engine {
 	BindRouters(r, Routers)
 
 	return r
+}
+
+func Wrap(fn RouterFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.PureJSON(http.StatusOK, fn(c))
+	}
 }

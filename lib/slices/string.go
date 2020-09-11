@@ -1,4 +1,4 @@
-package uslice
+package slices
 
 func StringIn(obj string, objs []string) bool {
 	for _, item := range objs {

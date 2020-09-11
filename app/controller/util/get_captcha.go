@@ -19,7 +19,7 @@ type GetCaptchaController struct {
 	businessName string
 }
 
-type GetCaptchaResp struct {
+type GetCaptchaResponse struct {
 	CaptchaData string `json:"captcha_data"`
 	Ticket      string `json:"ticket"`
 }
@@ -32,7 +32,7 @@ func NewGetCaptchaController(ctx context.Context, businessName string) *GetCaptc
 	}
 }
 
-func (ctrl *GetCaptchaController) Fetch() (*GetCaptchaResp, error) {
+func (ctrl *GetCaptchaController) Fetch() (*GetCaptchaResponse, error) {
 	now := time.Now().Unix()
 	data, str, err := generator.Captcha.GenBase64Captcha()
 	if err != nil {
@@ -40,5 +40,5 @@ func (ctrl *GetCaptchaController) Fetch() (*GetCaptchaResp, error) {
 		return nil, err
 	}
 	sessionDal.SetCaptcha(ctrl.session, str, ctrl.businessName, now+5*60)
-	return &GetCaptchaResp{CaptchaData: data, Ticket: strconv.FormatInt(now, 10)}, nil
+	return &GetCaptchaResponse{CaptchaData: data, Ticket: strconv.FormatInt(now, 10)}, nil
 }

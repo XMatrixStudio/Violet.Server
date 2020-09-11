@@ -3,16 +3,24 @@ package util
 import (
 	"github.com/gin-gonic/gin"
 	utilCtrl "github.com/xmatrixstudio/violet.server/app/controller/util"
-	"github.com/xmatrixstudio/violet.server/app/result"
-	"github.com/xmatrixstudio/violet.server/lib/uslice"
+	r "github.com/xmatrixstudio/violet.server/app/result"
+	v "github.com/xmatrixstudio/violet.server/lib/validates"
 )
 
 var getCaptchaBusinessList = []string{"register"}
 
-func GetCaptcha(c *gin.Context) {
+func GetCaptcha(c *gin.Context) r.Resp {
 	businessName := c.Query("business_name")
-	uslice.StringIn(businessName, getCaptchaBusinessList)
+	if err := validateGetCaptchaRequest(businessName); err != nil {
+		return r.OnError(c, err)
+	}
 	ctrl := utilCtrl.NewGetCaptchaController(c, businessName)
 	resp, err := ctrl.Fetch()
-	result.OnFetch(c, resp, err)
+	return r.OnFetch(c, resp, err)
+}
+
+func validateGetCaptchaRequest(businessName string) error {
+	return r.Assert(
+		r.AssertItem{Validator: v.NewStringValidator(businessName, v.Nothing).WithEnums(getCaptchaBusinessList), Err: r.ErrInvalidBusinessName},
+	)
 }

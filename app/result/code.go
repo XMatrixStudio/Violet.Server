@@ -1,17 +1,39 @@
 package result
 
 const (
-	CodeOk                  = 200
+	CodeOk                  = 0
 	CodeInternalServerError = 500
 )
 
+const (
+	codeBadRequest = 110000 + iota
+)
+
+const (
+	codeInvalidBusinessName = 120001 + iota
+	codeInvalidCaptcha
+	codeInvalidEmail
+	codeInvalidTicket
+)
+
+var (
+	// 110000+
+	ErrBadRequest = &Error{ErrCode: codeBadRequest, ErrMsg: "bad_request"}
+
+	// 120000+
+	ErrInvalidBusinessName = &Error{ErrCode: codeInvalidBusinessName, ErrMsg: "invalid_business_name"}
+	ErrInvalidCaptcha      = &Error{ErrCode: codeInvalidCaptcha, ErrMsg: "invalid_captcha"}
+	ErrInvalidEmail        = &Error{ErrCode: codeInvalidEmail, ErrMsg: "invalid_email"}
+	ErrInvalidTicket       = &Error{ErrCode: codeInvalidTicket, ErrMsg: "invalid_ticket"}
+)
+
 type Error struct {
-	ErrCode int
+	ErrCode int32
 	ErrMsg  string
 }
 
 func (err *Error) Error() string {
-	return ""
+	return err.ErrMsg
 }
 
 // 错误码由 模块-错误类型-错误编码 组成
