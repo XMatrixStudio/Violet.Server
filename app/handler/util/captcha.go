@@ -20,7 +20,8 @@ func GetCaptcha(c *gin.Context) r.Resp {
 }
 
 func validateGetCaptchaRequest(businessName string) error {
+	businessNameValidator := v.NewStringValidator(businessName, v.Nothing).WithEnums(getCaptchaBusinessList)
 	return r.Assert(
-		r.AssertItem{Validator: v.NewStringValidator(businessName, v.Nothing).WithEnums(getCaptchaBusinessList), Err: r.ErrInvalidBusinessName},
+		r.AssertItem{Validator: businessNameValidator, Err: r.ErrInvalidBusinessName},
 	)
 }

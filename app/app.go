@@ -11,6 +11,7 @@ import (
 	utilHandler "github.com/xmatrixstudio/violet.server/app/handler/util"
 	"github.com/xmatrixstudio/violet.server/app/result"
 	"github.com/xmatrixstudio/violet.server/app/service/generator"
+	"github.com/xmatrixstudio/violet.server/app/service/sender"
 	"github.com/xmatrixstudio/violet.server/lib/logs"
 	"go.uber.org/zap"
 )
@@ -39,22 +40,28 @@ func New(c *config.Config) *gin.Engine {
 	// 初始化组件
 	logs.InitLogger(c.App.Env == config.AppConfigEnvProduct)
 	generator.InitGenerator()
+	sender.InitSender()
 	if c.App.Env == config.AppConfigEnvProduct {
 		gin.SetMode(gin.ReleaseMode)
+	}
+
+	// 构建Session存储
+	store, err := redis.NewStore(10, "tcp", fmt.Sprintf("%s:%s", c.Redis.Host, c.Redis.Port),
+		c.Redis.Password, []byte(c.Redis.SessionSecret))
+	if err != nil {
+		logs.Fatal("call redis.NewStore fail", zap.Error(err))
 	}
 
 	// 构建Router
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
-
-	store, err := redis.NewStore(10, "tcp", fmt.Sprintf("%s:%s", c.Redis.Host, c.Redis.Port), c.Redis.Password, []byte("secret"))
-	if err != nil {
-		logs.Fatal("call redis.NewStore fail", zap.Error(err))
-	}
 	r.Use(sessions.Sessions("violet", store))
+	r.Use(logs.WithTraceID())
 
 	// 绑定Handler
 	BindRouters(r, Routers)
+
+	logs.Info("new violet app success")
 
 	return r
 }

@@ -3,12 +3,16 @@ package generator
 import "sync"
 
 var (
-	Captcha *CaptchaGenerator
-	once    sync.Once
+	Helper helper
+	once   sync.Once
 )
+
+type helper struct {
+	CaptchaGenerator *CaptchaGenerator
+}
 
 func InitGenerator() {
 	once.Do(func() {
-		Captcha = NewCaptchaGenerator()
+		Helper.CaptchaGenerator = NewCaptchaGenerator()
 	})
 }
