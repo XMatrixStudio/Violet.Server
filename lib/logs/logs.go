@@ -6,6 +6,10 @@ import (
 	"go.uber.org/zap"
 )
 
+func StartFail(msg string) {
+	panic("[StartFail] " + msg)
+}
+
 func Info(msg string, fields ...zap.Field) {
 	defaultLogger.Info(msg, fields...)
 }
@@ -21,6 +25,6 @@ func CtxError(ctx context.Context, msg string, field ...zap.Field) {
 
 func getContextField(ctx context.Context) []zap.Field {
 	ctxFields := make([]zap.Field, 0, 1)
-	ctxFields = append(ctxFields, zap.String("TraceID", getTraceID(ctx)))
+	ctxFields = append(ctxFields, zap.String("traceID", getTraceID(ctx)))
 	return ctxFields
 }

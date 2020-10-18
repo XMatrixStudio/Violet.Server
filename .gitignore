@@ -1,4 +1,13 @@
+# Dev
 .idea/
+.vscode/
+
+# Binary and Log
+log/
+*.exe
+*.out
+coverage
+
+# Config
 config.yaml
 config.yml
-*.exe
