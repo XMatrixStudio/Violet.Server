@@ -54,5 +54,5 @@ export async function addPasswordChange(userId: string) {
 }
 
 export async function getUserLog(userId: string): Promise<ILog | null> {
-  return await logDB.findOne({ _target: userId }, { login: { $slice: -3 }, password: { $slice: -1 }, 'login._id': 0 })
+  return await logDB.findOne({ _target: userId }, { login: { $slice: -3 }, password: { $slice: -1 } })
 }

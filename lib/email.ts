@@ -8,7 +8,7 @@ import config from '../app/config/config'
 const mailer = Mailer.createTransport({
   host: config!.email.host,
   port: config!.email.port,
-  secure: false,
+  secure: true,
   auth: {
     user: config!.email.user,
     pass: config!.email.password
