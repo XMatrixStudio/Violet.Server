@@ -6,25 +6,35 @@ import (
 	"go.uber.org/zap"
 )
 
-func StartFail(msg string) {
-	panic("[StartFail] " + msg)
+func Debug(ctx context.Context, msg string, fields ...zap.Field) {
+	fields = append(fields, getContextField(ctx)...)
+	defaultLogger.Debug(msg, fields...)
 }
 
-func Info(msg string, fields ...zap.Field) {
+func Info(ctx context.Context, msg string, fields ...zap.Field) {
+	fields = append(fields, getContextField(ctx)...)
 	defaultLogger.Info(msg, fields...)
 }
 
-func Fatal(msg string, fields ...zap.Field) {
-	defaultLogger.Fatal(msg, fields...)
+func Warn(ctx context.Context, msg string, fields ...zap.Field) {
+	fields = append(fields, getContextField(ctx)...)
+	defaultLogger.Warn(msg, fields...)
 }
 
-func CtxError(ctx context.Context, msg string, field ...zap.Field) {
-	field = append(field, getContextField(ctx)...)
-	defaultLogger.Error(msg, field...)
+func Error(ctx context.Context, msg string, fields ...zap.Field) {
+	fields = append(fields, getContextField(ctx)...)
+	defaultLogger.Error(msg, fields...)
+}
+
+func Fatal(ctx context.Context, msg string, fields ...zap.Field) {
+	fields = append(fields, getContextField(ctx)...)
+	defaultLogger.Fatal(msg, fields...)
 }
 
 func getContextField(ctx context.Context) []zap.Field {
 	ctxFields := make([]zap.Field, 0, 1)
-	ctxFields = append(ctxFields, zap.String("traceID", getTraceID(ctx)))
+	if traceID := getTraceID(ctx); traceID != "" {
+		ctxFields = append(ctxFields, zap.String(KeyTraceID, traceID))
+	}
 	return ctxFields
 }

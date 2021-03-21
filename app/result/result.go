@@ -6,30 +6,32 @@ import (
 	"go.uber.org/zap"
 )
 
-type Resp *_Resp
+type Result *_Result
 
-type _Resp struct {
+type _Result struct {
 	Code int32       `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data,omitempty"`
 }
 
-func OnDo(c *gin.Context, err error) Resp {
+func OnDo(c *gin.Context, err error) Result {
 	return OnFetch(c, nil, err)
 }
 
-func OnError(c *gin.Context, err error) Resp {
+func OnError(c *gin.Context, err error) Result {
 	return OnFetch(c, nil, err)
 }
 
-func OnFetch(c *gin.Context, data interface{}, err error) Resp {
+func OnFetch(c *gin.Context, data interface{}, err error) Result {
+	var httpErr *Error
 	if err != nil {
-		if httpErr, ok := err.(*Error); ok {
-			return &_Resp{Code: httpErr.ErrCode, Msg: httpErr.ErrMsg}
+		if e, ok := err.(*Error); ok {
+			httpErr = e
 		} else {
-			logs.CtxError(c, "fetch unknown error", zap.Error(err))
-			return &_Resp{Code: CodeInternalServerError, Msg: "unknown_error"}
+			logs.Error(c, "fetch unknown error", zap.Error(err))
+			httpErr = Unknown
 		}
+		return &_Result{Code: httpErr.code, Msg: httpErr.msg}
 	}
-	return &_Resp{Code: CodeOk, Msg: "success", Data: data}
+	return &_Result{Code: 0, Msg: "success", Data: data}
 }

@@ -1,7 +1,6 @@
 package util
 
 import (
-	"github.com/gin-gonic/gin"
 	utilCtrl "github.com/xmatrixstudio/violet.server/app/controller/util"
 	"github.com/xmatrixstudio/violet.server/app/http_gen/util"
 	r "github.com/xmatrixstudio/violet.server/app/result"
@@ -12,18 +11,18 @@ const (
 	emailPattern = `^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$`
 )
 
-func PostEmail(c *gin.Context) r.Resp {
+func PostEmail(rp *r.RequestParam) r.Resp {
 	req := util.PostEmailRequest{}
-	if err := c.BindJSON(&req); err != nil {
-		return r.OnError(c, r.ErrBadRequest)
+	if err := rp.GinCtx().BindJSON(&req); err != nil {
+		return r.OnError(rp, r.ErrBadRequest)
 	} else if err = validatePostEmailRequest(&req); err != nil {
-		return r.OnError(c, err)
+		return r.OnError(rp, err)
 	}
-	ctrl := utilCtrl.NewSendEmailController(c, req.Email, req.Captcha, req.Ticket)
-	return r.OnDo(c, ctrl.Do())
+	ctrl := utilCtrl.NewSendEmailController(rp, req.Email, req.Captcha, req.Ticket)
+	return r.OnDo(rp, ctrl.Do())
 }
 
-func PutEmail(c *gin.Context) r.Resp {
+func PutEmail(rp *r.RequestParam) r.Resp {
 	return nil
 }
 

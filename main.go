@@ -8,8 +8,15 @@ import (
 )
 
 func main() {
-	filename := parseFlag()
-	c := config.NewConfig(filename)
-	r := app.New(c)
-	_ = r.Run(fmt.Sprintf(":%v", c.App.Port))
+	parseFlag()
+	cfg, err := config.ReadConfigFromFile(getConfigFilename())
+	if err != nil {
+		panic(err)
+	}
+
+	r := app.NewEngine(cfg)
+	err = r.Run(fmt.Sprintf(":%v", cfg.App.Port))
+	if err != nil {
+		panic(err)
+	}
 }

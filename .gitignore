@@ -1,6 +1,7 @@
 # Dev
 .idea/
 .vscode/
+rest.txt
 
 # Binary and Log
 log/

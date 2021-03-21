@@ -1,17 +1,19 @@
 package util
 
-import "context"
+import (
+	"github.com/xmatrixstudio/violet.server/app/result"
+)
 
 type SendEmailController struct {
-	ctx     context.Context
+	rp      *result.RequestParam
 	email   string
 	captcha string
 	ticket  string
 }
 
-func NewSendEmailController(ctx context.Context, email, captcha, ticket string) *SendEmailController {
+func NewSendEmailController(rp *result.RequestParam, email, captcha, ticket string) *SendEmailController {
 	return &SendEmailController{
-		ctx:     ctx,
+		rp:      rp,
 		email:   email,
 		captcha: captcha,
 		ticket:  ticket,

@@ -1,7 +1,6 @@
 package util
 
 import (
-	"github.com/gin-gonic/gin"
 	utilCtrl "github.com/xmatrixstudio/violet.server/app/controller/util"
 	r "github.com/xmatrixstudio/violet.server/app/result"
 	v "github.com/xmatrixstudio/violet.server/lib/validates"
@@ -9,14 +8,14 @@ import (
 
 var getCaptchaBusinessList = []string{"register"}
 
-func GetCaptcha(c *gin.Context) r.Resp {
-	businessName := c.Query("business_name")
+func GetCaptcha(rp *r.RequestParam) r.Resp {
+	businessName := rp.GinCtx().Query("business_name")
 	if err := validateGetCaptchaRequest(businessName); err != nil {
-		return r.OnError(c, err)
+		return r.OnError(rp, err)
 	}
-	ctrl := utilCtrl.NewGetCaptchaController(c, businessName)
+	ctrl := utilCtrl.NewGetCaptchaController(rp, businessName)
 	resp, err := ctrl.Fetch()
-	return r.OnFetch(c, resp, err)
+	return r.OnFetch(rp, resp, err)
 }
 
 func validateGetCaptchaRequest(businessName string) error {

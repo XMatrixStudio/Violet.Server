@@ -11,8 +11,6 @@ import (
 const (
 	HeaderTraceID = "X-Trace-ID"
 	KeyTraceID    = "traceID"
-
-	defaultTraceID = "0000"
 )
 
 func WithTraceID() gin.HandlerFunc {
@@ -35,5 +33,5 @@ func getTraceID(ctx context.Context) string {
 	if val, ok := ctx.Value(KeyTraceID).(string); ok && val != "" {
 		return val
 	}
-	return defaultTraceID
+	return ""
 }

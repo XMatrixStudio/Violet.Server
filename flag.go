@@ -10,13 +10,20 @@ const (
 	version = "4.0.0-alpha"
 )
 
-func parseFlag() string {
+var (
+	cfgFilename string
+)
+
+func getConfigFilename() string {
+	return cfgFilename
+}
+
+func parseFlag() {
 	var h, v bool
-	var filename string
 
 	flag.BoolVar(&h, "h", false, "list help")
 	flag.BoolVar(&v, "v", false, "print violet version")
-	flag.StringVar(&filename, "c", "", "set configuration `file`")
+	flag.StringVar(&cfgFilename, "c", "", "set configuration `file`")
 	flag.Parse()
 
 	if h {
@@ -26,7 +33,6 @@ func parseFlag() string {
 		printVersion()
 		os.Exit(0)
 	}
-	return filename
 }
 
 func printUsage() {
@@ -36,5 +42,5 @@ func printUsage() {
 }
 
 func printVersion() {
-	_, _ = fmt.Fprintf(flag.CommandLine.Output(), "Version: Violet/%s, powered by XMatrixStudio\n", version)
+	_, _ = fmt.Fprintf(flag.CommandLine.Output(), "Version: XMatrix Violet/%s, powered by XMatrixStudio\n", version)
 }
