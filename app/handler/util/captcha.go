@@ -8,7 +8,7 @@ import (
 
 var getCaptchaBusinessList = []string{"register"}
 
-func GetCaptcha(rp *r.RequestParam) r.Resp {
+func GetCaptcha(rp *r.RequestContext) r.Resp {
 	businessName := rp.GinCtx().Query("business_name")
 	if err := validateGetCaptchaRequest(businessName); err != nil {
 		return r.OnError(rp, err)

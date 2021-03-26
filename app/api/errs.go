@@ -1,4 +1,4 @@
-package result
+package api
 
 var (
 	// [,9999] - 特殊状态码，禁止业务使用和预留
@@ -28,9 +28,9 @@ var (
 )
 
 var (
-	ErrInvalidEmail    = WithMsg(ErrInvalidParam, "invalid_email")
-	ErrInvalidPassword = WithMsg(ErrInvalidParam, "invalid_password")
-	ErrInvalidPhone    = WithMsg(ErrInvalidParam, "invalid_param")
+	ErrInvalidBusinessName = WithMsg(ErrInvalidParam, "invalid_business_name")
+	ErrInvalidEmail        = WithMsg(ErrInvalidParam, "invalid_email")
+	ErrInvalidPassword     = WithMsg(ErrInvalidParam, "invalid_password")
 )
 
 type Error struct {

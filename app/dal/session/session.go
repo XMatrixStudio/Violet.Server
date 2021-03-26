@@ -1,14 +1,12 @@
 package session
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/xmatrixstudio/violet.server/app/config"
-	"github.com/xmatrixstudio/violet.server/lib/logs"
 	"go.uber.org/zap"
 )
 
@@ -16,16 +14,16 @@ var (
 	redisStore redis.Store
 )
 
-func InitSessions(ctx context.Context, cfg config.Config) {
+func InitSessions(cfg config.Config) {
 	var err error
 	redisStore, err = redis.NewStore(10, "tcp", fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		cfg.Redis.Password, []byte(cfg.Redis.SessionSecret))
 	if err != nil {
-		logs.Fatal(ctx, "call redis.NewStore fail", zap.Error(err))
+		zap.L().Fatal("call redis.NewStore fail", zap.Error(err))
 	}
 }
 
-func WithSessions() gin.HandlerFunc {
+func MWSessions() gin.HandlerFunc {
 	return sessions.Sessions("violet", redisStore)
 }
 

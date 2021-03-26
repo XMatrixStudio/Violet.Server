@@ -11,8 +11,8 @@ const (
 	emailPattern = `^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$`
 )
 
-func PostEmail(rp *r.RequestParam) r.Resp {
-	req := util.PostEmailRequest{}
+func PostEmail(rp *r.RequestContext) r.Resp {
+	req := api_util.PostEmailRequest{}
 	if err := rp.GinCtx().BindJSON(&req); err != nil {
 		return r.OnError(rp, r.ErrBadRequest)
 	} else if err = validatePostEmailRequest(&req); err != nil {
@@ -22,11 +22,11 @@ func PostEmail(rp *r.RequestParam) r.Resp {
 	return r.OnDo(rp, ctrl.Do())
 }
 
-func PutEmail(rp *r.RequestParam) r.Resp {
+func PutEmail(rp *r.RequestContext) r.Resp {
 	return nil
 }
 
-func validatePostEmailRequest(req *util.PostEmailRequest) error {
+func validatePostEmailRequest(req *api_util.PostEmailRequest) error {
 	return r.Assert(
 		r.AssertItem{Validator: v.NewStringValidator(req.Captcha, v.NotZeroValue), Err: r.ErrInvalidCaptcha},
 		r.AssertItem{Validator: v.NewStringValidator(req.Email, v.NotZeroValue).WithPattern(emailPattern), Err: r.ErrInvalidEmail},

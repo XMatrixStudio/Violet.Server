@@ -1,29 +1,28 @@
 package handler
 
 import (
+	"github.com/xmatrixstudio/violet.server/app/api"
 	userCtrl "github.com/xmatrixstudio/violet.server/app/controller/user"
-	"github.com/xmatrixstudio/violet.server/app/http_gen/user"
-	r "github.com/xmatrixstudio/violet.server/app/result"
-	"github.com/xmatrixstudio/violet.server/lib/logs"
-	v "github.com/xmatrixstudio/violet.server/lib/validates"
+	"github.com/xmatrixstudio/violet.server/app/http_gen/api_user"
+	vd "github.com/xmatrixstudio/violet.server/lib/validates"
 	"go.uber.org/zap"
 )
 
 // Register 用户注册
-func Register(rp *r.RequestParam) r.Result {
-	req := user.RegisterRequest{}
-	if err := rp.Ctx().ShouldBindJSON(&req); err != nil {
-		return r.OnError(rp.Ctx(), r.ErrBadRequest)
+func Register(r *api.RequestContext) api.Result {
+	req := api_user.RegisterRequest{}
+	if err := r.Ctx().ShouldBindJSON(&req); err != nil {
+		return r.OnError(api.ErrBadRequest)
 	}
-	err := v.Assert(
-		v.I{V: v.NewStringValidator(req.Email).MustEmail(), E: r.ErrInvalidEmail},
-		v.I{V: v.NewStringValidator(req.Password).MustHex().MustLen(128, 128), E: r.ErrInvalidPassword},
+	err := vd.Assert(
+		vd.I{V: vd.NewStringValidator(req.Email).MustEmail(), E: api.ErrInvalidEmail},
+		vd.I{V: vd.NewStringValidator(req.Password).MustHex().MustLen(128, 128), E: api.ErrInvalidPassword},
 	)
 	if err != nil {
-		return r.OnError(rp.Ctx(), err)
+		return r.OnError(err)
 	}
 
-	logs.Info(rp.Ctx(), "call Register", zap.String("email", req.Email))
-	ctrl := userCtrl.NewRegisterController(rp, req)
-	return r.OnDo(rp.Ctx(), ctrl.Do())
+	r.Logger().Info("call Register", zap.String("email", req.Email))
+	ctrl := userCtrl.NewRegisterController(r, req)
+	return r.OnDo(ctrl.Do())
 }

@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/afocus/captcha v0.0.0-20191010092841-4bd1f21c8868
 	github.com/gin-contrib/sessions v0.0.3
+	github.com/gin-contrib/zap v0.0.1 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.4.1
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect

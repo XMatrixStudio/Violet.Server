@@ -10,8 +10,7 @@ import (
 )
 
 var (
-	defaultLogger *zap.Logger
-	once          sync.Once
+	once sync.Once
 )
 
 func InitLogger(logPath string, isProduct bool) {
@@ -22,13 +21,10 @@ func InitLogger(logPath string, isProduct bool) {
 		} else {
 			core = zapcore.NewCore(newDevelopmentEncoder(), newWriteSyncer(logPath), zapcore.DebugLevel)
 		}
-		defaultLogger = zap.New(core)
-		defaultLogger = defaultLogger.WithOptions(zap.AddCaller(), zap.AddCallerSkip(1))
+		defaultLogger := zap.New(core)
+		defaultLogger = defaultLogger.WithOptions(zap.AddCaller())
+		_ = zap.ReplaceGlobals(defaultLogger)
 	})
-}
-
-func Sync() {
-	_ = defaultLogger.Sync()
 }
 
 func newDevelopmentEncoder() zapcore.Encoder {

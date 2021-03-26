@@ -5,13 +5,13 @@ import (
 )
 
 type SendEmailController struct {
-	rp      *result.RequestParam
+	rp      *result.RequestContext
 	email   string
 	captcha string
 	ticket  string
 }
 
-func NewSendEmailController(rp *result.RequestParam, email, captcha, ticket string) *SendEmailController {
+func NewSendEmailController(rp *result.RequestContext, email, captcha, ticket string) *SendEmailController {
 	return &SendEmailController{
 		rp:      rp,
 		email:   email,

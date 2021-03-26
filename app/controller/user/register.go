@@ -1,38 +1,34 @@
 package user
 
 import (
-	"fmt"
-
+	"github.com/xmatrixstudio/violet.server/app/api"
 	"github.com/xmatrixstudio/violet.server/app/dal/store"
-	"github.com/xmatrixstudio/violet.server/app/http_gen/user"
-	"github.com/xmatrixstudio/violet.server/app/result"
+	"github.com/xmatrixstudio/violet.server/app/http_gen/api_user"
 	"github.com/xmatrixstudio/violet.server/lib/cryptos"
-	"github.com/xmatrixstudio/violet.server/lib/logs"
 	"go.uber.org/zap"
 )
 
 type RegisterController struct {
-	rp  *result.RequestParam
-	req user.RegisterRequest
+	r   *api.RequestContext
+	req api_user.RegisterRequest
 }
 
-func NewRegisterController(rp *result.RequestParam, req user.RegisterRequest) *RegisterController {
+func NewRegisterController(r *api.RequestContext, req api_user.RegisterRequest) *RegisterController {
 	return &RegisterController{
-		rp:  rp,
+		r:   r,
 		req: req,
 	}
 }
 
 func (ctrl *RegisterController) Do() error {
-	user, err := store.UserStore.FindOne(ctrl.rp.Ctx(), store.User{Email: ctrl.req.Email})
+	user, err := store.UserStore.FindOne(ctrl.r.Ctx(), store.User{Email: ctrl.req.Email})
 	if err != nil {
-		logs.Error(ctrl.rp.Ctx(), "find user by email fail", zap.Error(err))
+		ctrl.r.Logger().Error("find user by email fail", zap.Error(err))
 		return err
 	}
-	fmt.Println(user)
 
 	if user != nil {
-		return result.ErrUserExist
+		return api.ErrUserExist
 	}
 
 	passwordSalt := cryptos.RandString(64)
@@ -42,9 +38,9 @@ func (ctrl *RegisterController) Do() error {
 		Password:     password,
 		PasswordSalt: passwordSalt,
 	}
-	err = store.UserStore.Create(ctrl.rp.Ctx(), user)
+	err = store.UserStore.Create(ctrl.r.Ctx(), user)
 	if err != nil {
-		logs.Error(ctrl.rp.Ctx(), "create user fail", zap.Error(err))
+		ctrl.r.Logger().Error("create user fail", zap.Error(err))
 	}
 
 	return nil

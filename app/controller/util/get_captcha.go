@@ -12,12 +12,12 @@ import (
 )
 
 type GetCaptchaController struct {
-	rp               *result.RequestParam
+	rp               *result.RequestContext
 	businessName     string
 	captchaGenerator *generator.CaptchaGenerator
 }
 
-func NewGetCaptchaController(rp *result.RequestParam, businessName string) *GetCaptchaController {
+func NewGetCaptchaController(rp *result.RequestContext, businessName string) *GetCaptchaController {
 	return &GetCaptchaController{
 		rp:               rp,
 		businessName:     businessName,
@@ -25,7 +25,7 @@ func NewGetCaptchaController(rp *result.RequestParam, businessName string) *GetC
 	}
 }
 
-func (ctrl *GetCaptchaController) Fetch() (*util.GetCaptchaResponse, error) {
+func (ctrl *GetCaptchaController) Fetch() (*api_util.GetCaptchaResponse, error) {
 	now := ctrl.rp.Now().Unix()
 	data, str, err := ctrl.captchaGenerator.GenBase64Captcha()
 	if err != nil {
@@ -34,5 +34,5 @@ func (ctrl *GetCaptchaController) Fetch() (*util.GetCaptchaResponse, error) {
 	}
 	ticket := fmt.Sprintf("%s_%d", ctrl.businessName, now)
 	sessionDal.SetCaptcha(ctrl.rp.Session(), str, ctrl.businessName, now+5*60)
-	return &util.GetCaptchaResponse{CaptchaData: data, Ticket: ticket}, nil
+	return &api_util.GetCaptchaResponse{CaptchaData: data, Ticket: ticket}, nil
 }
