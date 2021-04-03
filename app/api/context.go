@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"sync"
 	"time"
 
@@ -14,7 +15,6 @@ var pool = sync.Pool{
 		return &RequestContext{
 			ctx:     nil,
 			logger:  nil,
-			mu:      sync.Mutex{},
 			now:     time.Time{},
 			session: nil,
 		}
@@ -24,22 +24,26 @@ var pool = sync.Pool{
 type RequestContext struct {
 	ctx     *gin.Context
 	logger  *zap.Logger
-	mu      sync.Mutex
 	now     time.Time
 	session sessions.Session
 }
 
-func NewRequestContext(c *gin.Context) *RequestContext {
+func NewRequestContext(c *gin.Context, handlerName string) *RequestContext {
+	// 从gin.Context中获取需要的数据
+	logger, ok := c.Value(keyLogger).(*zap.Logger)
+	if !ok || logger == nil {
+		logger = zap.L()
+	}
+	logger = logger.With(zap.String(keyHandler, handlerName))
+
+	// 更新gin.Context
+	c.Set(keyHandler, handlerName)
+	c.Set(keyLogger, logger)
+
+	// 构建RequestContext
 	r := pool.Get().(*RequestContext)
 	r.ctx = c
-
-	logger, ok := c.Value(keyLogger).(*zap.Logger)
-	if ok && logger != nil {
-		r.logger = logger
-	} else {
-		r.logger = zap.L()
-	}
-
+	r.logger = logger
 	r.now = time.Now()
 	r.session = sessions.Default(c)
 
@@ -49,14 +53,12 @@ func NewRequestContext(c *gin.Context) *RequestContext {
 func RecycleRequestParam(rp *RequestContext) {
 	rp.ctx = nil
 	rp.logger = nil
-	rp.mu = sync.Mutex{}
 	rp.now = time.Time{}
 	rp.session = nil
 	pool.Put(rp)
 }
 
 func (r *RequestContext) Copy() *RequestContext {
-	r.mu.Lock()
 	obj := pool.Get().(*RequestContext)
 	obj.ctx = r.ctx.Copy()
 	obj.logger = r.logger
@@ -65,7 +67,7 @@ func (r *RequestContext) Copy() *RequestContext {
 	return obj
 }
 
-func (r *RequestContext) Ctx() *gin.Context {
+func (r *RequestContext) Ctx() context.Context {
 	return r.ctx
 }
 
@@ -91,4 +93,12 @@ func (r *RequestContext) OnError(err error) Result {
 
 func (r *RequestContext) OnFetch(data interface{}, err error) Result {
 	return newResult(r, data, err)
+}
+
+func (r *RequestContext) ShouldBindJSON(obj interface{}) error {
+	return r.ctx.ShouldBindJSON(obj)
+}
+
+func (r *RequestContext) ShouldBindQuery(obj interface{}) error {
+	return r.ctx.ShouldBindQuery(obj)
 }

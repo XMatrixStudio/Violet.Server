@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/xmatrixstudio/violet.server/app/api"
+	"github.com/xmatrixstudio/violet.server/app/dal/entity"
 	"github.com/xmatrixstudio/violet.server/app/dal/store"
 	"github.com/xmatrixstudio/violet.server/app/http_gen/api_user"
 	"github.com/xmatrixstudio/violet.server/lib/cryptos"
@@ -21,7 +22,7 @@ func NewRegisterController(r *api.RequestContext, req api_user.RegisterRequest) 
 }
 
 func (ctrl *RegisterController) Do() error {
-	user, err := store.UserStore.FindOne(ctrl.r.Ctx(), store.User{Email: ctrl.req.Email})
+	user, err := store.UserStore.FindOne(ctrl.r.Ctx(), entity.User{Email: ctrl.req.Email})
 	if err != nil {
 		ctrl.r.Logger().Error("find user by email fail", zap.Error(err))
 		return err
@@ -33,7 +34,7 @@ func (ctrl *RegisterController) Do() error {
 
 	passwordSalt := cryptos.RandString(64)
 	password := cryptos.Sha512(cryptos.Sha512(ctrl.req.Password) + passwordSalt)
-	user = &store.User{
+	user = &entity.User{
 		Email:        ctrl.req.Email,
 		Password:     password,
 		PasswordSalt: passwordSalt,
@@ -41,6 +42,7 @@ func (ctrl *RegisterController) Do() error {
 	err = store.UserStore.Create(ctrl.r.Ctx(), user)
 	if err != nil {
 		ctrl.r.Logger().Error("create user fail", zap.Error(err))
+		return err
 	}
 
 	return nil

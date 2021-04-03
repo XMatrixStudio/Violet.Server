@@ -18,6 +18,7 @@ import (
 
 const (
 	headerTraceID = "X-Trace-ID"
+	keyHandler    = "handler"
 	keyLogger     = "logger"
 	keyTraceID    = "traceID"
 )

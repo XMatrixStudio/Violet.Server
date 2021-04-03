@@ -15,7 +15,7 @@ func main() {
 	}
 
 	r := app.NewEngine(cfg)
-	err = r.Run(fmt.Sprintf(":%v", cfg.App.Port))
+	err = r.Run(fmt.Sprintf(":%d", cfg.App.Port))
 	if err != nil {
 		panic(err)
 	}

@@ -6,26 +6,16 @@ import (
 	"time"
 
 	"github.com/xmatrixstudio/violet.server/app/config"
+	"github.com/xmatrixstudio/violet.server/app/dal/entity"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 type IUserStore interface {
-	Create(ctx context.Context, user *User) error
+	Create(ctx context.Context, user *entity.User) error
 	Delete(ctx context.Context, id int64) error
-	FindOne(ctx context.Context, user User) (*User, error)
-	Update(ctx context.Context, user *User) error
-}
-
-type User struct {
-	ID         int64 `gorm:"primaryKey"`
-	CreateTime int64 `gorm:"autoCreateTime"`
-	UpdateTime int64 `gorm:"autoUpdateTime"`
-	DeleteTime gorm.DeletedAt
-
-	Email        string `gorm:"index;unique"`
-	Password     string
-	PasswordSalt string
+	FindOne(ctx context.Context, user entity.User) (*entity.User, error)
+	Update(ctx context.Context, user *entity.User) error
 }
 
 type userMySQLStore struct {
@@ -39,7 +29,7 @@ func newUserMySQLStore(cfg config.MySQLConfig) (IUserStore, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = db.AutoMigrate(&User{})
+	err = db.AutoMigrate(&entity.User{})
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +40,7 @@ func newUserMySQLStore(cfg config.MySQLConfig) (IUserStore, error) {
 	}, nil
 }
 
-func (store *userMySQLStore) Create(ctx context.Context, user *User) error {
+func (store *userMySQLStore) Create(ctx context.Context, user *entity.User) error {
 	newCtx, cancel := context.WithTimeout(ctx, store.timeout)
 	defer cancel()
 	result := store.db.WithContext(newCtx).Create(user)
@@ -63,17 +53,17 @@ func (store *userMySQLStore) Create(ctx context.Context, user *User) error {
 func (store *userMySQLStore) Delete(ctx context.Context, id int64) error {
 	newCtx, cancel := context.WithTimeout(ctx, store.timeout)
 	defer cancel()
-	result := store.db.WithContext(newCtx).Delete(&User{}, id)
+	result := store.db.WithContext(newCtx).Delete(&entity.User{}, id)
 	if result.Error != nil {
 		return result.Error
 	}
 	return nil
 }
 
-func (store *userMySQLStore) FindOne(ctx context.Context, user User) (*User, error) {
+func (store *userMySQLStore) FindOne(ctx context.Context, user entity.User) (*entity.User, error) {
 	newCtx, cancel := context.WithTimeout(ctx, store.timeout)
 	defer cancel()
-	var newUser User
+	var newUser entity.User
 	result := store.db.WithContext(newCtx).Where(&user).First(&newUser)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
@@ -84,7 +74,7 @@ func (store *userMySQLStore) FindOne(ctx context.Context, user User) (*User, err
 	return &newUser, nil
 }
 
-func (store *userMySQLStore) Update(ctx context.Context, user *User) error {
+func (store *userMySQLStore) Update(ctx context.Context, user *entity.User) error {
 	newCtx, cancel := context.WithTimeout(ctx, store.timeout)
 	defer cancel()
 	result := store.db.WithContext(newCtx).Save(user)

@@ -8,21 +8,42 @@ import (
 	"go.uber.org/zap"
 )
 
-// Register 用户注册
-func Register(r *api.RequestContext) api.Result {
-	req := api_user.RegisterRequest{}
-	if err := r.Ctx().ShouldBindJSON(&req); err != nil {
+const (
+	lenPassword = 128
+)
+
+// Login 用户登陆
+func Login(r *api.RequestContext) api.Result {
+	req := api_user.LoginRequest{}
+	if err := r.ShouldBindJSON(&req); err != nil {
 		return r.OnError(api.ErrBadRequest)
 	}
 	err := vd.Assert(
 		vd.I{V: vd.NewStringValidator(req.Email).MustEmail(), E: api.ErrInvalidEmail},
-		vd.I{V: vd.NewStringValidator(req.Password).MustHex().MustLen(128, 128), E: api.ErrInvalidPassword},
+		vd.I{V: vd.NewStringValidator(req.Password).MustHex().MustLen(lenPassword, lenPassword), E: api.ErrInvalidPassword},
 	)
 	if err != nil {
 		return r.OnError(err)
 	}
 
-	r.Logger().Info("call Register", zap.String("email", req.Email))
-	ctrl := userCtrl.NewRegisterController(r, req)
-	return r.OnDo(ctrl.Do())
+	r.Logger().Info("API Register", zap.String("email", req.Email))
+	return r.OnDo(userCtrl.NewLoginController(r, req).Do())
+}
+
+// Register 用户注册
+func Register(r *api.RequestContext) api.Result {
+	req := api_user.RegisterRequest{}
+	if err := r.ShouldBindJSON(&req); err != nil {
+		return r.OnError(api.ErrBadRequest)
+	}
+	err := vd.Assert(
+		vd.I{V: vd.NewStringValidator(req.Email).MustEmail(), E: api.ErrInvalidEmail},
+		vd.I{V: vd.NewStringValidator(req.Password).MustHex().MustLen(lenPassword, lenPassword), E: api.ErrInvalidPassword},
+	)
+	if err != nil {
+		return r.OnError(err)
+	}
+
+	r.Logger().Info("API Register", zap.String("email", req.Email))
+	return r.OnDo(userCtrl.NewRegisterController(r, req).Do())
 }

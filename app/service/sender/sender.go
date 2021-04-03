@@ -1,18 +1,18 @@
 package sender
 
-import "sync"
+import (
+	"sync"
 
-var (
-	Helper helper
-	once   sync.Once
+	"github.com/xmatrixstudio/violet.server/app/config"
 )
 
-type helper struct {
-	EmailSender *EmailSender
-}
+var (
+	EmailSender *emailSender
+	once        sync.Once
+)
 
-func InitSender() {
+func InitSender(cfg config.Config) {
 	once.Do(func() {
-		Helper.EmailSender = NewEmailSender()
+		EmailSender = newEmailSender(cfg)
 	})
 }

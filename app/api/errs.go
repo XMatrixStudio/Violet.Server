@@ -22,6 +22,13 @@ var (
 	// [120000, 130000] - 用户模块
 	ErrUserExist = &Error{code: 120001, msg: "user_exist"}
 
+	// [130000, 140000] - 工具模块
+	ErrUtilCaptchaTimeout           = &Error{code: 130001, msg: "captcha_timeout"}
+	ErrUtilCaptchaWrongTicket       = &Error{code: 130002, msg: "captcha_wrong_ticket"}
+	ErrUtilCaptchaWrongBusinessName = &Error{code: 130003, msg: "captcha_wrong_business_name"}
+	ErrUtilCaptchaWrongValue        = &Error{code: 130004, msg: "captcha_wrong_value"}
+	ErrUtilEmailSendLimit           = &Error{code: 130005, msg: "email_send_limit"}
+
 	// [130000, 140000] - 租户模块
 	// [140000, 150000] - 管理模块
 	// [210000, 300000] - 开放API状态码
@@ -29,8 +36,10 @@ var (
 
 var (
 	ErrInvalidBusinessName = WithMsg(ErrInvalidParam, "invalid_business_name")
+	ErrInvalidCaptcha      = WithMsg(ErrInvalidParam, "invalid_captcha")
 	ErrInvalidEmail        = WithMsg(ErrInvalidParam, "invalid_email")
 	ErrInvalidPassword     = WithMsg(ErrInvalidParam, "invalid_password")
+	ErrInvalidTicket       = WithMsg(ErrInvalidParam, "invalid_ticket")
 )
 
 type Error struct {
