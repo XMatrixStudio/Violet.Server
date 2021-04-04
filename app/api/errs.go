@@ -28,6 +28,7 @@ var (
 	ErrUtilCaptchaWrongBusinessName = &Error{code: 130003, msg: "captcha_wrong_business_name"}
 	ErrUtilCaptchaWrongValue        = &Error{code: 130004, msg: "captcha_wrong_value"}
 	ErrUtilEmailSendLimit           = &Error{code: 130005, msg: "email_send_limit"}
+	ErrUtilEmailSendBanned          = &Error{code: 130006, msg: "email_send_banned"}
 
 	// [130000, 140000] - 租户模块
 	// [140000, 150000] - 管理模块
