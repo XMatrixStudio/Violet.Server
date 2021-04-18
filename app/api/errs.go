@@ -27,8 +27,7 @@ var (
 	ErrUtilCaptchaWrongTicket       = &Error{code: 130002, msg: "captcha_wrong_ticket"}
 	ErrUtilCaptchaWrongBusinessName = &Error{code: 130003, msg: "captcha_wrong_business_name"}
 	ErrUtilCaptchaWrongValue        = &Error{code: 130004, msg: "captcha_wrong_value"}
-	ErrUtilEmailSendLimit           = &Error{code: 130005, msg: "email_send_limit"}
-	ErrUtilEmailSendBanned          = &Error{code: 130006, msg: "email_send_banned"}
+	ErrUtilEmailSendLimit           = &Error{code: 130011, msg: "email_send_limit"}
 
 	// [130000, 140000] - 租户模块
 	// [140000, 150000] - 管理模块
@@ -36,11 +35,15 @@ var (
 )
 
 var (
-	ErrInvalidBusinessName = WithMsg(ErrInvalidParam, "invalid_business_name")
-	ErrInvalidCaptcha      = WithMsg(ErrInvalidParam, "invalid_captcha")
-	ErrInvalidEmail        = WithMsg(ErrInvalidParam, "invalid_email")
-	ErrInvalidPassword     = WithMsg(ErrInvalidParam, "invalid_password")
-	ErrInvalidTicket       = WithMsg(ErrInvalidParam, "invalid_ticket")
+	ErrInvalidBusinessName  = WithMsg(ErrInvalidParam, "invalid_business_name")
+	ErrInvalidCaptcha       = WithMsg(ErrInvalidParam, "invalid_captcha")
+	ErrInvalidEmailCode     = WithMsg(ErrInvalidParam, "invalid_email_code")
+	ErrInvalidEmailTicket   = WithMsg(ErrInvalidParam, "invalid_email_ticket")
+	ErrInvalidEmail         = WithMsg(ErrInvalidParam, "invalid_email")
+	ErrInvalidNickname      = WithMsg(ErrInvalidParam, "invalid_nickname")
+	ErrInvalidPassword      = WithMsg(ErrInvalidParam, "invalid_password")
+	ErrInvalidPasswordAgain = WithMsg(ErrInvalidParam, "invalid_password_again")
+	ErrInvalidTicket        = WithMsg(ErrInvalidParam, "invalid_ticket")
 )
 
 type Error struct {

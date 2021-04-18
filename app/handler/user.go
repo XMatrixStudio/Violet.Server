@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	lenPassword = 128
+	lenEmailCode = 5
+	lenPassword  = 128
 )
 
 // Login 用户登陆
@@ -38,6 +39,7 @@ func Register(r *api.RequestContext) api.Result {
 	}
 	err := vd.Assert(
 		vd.I{V: vd.NewStringValidator(req.Email).MustEmail(), E: api.ErrInvalidEmail},
+		vd.I{V: vd.NewStringValidator(req.EmailCode).MustLen(lenEmailCode, lenEmailCode), E: api.ErrInvalidEmailCode},
 		vd.I{V: vd.NewStringValidator(req.Password).MustHex().MustLen(lenPassword, lenPassword), E: api.ErrInvalidPassword},
 	)
 	if err != nil {

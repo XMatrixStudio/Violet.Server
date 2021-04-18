@@ -17,44 +17,88 @@ var (
 )
 
 type StringValidator struct {
-	val string
-	res bool
+	val   string // 需要校验的数据
+	res   bool   // 单阶段结果
+	final bool   // 最终结果
 }
 
 func NewStringValidator(val string) *StringValidator {
-	return &StringValidator{val: val, res: true}
+	return &StringValidator{val: val, res: true, final: false}
 }
 
 func (v *StringValidator) Result() bool {
-	return v.res
+	return v.final || v.res
 }
 
 func (v *StringValidator) MustEmail() *StringValidator {
-	v.res = v.res && emailRegex.MatchString(v.val)
+	if v.final || !v.res {
+		return v
+	}
+	v.res = emailRegex.MatchString(v.val)
+	return v
+}
+
+func (v *StringValidator) MustEmpty() *StringValidator {
+	if v.final || !v.res {
+		return v
+	}
+	v.res = v.val == ""
+	return v
+}
+
+func (v *StringValidator) MustEqual(val string) *StringValidator {
+	if v.final || !v.res {
+		return v
+	}
+	v.res = v.val == val
 	return v
 }
 
 func (v *StringValidator) MustHex() *StringValidator {
-	v.res = v.res && hexRegex.MatchString(v.val)
+	if v.final || !v.res {
+		return v
+	}
+	v.res = hexRegex.MatchString(v.val)
 	return v
 }
 
 func (v *StringValidator) MustIn(enums []string) *StringValidator {
-	v.res = v.res && slices.StringIn(v.val, enums)
+	if v.final || !v.res {
+		return v
+	}
+	v.res = slices.StringIn(v.val, enums)
 	return v
 }
 
 func (v *StringValidator) MustLen(min, max int) *StringValidator {
-	v.res = v.res && len(v.val) >= min && len(v.val) <= max
+	if v.final || !v.res {
+		return v
+	}
+	v.res = len(v.val) >= min && len(v.val) <= max
 	return v
 }
 
 func (v *StringValidator) MustMatch(pattern string) *StringValidator {
-	v.res = v.res && regexp.MustCompile(pattern).MatchString(v.val)
+	if v.final || !v.res {
+		return v
+	}
+	v.res = regexp.MustCompile(pattern).MatchString(v.val)
 	return v
 }
 
 func (v *StringValidator) MustNotEmpty() *StringValidator {
-	v.res = v.res && v.val != ""
+	if v.final || !v.res {
+		return v
+	}
+	v.res = v.val != ""
+	return v
+}
+
+func (v *StringValidator) Or() *StringValidator {
+	if !v.final && v.res {
+		v.final = true
+	} else if !v.res {
+		v.res = true
+	}
 	return v
 }
