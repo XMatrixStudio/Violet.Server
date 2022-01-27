@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package studio.xmatrix.violet.base;
+
+option go_package = "github.com/xmatrixstudio/violet.server/app/http_gen/baseapi";
+
+import "google/protobuf/descriptor.proto";
+
+message HttpRule {
+  // HTTP 模式，定义 Method 和 Path
+  oneof pattern {
+    string get = 1;
+    string post = 2;
+    string put = 3;
+    string patch = 4;
+    string delete = 5;
+
+    CustomPattern custom = 99;
+  }
+
+  // 自定义模式
+  message CustomPattern {
+    string method = 1; // 方法
+    string path = 2; // 路径
+  }
+
+  // 接口协议，值 form、json
+  string protocol = 101;
+  // 接口描述
+  string description = 102;
+}
+
+extend google.protobuf.MethodOptions {
+  HttpRule http = 10001;
+}

@@ -50,7 +50,7 @@ func NewRequestContext(c *gin.Context, handlerName string) *RequestContext {
 	return r
 }
 
-func RecycleRequestParam(rp *RequestContext) {
+func RecycleRequestContext(rp *RequestContext) {
 	rp.ctx = nil
 	rp.logger = nil
 	rp.now = time.Time{}
@@ -81,24 +81,4 @@ func (r *RequestContext) Now() time.Time {
 
 func (r *RequestContext) Session() sessions.Session {
 	return r.session
-}
-
-func (r *RequestContext) OnDo(err error) Result {
-	return newResult(r, nil, err)
-}
-
-func (r *RequestContext) OnError(err error) Result {
-	return newResult(r, nil, err)
-}
-
-func (r *RequestContext) OnFetch(data interface{}, err error) Result {
-	return newResult(r, data, err)
-}
-
-func (r *RequestContext) ShouldBindJSON(obj interface{}) error {
-	return r.ctx.ShouldBindJSON(obj)
-}
-
-func (r *RequestContext) ShouldBindQuery(obj interface{}) error {
-	return r.ctx.ShouldBindQuery(obj)
 }

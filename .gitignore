@@ -8,6 +8,7 @@ log/
 *.exe
 *.out
 coverage
+protoc-gen-*
 
 # Config
 config.yaml

@@ -1,27 +1,27 @@
-package user
+package userctrls
 
 import (
 	"github.com/xmatrixstudio/violet.server/app/api"
 	"github.com/xmatrixstudio/violet.server/app/dal/entity"
 	"github.com/xmatrixstudio/violet.server/app/dal/store"
-	"github.com/xmatrixstudio/violet.server/app/http_gen/api_user"
+	"github.com/xmatrixstudio/violet.server/app/http_gen/userapi"
 	"github.com/xmatrixstudio/violet.server/lib/cryptos"
 	"go.uber.org/zap"
 )
 
-type RegisterController struct {
+type UserRegisterController struct {
 	r   *api.RequestContext
-	req api_user.RegisterRequest
+	req *userapi.UserRegisterRequest
 }
 
-func NewRegisterController(r *api.RequestContext, req api_user.RegisterRequest) *RegisterController {
-	return &RegisterController{
+func NewUserRegisterController(r *api.RequestContext, req *userapi.UserRegisterRequest) *UserRegisterController {
+	return &UserRegisterController{
 		r:   r,
 		req: req,
 	}
 }
 
-func (ctrl *RegisterController) Do() error {
+func (ctrl *UserRegisterController) Do() error {
 	user, err := store.UserStore.FindOne(ctrl.r.Ctx(), entity.User{Email: ctrl.req.Email})
 	if err != nil {
 		ctrl.r.Logger().Error("find user by email fail", zap.Error(err))
