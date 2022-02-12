@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/xmatrixstudio/violet.server/app/config"
+	"github.com/xmatrixstudio/violet.server/app/configs"
 	"go.uber.org/zap"
 )
 
@@ -23,8 +23,8 @@ const (
 	keyTraceID    = "traceID"
 )
 
-func MWLogger(cfg config.Config) gin.HandlerFunc {
-	if cfg.App.Env != config.AppConfigEnvProduct {
+func MWLogger(cfg configs.Config) gin.HandlerFunc {
+	if cfg.App.Env != configs.AppConfigEnvProduct {
 		return gin.Logger()
 	}
 
@@ -58,8 +58,8 @@ func MWLogger(cfg config.Config) gin.HandlerFunc {
 	}
 }
 
-func MWRecovery(cfg config.Config) gin.HandlerFunc {
-	if cfg.App.Env != config.AppConfigEnvProduct {
+func MWRecovery(cfg configs.Config) gin.HandlerFunc {
+	if cfg.App.Env != configs.AppConfigEnvProduct {
 		return gin.Recovery()
 	}
 

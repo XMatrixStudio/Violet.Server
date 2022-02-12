@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package studio.xmatrix.violet.base;
+package studio.xmatrix.violet.baseapi;
 
 option go_package = "github.com/xmatrixstudio/violet.server/app/http_gen/baseapi";
 

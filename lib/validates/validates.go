@@ -1,19 +1,31 @@
 package validates
 
-type Validator interface {
-	Result() bool
+import (
+	"errors"
+
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+)
+
+type Item struct {
+	value interface{}
+	err   error
+	rules []validation.Rule
 }
 
-type I struct {
-	V Validator
-	E error
-}
-
-func Assert(items ...I) error {
+func Assert(items ...Item) error {
 	for _, item := range items {
-		if !item.V.Result() {
-			return item.E
+		if item.err == nil {
+			return errors.New("assert item err is nil")
+		}
+
+		err := validation.Validate(item.value, item.rules...)
+		if err != nil {
+			return item.err
 		}
 	}
 	return nil
+}
+
+func MakeItem(value interface{}, err error, rules ...validation.Rule) Item {
+	return Item{value: value, err: err, rules: rules}
 }

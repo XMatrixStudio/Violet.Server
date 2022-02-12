@@ -15,7 +15,7 @@ func NewResult(r *RequestContext, data interface{}, err error) *Result {
 	var httpErr *Error
 	if err != nil {
 		if e, ok := err.(*Error); ok {
-			r.Logger().Info("return error", zap.Int32("code", e.code), zap.String("message", e.msg))
+			r.Logger().Info("return error", zap.Int32("code", e.code), zap.String("message", e.message))
 			httpErr = e
 		} else {
 			r.Logger().Error("return unknown error", zap.Error(err))
@@ -27,8 +27,8 @@ func NewResult(r *RequestContext, data interface{}, err error) *Result {
 
 	res := &Result{
 		Code:    httpErr.code,
-		Message: httpErr.msg,
-		Display: "", // TODO
+		Message: httpErr.message,
+		Display: "", // TODO: 前端展示文案支持
 		Data:    data,
 	}
 	return res

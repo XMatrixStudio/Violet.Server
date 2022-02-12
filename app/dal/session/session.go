@@ -6,7 +6,7 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
-	"github.com/xmatrixstudio/violet.server/app/config"
+	"github.com/xmatrixstudio/violet.server/app/configs"
 	"go.uber.org/zap"
 )
 
@@ -14,7 +14,7 @@ var (
 	redisStore redis.Store
 )
 
-func InitSessions(cfg config.Config) {
+func InitSessions(cfg configs.Config) {
 	var err error
 	redisStore, err = redis.NewStore(10, "tcp", fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
 		cfg.Redis.Password, []byte(cfg.Redis.SessionSecret))

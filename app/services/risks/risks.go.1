@@ -1,0 +1,18 @@
+package risks
+
+type RiskChecker struct{}
+
+type Param struct {
+	// 行为信息
+	Event string
+
+	// 用户信息
+	UserID int64
+	Email  string
+
+	// 设备信息
+	IP        string
+	UserAgent string
+}
+
+func CheckBehavior(ip, ua, e string)

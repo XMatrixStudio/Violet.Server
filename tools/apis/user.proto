@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package studio.xmatrix.violet.user;
+package studio.xmatrix.violet.userapi;
 
 option go_package = "github.com/xmatrixstudio/violet.server/app/http_gen/userapi";
 
@@ -10,7 +10,7 @@ import "base.proto";
 
 service UserService {
   rpc UserInfo(google.protobuf.Empty) returns (UserInfoResponse) {
-    option (base.http) = {
+    option (baseapi.http) = {
       get: "/i/users/me",
       protocol: "form",
       description: "获取登陆用户信息"
@@ -18,7 +18,7 @@ service UserService {
   }
 
   rpc UserLogin(UserLoginRequest) returns (google.protobuf.Empty) {
-    option (base.http) = {
+    option (baseapi.http) = {
       post: "/i/users/session",
       protocol: "json",
       description: "用户登陆",
@@ -26,7 +26,7 @@ service UserService {
   }
 
   rpc UserLogout(google.protobuf.Empty) returns (google.protobuf.Empty) {
-    option (base.http) = {
+    option (baseapi.http) = {
       delete: "/i/users/session",
       protocol: "form",
       description: "用户登出"
@@ -34,7 +34,7 @@ service UserService {
   }
 
   rpc UserRegister(UserRegisterRequest) returns (google.protobuf.Empty) {
-    option (base.http) = {
+    option (baseapi.http) = {
       post: "/i/users",
       protocol: "json",
       description: "用户注册",

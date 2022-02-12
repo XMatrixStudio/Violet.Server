@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/xmatrixstudio/violet.server/app"
-	"github.com/xmatrixstudio/violet.server/app/config"
+	"github.com/xmatrixstudio/violet.server/app/configs"
 )
 
 func main() {
 	parseFlag()
-	cfg, err := config.ReadConfigFromFile(getConfigFilename())
+	cfg, err := configs.ReadConfigFromFile(getConfigFilename())
 	if err != nil {
 		panic(err)
 	}
