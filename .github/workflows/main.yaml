@@ -25,7 +25,7 @@ jobs:
       - run: go build -v .
       - run: go test -race -v ./... -covermode=atomic -coverprofile=coverage.txt
       - uses: codecov/codecov-action@v1
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
